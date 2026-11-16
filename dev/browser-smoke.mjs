@@ -82,7 +82,7 @@ async function screenshot(name) {
   await evaluate(`window.getSelection()?.removeAllRanges()`);
   await delay(300); // Let native touch feedback paint out before capturing the layout.
   const {data} = await send('Page.captureScreenshot', {format: 'png', captureBeyondViewport: false});
-  await writeFile(new URL(`shots4/main/${name}.png`, import.meta.url), Buffer.from(data, 'base64'));
+  await writeFile(new URL(`shots5/regression-main/${name}.png`, import.meta.url), Buffer.from(data, 'base64'));
 }
 async function load() {
   await evaluate(`window.__smokeBeforeNavigation=true`);
@@ -161,7 +161,7 @@ async function geometry(label) {
   check(report.scroll<=report.width&&!report.overlap&&report.bounds&&report.inputBottom<=report.visible+1&&report.fieldBottom<=report.inputBottom,label+' '+JSON.stringify(report));
 }
 try {
-  await mkdir(new URL('shots4/main',import.meta.url),{recursive:true});
+  await mkdir(new URL('shots5/regression-main',import.meta.url),{recursive:true});
   await send('Runtime.enable');await send('Log.enable');await send('Page.enable');
   const version=await cdp('Browser.getVersion');
   results.push(`環境：${process.version}，${version.product}，手機 DPR 3／觸控模擬`);
@@ -443,7 +443,7 @@ try {
 } catch(error) {
   await screenshot('failure').catch(()=>{});results.push(`FAIL ${error.stack}`);console.error(error);process.exitCode=1;
 } finally {
-  await writeFile(new URL(process.argv.includes('--intro')?'browser-intro4-output.txt':process.argv.includes('--extra')?'browser-extra4-output.txt':process.argv.includes('--tail')?'browser-tail4-output.txt':'browser-smoke4-output.txt',import.meta.url),results.join('\n')+'\nConsole errors: '+JSON.stringify(errors)+'\n');
+  await writeFile(new URL(process.argv.includes('--intro')?'browser-intro5-output.txt':process.argv.includes('--extra')?'browser-extra5-output.txt':process.argv.includes('--tail')?'browser-tail5-output.txt':'browser-smoke5-output.txt',import.meta.url),results.join('\n')+'\nConsole errors: '+JSON.stringify(errors)+'\n');
   await cdp('Browser.close').catch(()=>{});ws.close();
   if(chrome.exitCode===null)await new Promise(resolve=>chrome.once('exit',resolve));
   await rm(new URL(profile,import.meta.url),{recursive:true,force:true});

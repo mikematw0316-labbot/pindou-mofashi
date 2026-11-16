@@ -1,5 +1,5 @@
 /** 無套件；直接執行 /opt/homebrew/bin/node selftest.mjs。從同資料夾 index.html 抽取內嵌題庫。 */
-import {readFileSync} from 'node:fs';
+import {readFileSync, readdirSync, statSync, existsSync} from 'node:fs';
 import assert from 'node:assert/strict';
 // data URI 明確以 ESM 載入，不依賴 package.json 的 type 或 Node 自動偵測。
 const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
@@ -300,7 +300,9 @@ const secondHTML = readFileSync(new URL('v2.html', import.meta.url), 'utf8');
 const bankBlock = text => text.match(/\/\/ BEGIN QUESTION BANK\n([\s\S]*?)\n\/\/ END QUESTION BANK/u)[1];
 equal(bankBlock(thirdHTML), bankBlock(secondHTML), '第三版與 v2.html 題庫逐位元相同');
 equal(bankBlock(thirdHTML), bankBlock(readFileSync(new URL('v3.html', import.meta.url),'utf8')), '第四版與 v3.html 題庫逐位元相同');
-check(!/<(?:script|img|audio|video|source)[^>]+src\s*=/iu.test(thirdHTML), '單檔沒有外部 script、圖片或音訊資源');
+check(!/<(?:script|audio|video)[^>]+src\s*=/iu.test(thirdHTML), '沒有外部 script 或音訊資源');
+check(!/(?:src|href)=["']https?:/iu.test(thirdHTML), '遊戲不依賴遠端資源');
+equal(bankBlock(thirdHTML), bankBlock(readFileSync(new URL('v4.html', import.meta.url),'utf8')), '第五版與 v4.html 題庫逐位元相同');
 const prefixFunction = thirdHTML.slice(thirdHTML.indexOf('function pendingLetters('), thirdHTML.indexOf('function configureInputs('));
 const state = {raw: 'b', consumed: 1};
 const pendingLettersTest = new Function('inputState', 'normalizeLetters', prefixFunction + '; return pendingLetters;')(state, text => text.toLowerCase().replace(/[\s’']/gu, '').replace(/ü/g, 'v'));
@@ -321,7 +323,22 @@ equal(pendingLettersTest('nihao', ['nihao']).slice(state.consumed), 'nihao', '�
 state.raw = 'ni'; state.consumed = 2;
 equal(pendingLettersTest('ninihao', ['nihao']).slice(state.consumed), 'nihao', '共享前綴的原生殘留仍消耗舊 ni');
 
-console.log('拼鬥魔法師・單檔內嵌題庫自我檢查');
+// TASK5 resource contract: complete local artwork, fixed budgets and fallback retained.
+const artNames5=['mage-idle','mage-cast','journey','title','app-icon','gate-intact','gate-damaged','reference','_overview',...Array.from({length:5},(_,i)=>`battle-${i+1}`),...Array.from({length:5},(_,i)=>['normal','fast','heavy','boss'].map(t=>`r${i+1}-${t}`)).flat()];
+for(const name of artNames5) {
+ const url=new URL(`assets/${name}.webp`,import.meta.url);
+ check(existsSync(url),`素材完整 ${name}`);
+ if(existsSync(url)){const bytes=readFileSync(url);check(bytes.length<=200000,`${name} ≤200KB`);check(bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WEBP',`${name} 為有效 WebP 容器`);}
+}
+const imageFiles5=readdirSync(new URL('assets/',import.meta.url)).filter(n=>/\.(webp|png)$/u.test(n));
+const artBytes5=imageFiles5.reduce((n,f)=>n+statSync(new URL(`assets/${f}`,import.meta.url)).size,0);
+check(artBytes5<=6000000,`圖片總量 ≤6MB，實際 ${artBytes5} bytes`);
+check(existsSync(new URL('assets/apple-touch-icon.png',import.meta.url)),'Apple touch icon 存在');
+check(thirdHTML.includes('function creatureFallbackSVG')&&thirdHTML.includes('function sceneFallbackSVG')&&thirdHTML.includes("document.addEventListener('error'"),'保留原始角色／場景 SVG 與圖片錯誤回退');
+check(thirdHTML.includes('prefers-reduced-motion:reduce')&&thirdHTML.includes('class="bottom-toolbar"'),'新動畫尊重 reduced-motion，具備底部工具列');
+console.log(`TASK5 圖片：${imageFiles5.length} 張，${artBytes5} bytes`);
+
+console.log('拼鬥魔法師・內嵌題庫與素材自我檢查');
 console.log(`第 1 區：${phonics.length} 題（聲母 ${phonics.filter(q=>q.mode==='initial').length}、韻母 ${phonics.filter(q=>q.mode==='final').length}；含 ㄝ／ㄦ 補充）`);
 console.log(`第 2 區：${characters.length} 個不重複單字`);
 console.log(`第 3 區：${soundGroups.length} 組，${soundGroups.reduce((n,g)=>n+g.pool.length,0)} 個分組題位，${regionLists[3].length} 個不重複單字`);

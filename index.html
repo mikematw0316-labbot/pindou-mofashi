@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="拼鬥魔法師：先練拼音，再用真實拼音輸入法施法對抗怪物。">
+  <link rel="icon" type="image/webp" href="assets/app-icon.webp">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <title>拼鬥魔法師｜拼音施法，展開冒險</title>
   <style>
     :root {
@@ -599,6 +601,153 @@
       .enemy .creature,.enemy .eye,.enemy.locked .question-card,.magic-shake,.gate-hit,.boss-impact,.health-hit,.card-flip { animation:none!important; }
       .magic-bolt { animation-duration:.01s; }
     }
+
+/* TASK5 · Sunlit storybook design system */
+:root {
+ --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:24px;--space-6:32px;--space-7:48px;
+ --radius-sm:10px;--radius-md:18px;--radius-lg:28px;--radius-pill:99px;
+ --shadow-low:0 3px 0 #b6a47e33;--shadow-mid:0 6px 0 #b6a47e26,0 12px 28px #5c52371a;--shadow-high:0 18px 60px #263d3740;
+ --paper:#f5efdf;--panel:#fffaf0;--ink:#263f3b;--muted:#56645a;--line:#d6c6a4;--accent:#24604f;--soft:#e9edda;--gold:#835713;--danger:#9d382f;--danger-soft:#f8e1d6;
+ --type-title:32px;--type-heading:24px;--type-body:15px;--type-caption:12px;--type-number:24px;
+ --shadow:var(--shadow-mid);font-family:ui-rounded,"Hiragino Maru Gothic ProN","PingFang TC",system-ui,sans-serif;
+}
+:root[data-theme="dark"] {--paper:#192d2a;--panel:#233c35;--ink:#fff6df;--muted:#d2d6c0;--line:#6d7c64;--accent:#c2dfb1;--soft:#324b3f;--gold:#ffdc8c;--danger:#ffc0a9;--danger-soft:#553c36;}
+body {background:radial-gradient(ellipse at 30% 0,#fff9e9,transparent 65%),var(--paper);font-size:var(--type-body);}
+:root[data-theme="dark"] body {background:var(--paper);}
+button,select {min-height:44px;border-radius:var(--radius-sm);border:1px solid var(--line);border-bottom-width:3px;background:var(--panel);font-weight:650;transition:transform .12s,box-shadow .12s,background .12s;}
+button:active:not(:disabled) {transform:translateY(2px);box-shadow:none;}
+button:focus-visible {outline:3px solid var(--gold);outline-offset:3px;}
+.primary {background:linear-gradient(#327a62,#235b4b);border-color:#1c4f40;color:#fffbed;box-shadow:0 3px 0 #173e32, inset 0 1px #ffffff40;}
+.primary:hover:not(:disabled) {background:#235b4b;color:#fffbed;}
+.quiet {border-color:transparent;background:transparent;box-shadow:none;}
+h1,h2,h3 {font-weight:850;letter-spacing:.02em;}h1 {font-size:var(--type-title);}h2 {font-size:var(--type-heading);}
+.ui-icon {width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;vertical-align:middle;}
+header {max-width:1040px;margin:auto;border:0;padding:18px 22px 12px;min-height:86px;gap:10px;}
+.brand {gap:8px;min-width:0;}.brand-mark {display:none;}.brand strong {letter-spacing:.04em;font-size:23px;}.brand small {font-size:10px;letter-spacing:.12em;color:var(--muted);}
+.brand-logo {width:206px;height:68px;object-fit:contain;display:block;}.brand:has(.art-ready) .brand-copy {display:none;}
+header .tools {width:auto;flex-wrap:nowrap;gap:6px;}
+header .tools > button,header .tools > select {display:none;}
+.wallet {display:flex;align-items:center;gap:5px;color:var(--gold);font:800 14px ui-rounded,system-ui;padding:7px 10px;border:1px solid #d8b978;border-radius:99px;background:#fff6d9;box-shadow:inset 0 2px #fff;}
+.player-info {display:grid;gap:5px;justify-items:end;}.star-wallet {font-size:12px;font-weight:800;color:var(--gold);white-space:nowrap;}
+main {max-width:1040px;padding:8px 22px 100px;}
+.map-layout {display:grid;grid-template-columns:42% minmax(0,1fr);gap:24px;align-items:start;}
+.map-layout>aside {min-width:0;position:sticky;top:14px;}
+.intro {padding:0 4px;margin:8px 0 14px;}.intro .eyebrow {font-size:10px;letter-spacing:.12em;margin-bottom:6px;}.intro h1 {font-size:29px;margin-bottom:8px;}.intro p {font-size:13px;line-height:1.7;margin:0;}
+.journey-scene {position:relative;height:400px;border:3px solid #fff6df;border-radius:var(--radius-lg);overflow:hidden;background:#dfdfbc;box-shadow:var(--shadow-mid);isolation:isolate;}
+.journey-scene > .journey-fallback,.journey-scene > img {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-1;}
+.journey-scene::after {content:"";position:absolute;inset:0;background:linear-gradient(0deg,#f6efd044,transparent 70%);pointer-events:none;z-index:-1;}
+.region-nav {display:block;position:absolute;inset:0;margin:0;}
+.region-tab {position:absolute;width:110px;min-height:48px;border-radius:20px;background:#fff8e4ed;text-align:center;padding:4px 6px;font-size:11px;box-shadow:0 3px 0 #9e895b55;display:flex;align-items:center;gap:5px;line-height:1.25;}
+.region-tab .region-number {display:grid;place-items:center;width:29px;height:29px;border:1px solid #cdb778;background:#f0e1b3;border-radius:50%;color:#514c30;font:800 15px ui-rounded,system-ui;margin:0;opacity:1;flex-shrink:0;}
+.region-tab small {display:block;font-size:9px;opacity:1;margin-top:3px;}
+.region-tab[aria-pressed="true"] {background:#245c4e;color:#fff9e9;border-color:#194538;box-shadow:0 3px 0 #173e32,0 0 0 3px #ffde81;}
+.region-tab:nth-child(1) {left:7%;bottom:7%;}.region-tab:nth-child(2) {right:6%;bottom:26%;}.region-tab:nth-child(3) {left:6%;bottom:44%;}.region-tab:nth-child(4) {right:6%;bottom:63%;}.region-tab:nth-child(5) {left:8%;top:5%;}
+.side-note {display:none;}#audio-hint {display:block;border:0;padding:0 4px;margin:12px 0;font-size:11px;text-align:center;}
+.map-panel {border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px;background:var(--panel);box-shadow:var(--shadow-mid);overflow:hidden;}
+.map-heading {gap:12px;margin-bottom:12px;align-items:center;}.map-heading h2 {font-size:26px;margin-bottom:5px;}.map-heading p {font-size:12px;line-height:1.65;}.map-heading .eyebrow {font-size:10px;margin:0 0 4px;letter-spacing:.04em;}
+.map-art {width:78px;height:86px;border-radius:18px;flex-shrink:0;background:var(--soft);}.map-art .creature {width:66px;height:72px;margin:10px auto;}
+.stage-grid {display:flex;flex-direction:column;position:relative;gap:18px;padding:10px 2px 20px;isolation:isolate;}
+.stage-grid::before {content:"";position:absolute;left:25%;right:25%;top:30px;bottom:50px;z-index:-1;background:repeating-linear-gradient(160deg,transparent 0 16px,#d8ba7980 17px 24px,transparent 25px 45px);border-left:4px solid #e1cd9b;border-right:4px solid #e1cd9b;border-radius:45%;}
+.stage-node {width:84%;min-height:106px;padding:13px 14px 12px 66px;border-radius:22px;border:1px solid var(--line);border-bottom-width:4px;background:var(--panel);display:flex;gap:2px;box-shadow:0 4px 15px #6b55300c;overflow:visible;}
+.stage-node:nth-child(even) {align-self:flex-end;}.stage-node:nth-child(odd) {align-self:flex-start;}
+.stage-node::before {content:attr(data-number);position:absolute;left:10px;top:21px;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:linear-gradient(#f3df9c,#e9c36c);border:2px solid #b68b3e;color:#594013;box-shadow:0 3px 0 #b78b4166,inset 0 1px #fff8dd;font:900 20px ui-rounded,system-ui;}
+.stage-node strong {font-size:14px;line-height:1.45;}.stage-node .node-no {font:10px system-ui;color:var(--muted);max-width:100%;}.stage-node .stars {position:static;font-size:17px;letter-spacing:2px;color:var(--gold);line-height:1.2;margin:3px 0 0;}.stage-node .best {font-size:10px;}
+.stage-node.next-node {border:2px solid #36745a;border-bottom-width:4px;background:linear-gradient(110deg,#eef4dc,var(--panel));box-shadow:0 0 0 3px #dce7c6;}
+.stage-node.cleared::before {background:linear-gradient(#77a980,#38775e);border-color:#2e664e;color:#fffbed;}
+.stage-node[aria-disabled="true"] {background:var(--paper);color:var(--muted);border-style:dashed;box-shadow:none;}.stage-node[aria-disabled="true"]::before {background:var(--soft);color:var(--muted);border-color:var(--line);box-shadow:none;}
+.stage-node.boss-node::before {border-radius:15px;transform:rotate(-8deg);background:#e7c582;}.stage-node.boss-node {border-color:#bf9a59;}
+.map-footer {margin-top:4px;padding-top:12px;}.map-footer .tools {display:none;}.map-footer small {font-size:11px;}
+.bottom-toolbar {position:fixed;z-index:25;bottom:max(10px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:min(480px,calc(100% - 24px));padding:6px;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-high);}
+.bottom-toolbar button {display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:55px;border:0;background:transparent;padding:5px 1px;font-size:10px;color:var(--ink);border-radius:15px;}
+.bottom-toolbar button:hover {background:var(--soft);}.bottom-toolbar .ui-icon {width:21px;height:21px;}.playing .bottom-toolbar {display:none;}
+footer {max-width:1040px;padding:0 22px 108px;font-size:10px;}footer .tools {margin-top:6px;}
+.art-wrap {position:relative;display:block;}.art-wrap > svg {width:100%;height:100%;display:block;}.art-wrap > .asset-img {position:absolute;inset:0;width:100%;height:100%;object-fit:contain;}.art-wrap.art-ready > svg {visibility:hidden;}.art-wrap.art-ready > .asset-img {visibility:visible;}.asset-img {color:transparent;}.art-wrap:not(.art-ready) > .asset-img {visibility:hidden;}
+.scene-art {position:absolute;inset:0;width:100%;height:100%;z-index:-1;}.scene-art > svg {position:absolute;inset:0;width:100%;height:100%;}.scene-art > .asset-img {object-fit:cover;}.landscape.scene-art {opacity:1;}
+.journey-scene > img,.brand-logo {opacity:0;transition:opacity .2s;}.journey-scene > img.art-ready,.brand-logo.art-ready {opacity:1;}.brand-logo:not(.art-ready) {display:none;}
+.playing {background:var(--paper);}.playing main {max-width:640px;}
+#play-screen {gap:6px;padding-inline:10px;}
+.play-heading {min-height:44px;}.play-heading h2 {font-size:14px;}.play-heading button {min-width:44px;min-height:44px;padding:5px 9px;font-size:11px;}.play-heading [data-action="sound"] {font-size:0;}.play-heading [data-action="sound"] .ui-icon {display:block;}
+.hud {background:linear-gradient(110deg,var(--panel),var(--soft));border:1px solid var(--line);border-bottom:3px solid var(--line);border-radius:16px;box-shadow:0 3px 8px #5943290d;min-height:52px;}
+.stat {padding:6px 10px;}.stat strong {font:850 19px ui-rounded,system-ui;}.stat small {font-size:10px;color:var(--muted);}.stat:has(#combo-value) {text-align:center;background:#d8b65c1c;border-radius:0 0 12px 12px;}#combo-value {color:var(--gold);}
+.meter {height:10px!important;border:1px solid #657650;border-radius:99px;background:#b6bd9c;box-shadow:inset 0 2px 2px #29422c36;}
+.meter>i {background:linear-gradient(#99c76a 0%,#5e954e 48%,#36744f 49%,#47895a 100%);border-radius:99px;transition:width .22s;box-shadow:inset 0 1px #dff0b7;}
+.boss-status {padding:5px 8px;background:var(--panel);border:1px solid var(--line);border-radius:12px;}.boss-status .meter>i {background:linear-gradient(#d6b8df,#886b9d);}.charge .meter>i {background:linear-gradient(#f6ce75,#b16e31);}
+.battlefield,.battlefield.crowded {border:2px solid #aebc8b;border-radius:24px;box-shadow:inset 0 2px 6px #4357351a;}
+.battlefield::before {opacity:.35;border-color:#9d7b3944;background:linear-gradient(0deg,#ecd8ae66,transparent);}
+.battlefield .scene-art::after {content:"";position:absolute;inset:0;background:linear-gradient(#fff6dc1a,#fff9e122 50%,transparent);}
+.enemy .question-card,.battlefield.crowded .question-card {color:#293e35;background:linear-gradient(135deg,#fff8e1,#f2e3b9);border:1px solid #b99b5a;border-top:4px solid #b19358;border-radius:11px 11px 17px 17px;box-shadow:0 4px 0 #8b74422b,0 7px 15px #273e3220;padding:7px 3px;}
+.enemy .question-card::after {content:"◆";font-size:9px;color:#957942;position:absolute;bottom:-10px;left:calc(50% - 5px);}
+.enemy.locked .question-card,.battlefield.crowded .locked .question-card {border-color:#286951;box-shadow:0 3px 0 #286951,0 0 14px #fff1a28a;}
+.question-card .reading,.question-card .example {color:#566046;}.question-card .answer {color:#294f3d;}.question-card .pending,.question-card .unknown {color:#536047;opacity:1;}.question-card .typed {color:#1c5c43;background:#d3e8b8;}.question-card .lock-label {color:#21543f;}.question-card .replay {color:#285b45;}
+.replay .ui-icon {width:18px;height:18px;}.question-card .prompt {font-weight:850;}.enemy .creature {filter:drop-shadow(0 4px 2px #35442830);}
+.gate {height:76px;width:88px;bottom:-5px;left:calc(50% - 77px);}.mage {width:68px;height:84px;left:calc(50% + 3px);bottom:0;}
+.mage .mage-cast {opacity:0;}.mage.staff-flash .mage-idle {opacity:0;}.mage.staff-flash .mage-cast {opacity:1;}
+.cast-bar {position:relative;min-height:52px;border:2px solid #b79555;border-inline-width:7px;border-radius:12px;background:linear-gradient(#fff9e5,#efdfb8);box-shadow:0 3px 0 #b4945733;color:#293e35;gap:5px;}.cast-bar::before,.cast-bar::after {content:"";height:calc(100% + 8px);width:6px;position:absolute;top:-4px;background:#c7a76b;border:1px solid #8f713c;border-radius:6px;}.cast-bar::before {left:-9px;}.cast-bar::after {right:-9px;}.cast-bar label {font-size:11px;color:#565d41;font-weight:800;}.cast-bar .spell-input {color:#263f35;font-size:19px;}.cast-bar:focus-within {box-shadow:0 0 0 3px #d6c28655;}
+#guide-panel,.duel-panel,.start-card,dialog,.result-card {border:1px solid var(--line);border-top:5px solid #c4a163;border-radius:var(--radius-lg);background:var(--panel);box-shadow:var(--shadow-mid);}
+#guide-panel {padding:12px;}.lesson-card {background:linear-gradient(135deg,var(--soft),var(--panel));border:1px solid var(--line);border-radius:18px;}.guide-steps span {min-width:58px;}.guide-steps .active {background:#29604e;color:#fff7df;}.teach-rule,.hint-box {border-radius:16px;}.example-tile,.shop-item {border-radius:18px;background:linear-gradient(140deg,var(--panel),var(--soft));border:1px solid var(--line);}.shop-item h3 {color:var(--accent);}
+dialog {padding:22px;}dialog::backdrop {background:#20362c80;backdrop-filter:blur(5px);}.dialog-top h2 {font-size:23px;}.dialog-actions {z-index:2;}.start-card {padding:22px;}.start-card .primary {min-height:50px;}.counting #start-reason {animation:count5 .4s both;}
+.result-card {position:relative;overflow:hidden;isolation:isolate;padding:24px;}.result-card::before {content:"";position:absolute;z-index:-1;inset:0;background:radial-gradient(ellipse at 50% 10%,#f4d47e66,transparent 60%);}.result-card .eyebrow {padding-right:65px;}.result-card h1 {font-size:27px;max-width:85%;}.result-mage {position:absolute;right:12px;top:15px;width:76px;height:105px;transform:rotate(8deg);}.result-stars {text-align:center;letter-spacing:8px;font-size:46px;line-height:1.4;margin:18px 0;color:#9a6515;text-shadow:0 2px #ffe5a0;}.result-stars span {display:inline-block;animation:star5 .55s cubic-bezier(.25,1.4,.5,1) both;animation-delay:calc(.6s + var(--i)*.3s);}.record-badge {display:inline-flex;gap:5px;align-items:center;font-weight:800;color:#765010;background:#fff0b9;border:1px solid #d4aa57;padding:8px 12px;border-radius:99px;font-size:12px;}.result-stats div {border:1px solid var(--line);}.result-stats b {font:850 24px ui-rounded,system-ui;}.result-stats small {font-size:11px;}.comparison {border-radius:0 14px 14px 0;}
+.empty-state {padding:24px 14px;text-align:center;border:1px dashed var(--line);border-radius:18px;background:var(--soft);}.empty-state .ui-icon {width:34px;height:34px;display:block;margin:0 auto 10px;color:var(--accent);}.empty-state p {margin:0;font-size:13px;}
+.notice {border:1px solid var(--danger);border-radius:12px;margin:8px 12px;line-height:1.6;}#toast {border:1px solid var(--line);box-shadow:var(--shadow-high);border-radius:16px;bottom:88px;font-size:13px;background:var(--ink);color:var(--panel);}
+.screen-enter {animation:page5 .26s ease-out;}.combo-banner {color:#714415;text-shadow:0 2px #fff5d9,2px 0 #fff5d9,-2px 0 #fff5d9;}.feedback {color:#245a40;background:#fff7df;}.tier-up {color:#963b16;}
+@keyframes page5 {from {opacity:.4;translate:0 8px;}to {opacity:1;translate:0 0;}}@keyframes star5 {from {opacity:0;transform:translateY(-25px) rotate(-20deg) scale(.3);}to {opacity:1;transform:none;}}@keyframes count5 {from {opacity:.3;scale:.8;}to {opacity:1;scale:1;}}
+@media(max-width:700px) {
+ header {padding:10px 14px 4px;min-height:78px;}.brand-logo {width:205px;height:63px;}.brand strong {font-size:21px;}.wallet {font-size:12px;padding:6px 9px;}.star-wallet {font-size:11px;}
+ main {padding:6px 14px 96px;}.map-layout {display:block;}.map-layout>aside {position:static;}.intro {margin:4px 0 10px;padding:0 3px;}.intro .eyebrow {display:none;}.intro h1 {font-size:21px;margin-bottom:4px;}.intro h1 br {display:none;}.intro p {font-size:12px;}.intro p br {display:none;}
+ .journey-scene {height:270px;margin-bottom:12px;}.journey-scene > img {object-position:center 51%;}.region-tab {width:104px;font-size:10px;min-height:44px;}.region-tab .region-number {height:27px;width:27px;}.region-tab small {font-size:8px;}.region-tab:nth-child(1) {left:5%;bottom:6%;}.region-tab:nth-child(2) {right:5%;bottom:24%;}.region-tab:nth-child(3) {left:6%;bottom:43%;}.region-tab:nth-child(4) {right:6%;bottom:61%;}.region-tab:nth-child(5) {left:9%;top:3%;}
+ #audio-hint {margin:4px 0 12px;font-size:10px;}.map-panel {padding:16px;}.map-heading h2 {font-size:24px;}.stage-node {width:86%;}.stage-grid {gap:17px;}.stage-node strong {font-size:14px;}.stage-node .best {font-size:10px;}.map-progress {line-height:1.7;}
+ .playing main {padding:0;}.result-card {padding:20px 16px;}.result-stats {gap:9px;}.result-stats div {padding:12px;}footer {padding-inline:17px;}.shop-grid {gap:12px;}
+}
+@media(max-width:370px) {.brand-logo {width:183px;}.brand strong {font-size:19px;}.wallet {padding:6px;font-size:11px;}.journey-scene {height:250px;}.stage-node {width:92%;padding-right:10px;}.stage-node strong {font-size:13px;}}
+/* Keep the pre-existing compact keyboard geometry at tiny viewport heights. */
+.tiny-view .hud {min-height:38px;}.tiny-view .stat {padding:3px 6px;}.tiny-view .stat strong {font-size:15px;}.tiny-view .meter {height:7px!important;}.tiny-view .gate {height:38px;width:46px;}.tiny-view .mage {height:44px;width:40px;}.tiny-view .enemy .question-card {border-top-width:2px;padding:4px 2px;}.tiny-view .cast-bar {min-height:44px;}.tiny-view #play-screen {gap:4px;}.tiny-view .play-heading {min-height:44px;}.tiny-view .play-heading button {min-height:44px;}.tiny-view .question-card::after {display:none;}
+@media(prefers-reduced-motion:reduce) {*,*::before,*::after {animation-duration:.01ms!important;animation-delay:0s!important;transition:none!important;scroll-behavior:auto!important;}.scene-far,.scene-mid,.scene-front,.mage {animation:none!important;}}
+
+
+.mage.cast-unavailable.staff-flash .mage-idle {opacity:1;}
+
+.sound-row label,.debug-switch {min-height:44px;display:flex;align-items:center;}
+
+.duel-panel > .scene-art {opacity:.17;}
+
+.enemy .creature {width:64px;height:64px;}
+.enemy.boss .creature {width:100px;height:104px;}
+.tiny-view .enemy .creature {width:30px;height:30px;}
+.tiny-view .enemy.boss .creature {width:48px;height:50px;}
+
+summary {min-height:44px;display:flex;align-items:center;}
+
+.gate.art-wrap,.mage.art-wrap {position:absolute;}
+.hud .stat:first-child {display:block;padding:7px 9px;}
+.hud .hp-text {display:flex;justify-content:space-between;margin-bottom:4px;}
+.hud .stat:not(:first-child) {flex-direction:column;gap:1px;}
+.tiny-view .hud .stat:first-child {padding:4px 6px;}
+.tiny-view .hud .hp-text {margin-bottom:2px;}
+
+html {scroll-padding-block:12px 110px;}
+.stage-node {scroll-margin-block:12px 110px;}
+
+.region-tab {color:#263f3b;}
+.wallet {color:#835713;}
+button:disabled {opacity:1;color:var(--muted);background:var(--soft);box-shadow:none;}
+.spell-input::placeholder {color:#606858;opacity:1;}
+:root[data-theme="dark"] .result-stars {color:#ffdc8c;}
+:root[data-theme="dark"] .result-card::before {opacity:.15;}
+
+.shop-item {padding:14px;}
+.shop-item .eyebrow {font-size:10px;line-height:1.4;margin-bottom:6px;}
+.shop-item h3 {margin-bottom:8px;}
+.shop-item p {line-height:1.65;margin-bottom:10px;}
+
+#modal {overflow:hidden;}
+#modal-content {display:flex;flex-direction:column;min-height:0;max-height:calc(var(--visible-height) - 80px);}
+#modal-content > .dialog-top {flex-shrink:0;}
+#modal-content > .dialog-top h2 {margin-bottom:12px;}
+.dialog-scroll {min-height:0;overflow:auto;overscroll-behavior:contain;scroll-padding-block:8px;padding:0 2px 4px;}
+#modal #modal-content > .dialog-actions {position:static;flex-shrink:0;margin-top:12px;padding:6px 0 0;}
+
+.enemy .creature {max-width:calc(var(--field-height,480px)*.32);max-height:calc(var(--field-height,480px)*.32);}
+.enemy.boss .creature {max-width:calc(var(--field-height,480px)*.28);max-height:calc(var(--field-height,480px)*.28);}
   </style>
 </head>
 <body>
@@ -606,13 +755,13 @@
   <header>
     <div class="brand">
       <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true"><path d="M6 42V17h8V8h7v9h6V8h7v9h8v25H30V29a6 6 0 0 0-12 0v13Z" fill="currentColor"/><path d="m24 2 3 5-3 5-3-5Z" fill="currentColor"/></svg>
-      <div><strong>拼鬥魔法師</strong><small>拼音施法・明亮冒險</small></div>
+      <img class="brand-logo" src="assets/title.webp" width="310" height="100" alt="拼鬥魔法師" fetchpriority="high"><div class="brand-copy"><strong>拼鬥魔法師</strong><small>拼音施法・明亮冒險</small></div>
     </div>
     <div class="tools">
-      <span class="wallet" id="wallet">金幣 0</span>
-      <button data-action="reference">對照表</button>
-      <button data-action="settings">設定</button><button id="audio-toggle" aria-pressed="false" data-action="sound">總靜音</button>
-      <select id="theme-select" aria-label="顯示色彩"><option value="light">淺色</option><option value="dark">深色</option></select>
+      <div class="player-info"><span class="wallet" id="wallet">金幣 0</span><span class="star-wallet" id="star-wallet">旅程星星 0</span></div>
+      
+      <button id="audio-toggle" aria-pressed="false" data-action="sound">總靜音</button>
+      <select id="theme-select" aria-label="顯示色彩" hidden><option value="light">淺色</option><option value="dark">深色</option></select>
     </div>
   </header>
   <div class="mobile-note">使用拼音或英文鍵盤施法；也可在設定開啟內建鍵盤。</div>
@@ -621,14 +770,14 @@
     <section id="map-screen" aria-label="關卡地圖">
       <div class="map-layout">
         <aside>
-          <div class="intro"><p class="eyebrow">一趟從注音出發的旅程</p><h1>拼出你的<br>第一道魔法。</h1><p>把熟悉的注音，化成指尖的拼音。<br>先跟著練習，再用拼音對抗怪物。</p></div>
-          <nav id="region-nav" class="region-nav" aria-label="選擇地區"></nav>
+          <div class="intro"><p class="eyebrow">把字母，變成魔法</p><h1>沿著光，出發吧。</h1><p>先學一點拼音，再守住一座城。</p></div>
+          <div class="journey-scene" aria-label="從草原、森林、沼澤、山道到神殿的五區旅程"><svg class="journey-fallback" viewBox="0 0 390 420" preserveAspectRatio="none" aria-hidden="true"><rect width="390" height="420" fill="#dce3c0"/><path d="M0 50Q90 0 200 80T390 50V420H0Z" fill="#c1d1a3"/><path d="M20 420C0 310 360 370 315 280S40 260 85 170 355 190 310 80 100 60 90 0" fill="none" stroke="#f4d998" stroke-width="30"/><g fill="#719074"><path d="m20 220 30-65 30 65m220-100 25-65 25 65"/><path d="m225 70 35-65 35 65" fill="#9b9680"/></g><path d="M40 355v-40h15v-14h15v14h15v40m210-315V15h20v25" stroke="#9c8c61" stroke-width="7" fill="#f7edcb"/></svg><img src="assets/journey.webp" alt="" width="600" height="900" fetchpriority="high"><nav id="region-nav" class="region-nav" aria-label="選擇地區"></nav></div>
           <p id="audio-hint" class="side-note">點任何按鈕後開始播放聲音</p><p class="side-note">使用系統拼音或英文鍵盤。<br>不用聲調，n／l 後的 ü 打 v。<br>第 5 區選出繁體中文整句。</p>
         </aside>
         <div class="map-panel">
           <div id="map-heading" class="map-heading"></div>
           <div id="stage-grid" class="stage-grid"></div>
-          <div class="map-footer"><div class="tools"><button data-action="review">複習清單 <span id="review-count">0</span></button><button data-action="shop">城邊小店</button></div><small id="map-progress"></small></div>
+          <div class="map-footer"><span id="review-count" hidden>0</span><small id="map-progress"></small></div>
         </div>
       </div>
     </section>
@@ -650,8 +799,8 @@
       <div id="battlefield" class="battlefield">
         <svg class="landscape" viewBox="0 0 1200 350" preserveAspectRatio="none" aria-hidden="true"><path d="M0 220 120 140 240 210 420 90 600 210 770 125 950 210 1100 100 1200 180V350H0Z" fill="currentColor"/><path d="M0 270Q300 210 600 275T1200 240" fill="none" stroke="currentColor" stroke-width="3"/></svg>
         <div class="ground"></div>
-        <svg id="gate" class="gate" viewBox="0 0 110 100" aria-hidden="true"><path d="M8 96V36h18V18h18v18h24V18h18v18h16v60Z" fill="#a9b898" stroke="#60785d" stroke-width="3"/><path d="M39 98V62q16-25 32 0v36" fill="#a97949" stroke="#60785d" stroke-width="3"/><path d="M55 54v44M14 48h14m53 0h14M13 72h14m54 0h14" stroke="#e9efda" stroke-width="4"/><path d="m48 14 8-12 8 12-8 12Z" fill="#ddb75c"/><circle cx="50" cy="77" r="2" fill="#fff1bd"/><circle cx="61" cy="77" r="2" fill="#fff1bd"/></svg>
-        <svg id="mage" class="mage" viewBox="0 0 70 100" aria-label="拼鬥魔法師"><path d="M19 96 26 54h26l12 42Z" fill="#447d8b" stroke="#315862" stroke-width="2"/><path d="m27 57 12 15 12-15" fill="#f3dc8b"/><path d="M28 88h22" stroke="#e7d297" stroke-width="3"/><circle cx="40" cy="41" r="15" fill="#f2d5af"/><path d="M25 41q-2-23 18-20 17 5 12 24l-8-15-20 15" fill="#5a4c3b"/><path d="m16 29 22-27 12 26 12 7H15Z" fill="#447d8b" stroke="#315862" stroke-width="2"/><path d="m25 22 25 3" stroke="#e7c66c" stroke-width="4"/><circle cx="36" cy="43" r="2" fill="#2e443f"/><circle cx="47" cy="43" r="2" fill="#2e443f"/><path d="m38 51 5 2 4-3" fill="none" stroke="#8e624f" stroke-width="2"/><path d="M9 97V50" stroke="#947044" stroke-width="4"/><path d="m9 35 8 12-8 12-8-12Z" fill="#edbf5b" stroke="#9c7634" stroke-width="2"/><path d="m28 68-15 6" stroke="#447d8b" stroke-width="8"/></svg>
+        <div id="gate" class="gate art-wrap" aria-label="光種城門"><svg  class="fallback-art" viewBox="0 0 110 100" aria-hidden="true"><path d="M8 96V36h18V18h18v18h24V18h18v18h16v60Z" fill="#a9b898" stroke="#60785d" stroke-width="3"/><path d="M39 98V62q16-25 32 0v36" fill="#a97949" stroke="#60785d" stroke-width="3"/><path d="M55 54v44M14 48h14m53 0h14M13 72h14m54 0h14" stroke="#e9efda" stroke-width="4"/><path d="m48 14 8-12 8 12-8 12Z" fill="#ddb75c"/><circle cx="50" cy="77" r="2" fill="#fff1bd"/><circle cx="61" cy="77" r="2" fill="#fff1bd"/></svg><img class="asset-img" src="assets/gate-intact.webp" alt="" width="240" height="240" loading="lazy"></div>
+        <div id="mage" class="mage art-wrap" aria-label="拼鬥魔法師"><svg  class="fallback-art" viewBox="0 0 70 100" aria-label="拼鬥魔法師"><path d="M19 96 26 54h26l12 42Z" fill="#447d8b" stroke="#315862" stroke-width="2"/><path d="m27 57 12 15 12-15" fill="#f3dc8b"/><path d="M28 88h22" stroke="#e7d297" stroke-width="3"/><circle cx="40" cy="41" r="15" fill="#f2d5af"/><path d="M25 41q-2-23 18-20 17 5 12 24l-8-15-20 15" fill="#5a4c3b"/><path d="m16 29 22-27 12 26 12 7H15Z" fill="#447d8b" stroke="#315862" stroke-width="2"/><path d="m25 22 25 3" stroke="#e7c66c" stroke-width="4"/><circle cx="36" cy="43" r="2" fill="#2e443f"/><circle cx="47" cy="43" r="2" fill="#2e443f"/><path d="m38 51 5 2 4-3" fill="none" stroke="#8e624f" stroke-width="2"/><path d="M9 97V50" stroke="#947044" stroke-width="4"/><path d="m9 35 8 12-8 12-8-12Z" fill="#edbf5b" stroke="#9c7634" stroke-width="2"/><path d="m28 68-15 6" stroke="#447d8b" stroke-width="8"/></svg><img class="asset-img mage-idle" src="assets/mage-idle.webp" alt="" width="180" height="270" loading="lazy"><img class="asset-img mage-cast" src="assets/mage-cast.webp" alt="" width="180" height="270" loading="lazy"></div>
         <span class="gate-label">光種城門</span>
         <div id="target-line" hidden></div><div id="enemy-layer"></div>
       </div>
@@ -675,6 +824,7 @@
     </section>
     <section id="result-screen" class="result-layout" aria-label="關卡結算" hidden></section>
   </main>
+  <nav class="bottom-toolbar" aria-label="冒險工具列"><button data-action="reference" data-icon="book">查看對照</button><button data-action="shop" data-icon="shop">逛逛小店</button><button data-action="review" data-icon="review">複習錯題</button><button data-action="settings" data-icon="settings">調整設定</button><button data-action="sound" data-icon="sound" aria-pressed="false">關閉聲音</button></nav>
   <footer><span>原創離線練習遊戲 · 不含聲調的漢語拼音</span><div class="tools"><span id="save-status">進度自動儲存在此瀏覽器</span><button class="quiet danger" data-action="reset">重設進度</button></div></footer>
   <dialog id="modal" aria-labelledby="modal-title"><div id="modal-content"></div></dialog>
   <div id="toast" role="status" hidden></div>
@@ -1586,8 +1736,8 @@ const regionCopy = [
 ];
 const artNames = ['芽甲獸', '枝耳獸', '苔壺獸', '岩匣獸', '墨冠守望者'];
 
-// 全部圖形為本遊戲原創內嵌 SVG，各區有不同輪廓；不依賴字型圖示。
-function creatureSVG(region = 1, boss = false, variant = 0) {
+// 原創內嵌 SVG 保留為圖片載入前與失敗時的完整回退。
+function creatureFallbackSVG(region = 1, boss = false, variant = 0) {
   const shapes = [
     '<path d="M23 43Q8 20 26 14L43 35Q52 7 70 12L64 40Q85 43 82 67L75 87H26L16 67Q13 52 23 43Z"/>',
     '<path d="m22 39-8-27 26 17 10-23 12 23 25-17-8 28 11 31-17 20H26L10 71Z"/>',
@@ -1598,6 +1748,51 @@ function creatureSVG(region = 1, boss = false, variant = 0) {
   const crown = boss ? '<path d="m17 22-8-18 25 10L50 0l16 14L91 4l-8 18Z" fill="var(--gold)"/><path d="M9 54 1 46v31l16 7m74-30 8-8v31l-16 7" fill="var(--gold)"/>' : '';
   return `<svg class="creature" viewBox="0 0 100 108" role="img" aria-label="${boss ? '三段護甲・' : ''}${artNames[region - 1] || artNames[0]}"><g fill="currentColor">${shapes[region - 1] || shapes[0]}${variant === 1 ? '<path d="m12 48-11-9 4 27 15 4m65-22 14-9-4 27-15 4" fill="#e6a03d"/>' : variant === 2 ? '<path d="m21 42 29-16 29 16-4 37-25 13-25-13Z" fill="#d69243"/><path d="M50 32v53M27 49h46" stroke="#fff4d0" stroke-width="4"/>' : '<path d="M23 36Q12 12 33 19m35 17Q88 13 68 18" fill="none" stroke="#a0c76e" stroke-width="6"/>'}${crown}<path d="m26 85-8 17h20l4-15m17 0 4 15h20l-9-17"/></g><path d="M31 51h13v13H31Zm25 0h13v13H56Z" fill="var(--panel)"/><circle class="eye" cx="39" cy="58" r="3" fill="var(--ink)"/><circle class="eye" cx="61" cy="58" r="3" fill="var(--ink)"/><path d="m43 76 7 4 7-4" fill="none" stroke="var(--panel)" stroke-width="3"/></svg>`;
 }
+// Artwork is decorative: the original SVG remains visible until a real image loads.
+// Capturing load/error handles both initial HTML and cards created during play.
+const iconPaths = {
+ book:'M4 4h6l2 2 2-2h6v15h-6l-2 2-2-2H4ZM12 6v15M7 8h2m6 0h2M7 12h2m6 0h2',
+ shop:'M3 10l2-6h14l2 6M4 11v9h16v-9M3 10q2 4 4 0 2 4 5 0 3 4 5 0 2 4 4 0M9 20v-6h6v6',
+ review:'M4 9a8 8 0 1 1 1 9M4 4v5h5M12 7v5l3 2',
+ settings:'M9 3h6l1 3 3 1 2 5-2 5-3 1-1 3H9l-1-3-3-1-2-5 2-5 3-1ZM9 12a3 3 0 1 0 6 0 3 3 0 1 0-6 0',
+ sound:'M4 9h4l5-5v16l-5-5H4ZM16 8q4 4 0 8m3-11q6 7 0 14',
+ mute:'M4 9h4l5-5v16l-5-5H4ZM17 9l5 6m0-6-5 6',
+ star:'m12 3 3 6 6 1-4.5 4.5L18 21l-6-3-6 3 1.5-6.5L3 10l6-1Z',
+ coin:'M21 12a9 9 0 1 1-18 0 9 9 0 1 1 18 0ZM12 7v10m-3-8h6m-6 6h6',
+ close:'m6 6 12 12M18 6 6 18',
+ wand:'m4 20 12-12 4 4L8 24M15 3l1-3 1 3 3 1-3 1-1 3-1-3-3-1M5 5V1M3 3h4'
+};
+function icon(name) {return `<svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${iconPaths[name] || iconPaths.wand}"/></svg>`;}
+function decorateIcons(root=document) {
+ root.querySelectorAll('[data-icon]').forEach(el=>{if(!el.querySelector('.ui-icon'))el.insertAdjacentHTML('afterbegin',icon(el.dataset.icon));});
+}
+function assetLoaded(img) {
+ if (!(img instanceof HTMLImageElement)) return;
+ img.classList.add('art-ready');
+ if (img.classList.contains('asset-img') && !img.classList.contains('mage-cast')) img.parentElement.classList.add('art-ready');
+}
+document.addEventListener('load',event=>assetLoaded(event.target),true);
+document.addEventListener('error',event=>{
+ const img=event.target;
+ if (!(img instanceof HTMLImageElement))return;
+ img.classList.remove('art-ready');
+ if (img.classList.contains('asset-img') && !img.classList.contains('mage-cast'))img.parentElement.classList.remove('art-ready');
+ // A failed cast pose must still leave the loaded idle pose visible.
+ if(img.classList.contains('mage-cast'))img.parentElement.classList.add('cast-unavailable');
+},true);
+function imageArt(file,fallback,classes='creature',priority='lazy') {
+ return `<span class="${classes} art-wrap">${fallback.replace('class="creature"','class="fallback-art"').replace('class="landscape"','class="fallback-art"')}<img class="asset-img" src="assets/${file}.webp" alt="" width="${classes.includes('scene-art')?600:180}" height="${classes.includes('scene-art')?900:180}" loading="${priority}" decoding="async"></span>`;
+}
+function creatureSVG(region=1,boss=false,variant=0) {return imageArt(`r${region}-${boss?'boss':['normal','fast','heavy'][variant%3]}`,creatureFallbackSVG(region,boss,variant));}
+function sceneSVG(region) {return imageArt(`battle-${region}`,sceneFallbackSVG(region),'landscape scene-art','eager');}
+function celebrateScore() {
+ const el=$('#result-score');if(!el)return;
+ const final=Number(el.dataset.value);if(matchMedia('(prefers-reduced-motion: reduce)').matches){el.textContent=final;return;}
+ const start=performance.now();
+ function frame(now){if(screen!=='result'||!el.isConnected)return;const t=Math.min(1,(now-start)/850);el.textContent=Math.round(final*(1-(1-t)**3));if(t<1)requestAnimationFrame(frame);}
+ requestAnimationFrame(frame);
+}
+
 function mapArt(region) {
   return `<div class="map-art" aria-hidden="true">${sceneSVG(region)}${creatureSVG(region, true)}</div>`;
 }
@@ -1685,9 +1880,11 @@ function persist() {
   refreshHeader();
 }
 function refreshHeader() {
-  $('#wallet').textContent = `金幣 ${save.coins}`;
+  $('#wallet').innerHTML = `${icon('coin')}<span>${save.coins}</span>`;
+  $('#star-wallet').innerHTML = `${icon('star')} ${stages.reduce((n,s)=>n+(save.records[s.id]?.stars||0),0)} / 90`;
   document.querySelectorAll('[data-action="sound"]').forEach(button => {
-    button.textContent = save.settings.muted ? '聲音已靜音' : '總靜音';
+    button.innerHTML = `${icon(save.settings.muted?'mute':'sound')}<span>${save.settings.muted ? '開啟聲音' : '關閉聲音'}</span>`;
+    button.setAttribute('aria-label',save.settings.muted?'開啟聲音':'關閉聲音');
     button.setAttribute('aria-pressed', String(save.settings.muted));
   });
   $('#theme-select').value = save.settings.theme;
@@ -2005,6 +2202,8 @@ function showScreen(name) {
   if (name !== 'play') { cancelKeyboardWait(); $('#start-overlay').hidden = true; castInput.blur(); }
   window.scrollTo(0, 0);
   for (const value of ['map', 'play', 'result']) $(`#${value}-screen`).hidden = value !== name;
+  const page=$(`#${name}-screen`);page.classList.remove('screen-enter');requestAnimationFrame(()=>page.classList.add('screen-enter'));
+  document.querySelector('.bottom-toolbar').hidden = name !== 'map';
 }
 function isUnlocked(stage) {
   if (stage.id.startsWith('review')) return true;
@@ -2026,7 +2225,7 @@ function renderMap() {
     const record = save.records[id];
     const unlocked = isUnlocked(stage);
     const boss = stage.kind.includes('boss');
-    return `<button class="stage-node ${boss ? 'boss-node' : ''} ${next?.id === id ? 'next-node' : ''}" data-action="stage" data-id="${id}" aria-disabled="${!unlocked}" aria-label="${escapeHTML(stage.title)}，${unlocked ? '可挑戰' : '尚未解鎖，可預覽教學'}"><span class="node-no">${boss ? '守關挑戰 / 王關' : `第 ${i + 1} 小關 / ${String(i + 1).padStart(2, '0')}`}${!unlocked ? ' · 待解鎖' : ''}</span><strong>${escapeHTML(stage.title)}</strong><span class="stars" aria-label="${record?.stars || 0} 顆星">${'★'.repeat(record?.stars || 0)}${'☆'.repeat(3 - (record?.stars || 0))}</span><span class="best">${record?.bestSpeed ? `最佳 ${record.bestSpeed.toFixed(0)} ${region.id === 5 ? '中文字' : '字母'}／分` : unlocked ? '準備好，按此查看教學' : '通過前一關後解鎖'}</span></button>`;
+    return `<button data-number="${boss ? '王' : i+1}" class="stage-node ${record?.stars ? 'cleared' : ''} ${boss ? 'boss-node' : ''} ${next?.id === id ? 'next-node' : ''}" data-action="stage" data-id="${id}" aria-disabled="${!unlocked}" aria-label="${escapeHTML(stage.title)}，${unlocked ? '可挑戰' : '尚未解鎖，可預覽教學'}"><span class="node-no">${boss ? '守關挑戰 / 王關' : `第 ${i + 1} 小關 / ${String(i + 1).padStart(2, '0')}`}${!unlocked ? ' · 待解鎖' : ''}</span><strong>${escapeHTML(stage.title)}</strong><span class="stars" aria-label="${record?.stars || 0} 顆星">${'★'.repeat(record?.stars || 0)}${'☆'.repeat(3 - (record?.stars || 0))}</span><span class="best">${record?.bestSpeed ? `最佳 ${record.bestSpeed.toFixed(0)} ${region.id === 5 ? '中文字' : '字母'}／分` : unlocked ? '點一下，準備施法' : '先通過前一站'}</span></button>`;
   }).join('');
   const activeReview = Object.values(save.review).filter(r => r.mastered < 3).length;
   $('#review-count').textContent = activeReview;
@@ -2048,16 +2247,25 @@ function openModal(kind, content, focusSelector) {
   if (modal.open) modal.close();
   modalKind = kind;
   $('#modal-content').innerHTML = content;
+  const contentRoot=$('#modal-content');
+  const scroller=document.createElement('div');scroller.className='dialog-scroll';
+  for(const node of [...contentRoot.childNodes]) {
+    if(node.nodeType===1 && node.matches('.dialog-top,.dialog-actions'))continue;
+    scroller.append(node);
+  }
+  contentRoot.insertBefore(scroller,contentRoot.querySelector(':scope > .dialog-actions'));
+  decorateIcons(contentRoot);
   modal.showModal();
   const target = focusSelector ? modal.querySelector(focusSelector) : modal.querySelector('button');
-  target?.focus();
+  target?.focus({preventScroll:true});
+  modal.scrollTop=0;
 }
 function closeModal() {
   if (modal.open) modal.close();
   modalKind = '';
 }
 function dialogHeader(title) {
-  return `<div class="dialog-top"><h2 id="modal-title">${title}</h2><button data-action="close" aria-label="關閉視窗">關閉</button></div>`;
+  return `<div class="dialog-top"><h2 id="modal-title">${title}</h2><button data-action="close" aria-label="關閉視窗">${icon('close')}</button></div>`;
 }
 function referenceHTML() {
   const cells = list => list.map(q => `<div class="ref-cell"><span>${q.symbol}</span><b class="mono">${q.notation}${q.notation !== q.pinyin ? ` → ${q.pinyin}` : ''}</b></div>`).join('');
@@ -2066,7 +2274,15 @@ function referenceHTML() {
 function exampleHTML(q) {
   return `<div class="example-tile"><strong>${escapeHTML(q.symbol || q.text)}</strong><small>${escapeHTML(q.kind === 'phonics' ? `例字 ${q.text}・${q.exampleNote}` : q.zhuyin)}</small><b>${q.pinyin}</b></div>`;
 }
+const warmedRegions = new Set();
+function warmRegion(region) {
+ if(warmedRegions.has(region))return;warmedRegions.add(region);
+ for(const file of [`battle-${region}`,`r${region}-normal`,`r${region}-fast`,`r${region}-heavy`,`r${region}-boss`,'mage-idle','mage-cast','gate-intact','gate-damaged']) {
+  const img=new Image();img.decoding='async';img.src=`assets/${file}.webp`;
+ }
+}
 function teach(stage) {
+ warmRegion(stage.region||1);
   if (!stage) return;
   pendingStage = stage;
   const unlocked = isUnlocked(stage);
@@ -2087,7 +2303,7 @@ function teach(stage) {
     : region === 1 ? '依題卡標示輸入：ㄅ（八）只打 b，ㄓ（知）只打 zh；元、雲、翁則打 yuan、yun、weng。'
       : '不要加聲調、空格或把 ü 打成 u；女為 nv，去為 qu。打錯會立刻亮出正解 1.5 秒。');
   const systemHelp = ime ? `<details open><summary>新增與切換繁體拼音輸入法</summary><div class="hint-box"><b>macOS：</b>系統設定 → 鍵盤 → 文字輸入 → 編輯 → ＋ → 繁體中文 → 拼音。用地球鍵／Control＋空白鍵切換；選擇繁體拼音，鍵入拼音後用空白或數字選字。不同系統版本的名稱可能略有差異。<br><b>Windows：</b>設定 → 時間與語言 → 語言與地區 → 中文（繁體，台灣）→ 語言選項 → Microsoft 注音 → 鍵盤選項 → 按鍵指派／鍵盤配置，選漢語拼音。用 Win＋空白鍵切換、Shift 切中英。也可在已有的 Microsoft 拼音設定啟用繁體輸出；請確認輸入框產生的是繁體字。<br><b>連打：</b>先練「我們」women，再連成詞句；候選不對時重新選字。本頁無法替你安裝或判斷輸入法種類。</div></details>` : '';
-  openModal('teach', `${dialogHeader(`${stage.region ? `第 ${stage.region} 區・` : ''}${escapeHTML(stage.title)}`)}<p class="eyebrow">怪物圖鑑 / ${artNames[region - 1]}${stage.kind.includes('boss') ? '・王有三段血條' : ''}</p><div class="teach-rule">${rules}</div><div class="example-grid">${examples.filter(Boolean).map(exampleHTML).join('')}</div><p class="hint-box"><b>常見錯誤：</b>${common}<br>${ime ? '王的蓄力不會在組字時停止；按暫停可安全休息。' : '每個正確字母會擊退怪物；Tab 消耗偷看且不累積本次連擊。Backspace／Esc 解除鎖定；未鎖定時 Esc 暫停。'}</p>${systemHelp}${region === 1 ? `<details><summary>完整注音 ↔ 拼音對照表</summary>${referenceHTML()}</details>` : ''}<p class="muted" style="font-size:12px">${stage.kind.includes('boss') ? '王題目優先選本區易錯題與你的錯題；打錯會回復少量護甲並加速蓄力。' : `本關同場最多 ${Math.min(3, stage.maxSimultaneous)} 隻；通過後解鎖下一關。`} ${!unlocked ? '目前尚未解鎖，請先通過前一關。' : ''}</p><div class="dialog-actions"><button data-action="close">回地圖</button>${(save.records[stage.id]?.stars === 3 && !stage.kind.includes('boss')) ? '<button data-action="skip-guide">跳過教學</button>' : ''}<button class="primary" data-action="start" ${unlocked ? '' : 'disabled'}>${stage.kind.includes('boss') || stage.reviewOnly ? '準備挑戰' : '開始引導練習'}</button></div>`, unlocked ? '[data-action="start"]' : '[data-action="close"]');
+  openModal('teach', `${dialogHeader(`${stage.region ? `第 ${stage.region} 區・` : ''}${escapeHTML(stage.title)}`)}<p class="eyebrow">怪物圖鑑 / ${artNames[region - 1]}${stage.kind.includes('boss') ? '・王有三段血條' : ''}</p><div class="teach-rule">${rules}</div><div class="example-grid">${examples.filter(Boolean).map(exampleHTML).join('')}</div><p class="hint-box"><b>常見錯誤：</b>${common}<br>${ime ? '王的蓄力不會在組字時停止；按暫停可安全休息。' : '每個正確字母會擊退怪物；Tab 消耗偷看且不累積本次連擊。Backspace／Esc 解除鎖定；未鎖定時 Esc 暫停。'}</p>${systemHelp}${region === 1 ? `<details><summary>完整注音 ↔ 拼音對照表</summary>${referenceHTML()}</details>` : ''}<p class="muted" style="font-size:12px">${stage.kind.includes('boss') ? '王題目優先選本區易錯題與你的錯題；打錯會回復少量護甲並加速蓄力。' : `本關同場最多 ${Math.min(3, stage.maxSimultaneous)} 隻；通過後解鎖下一關。`} ${!unlocked ? '目前尚未解鎖，請先通過前一關。' : ''}</p><div class="dialog-actions"><button data-action="close">返回地圖</button>${(save.records[stage.id]?.stars === 3 && !stage.kind.includes('boss')) ? '<button data-action="skip-guide">跳過教學</button>' : ''}<button class="primary" data-action="start" ${unlocked ? '' : 'disabled'}>${stage.kind.includes('boss') || stage.reviewOnly ? '準備挑戰' : '開始引導練習'}</button></div>`, unlocked ? '[data-action="start"]' : '[data-action="close"]');
 }
 function showReference() {
   if (screen === 'play' && game?.running && !game.paused) pauseGame('已暫停，安心查看對照表。', false);
@@ -2101,7 +2317,7 @@ function showReview() {
   openModal('review', `${dialogHeader('需要複習的腳印')}<p class="muted">錯過的題會在後續適合的關卡優先出現。連續完整答對三次，標記為已熟練；再錯就重新複習。</p>${entries.length ? `<ul class="review-list">${entries.map(([id, value]) => {
     const q = questionsById[id];
     return `<li><span><strong>${escapeHTML(q.prompt || q.text)}</strong><small>${escapeHTML(q.zhuyin)} · 錯 ${value.count} 次 · ${value.mastered >= 3 ? '已熟練' : `熟練 ${value.mastered}/3`}</small></span><b class="mono">${q.pinyin}</b></li>`;
-  }).join('')}</ul>` : '<div class="teach-rule">還沒有錯題。先到草原試試身手，這裡會替你記住需要練習的地方。</div>'}<div class="dialog-actions"><button data-action="review-start" ${typing.length ? '' : 'disabled'}>拼音複習關（${typing.length} 題）</button><button data-action="review-spell" ${spells.length ? '' : 'disabled'}>咒語複習關（${spells.length} 句）</button><button class="primary" data-action="close">回地圖</button></div>`);
+  }).join('')}</ul>` : `<div class="empty-state">${icon('review')}<p>還沒有錯題。去草原施展第一道魔法吧！</p></div>`}<div class="dialog-actions"><button data-action="review-start" ${typing.length ? '' : 'disabled'}>開始拼音複習（${typing.length} 題）</button><button data-action="review-spell" ${spells.length ? '' : 'disabled'}>開始咒語複習（${spells.length} 句）</button><button class="primary" data-action="close">返回地圖</button></div>`);
 }
 function makeReview(ime = false) {
   const pool = Object.entries(save.review).filter(([id, item]) => item.mastered < 3 && (questionsById[id].kind === 'sentence') === ime).map(([id]) => id);
@@ -2118,8 +2334,8 @@ function showShop() {
   openModal('shop', `${dialogHeader('城邊小店')}<p class="muted">用過關金幣，讓練習多一點餘裕。現有 <b>${save.coins}</b> 金幣。</p><div class="shop-grid">${Object.entries(upgradeInfo).map(([key, item]) => {
     const level = save.upgrades[key];
     const price = item.base * (level + 1);
-    return `<article class="shop-item"><p class="eyebrow">${level} / ${item.cap} 級</p><h3>${item.title}</h3><p>${item.description}</p><button data-action="buy" data-id="${key}" ${level >= item.cap || save.coins < price ? 'disabled' : ''}>${level >= item.cap ? '已升滿' : `${price} 金幣升級`}</button></article>`;
-  }).join('')}</div><div class="dialog-actions"><button class="primary" data-action="close">回地圖</button></div>`);
+    return `<article class="shop-item"><p class="eyebrow">${level} / ${item.cap} 級</p><h3>${item.title}</h3><p>${item.description}</p><button data-action="buy" data-id="${key}" ${level >= item.cap || save.coins < price ? 'disabled' : ''}>${level >= item.cap ? '完成升級' : `升級・${price} 金幣`}</button></article>`;
+  }).join('')}</div><div class="dialog-actions"><button class="primary" data-action="close">返回地圖</button></div>`);
 }
 function buy(key) {
   const item = upgradeInfo[key];
@@ -2273,6 +2489,8 @@ function positionEnemy(enemy) {
   const element = enemy.element;
   const width = field.clientWidth;
   const height = field.clientHeight;
+  const heightValue=`${height}px`;
+  if(field.style.getPropertyValue('--field-height')!==heightValue)field.style.setProperty('--field-height',heightValue);
   // Each monster owns a separate vertical track. Card height includes the creature.
   const count = game.training ? (game.onboarding === 2 ? 2 : 1) : (window.visualViewport?.height || innerHeight) < 470 && game.enemies.length <= 1 ? 1 : game.maxEnemies;
   enemy.element.classList.toggle('wide-card', count === 1);
@@ -2301,7 +2519,7 @@ function renderEnemy(enemy) {
   const answer = [...q.pinyin].map((letter, i) => `<span class="${i < enemy.progress ? 'typed' : reveal ? 'pending' : 'unknown'}">${i < enemy.progress || reveal ? letter : '·'}</span>`).join('');
   enemy.element.classList.toggle('locked', game.locked === enemy.id);
   enemy.element.classList.toggle('reveal', enemy.reveal > 0);
-  enemy.element.innerHTML = `<div class="question-card"><span class="lock-label">已鎖定</span><button type="button" class="replay" data-action="replay" data-id="${enemy.id}" aria-label="再唸一次">◖))</button><span class="reading">${escapeHTML(q.kind === 'phonics' ? (q.wholeSyllable ? '請打完整音節' : '請打注音片段') : q.zhuyin)}</span><span class="prompt">${escapeHTML(q.symbol || q.text)}</span>${q.kind === 'phonics' ? `<span class="example">例字：${q.text}</span>${q.notation === 'ü' ? `<span class="example">・${q.exampleNote}</span>` : ''}` : ''}<div class="answer" aria-label="${reveal ? q.pinyin : `已輸入 ${q.pinyin.slice(0, enemy.progress) || '尚無'}`}">${answer}</div>${game.boss || enemy.maxRemaining > 1 ? `<div class="plates" aria-label="剩餘 ${game.boss ? game.bossHP : enemy.remaining} 題護甲">${Array.from({length: game.boss ? game.bossMax : enemy.maxRemaining}, (_,i) => `<i class="${i >= (game.boss ? game.bossHP : enemy.remaining) ? 'empty' : ''}"></i>`).join('')}</div>` : ''}</div>${creatureSVG(game.stage.region || 1, game.boss, enemy.variant || (enemy.lane % 3))}`;
+  enemy.element.innerHTML = `<div class="question-card"><span class="lock-label">已鎖定</span><button type="button" class="replay" data-action="replay" data-id="${enemy.id}" aria-label="再唸一次">${icon('sound')}</button><span class="reading">${escapeHTML(q.kind === 'phonics' ? (q.wholeSyllable ? '請打完整音節' : '請打注音片段') : q.zhuyin)}</span><span class="prompt">${escapeHTML(q.symbol || q.text)}</span>${q.kind === 'phonics' ? `<span class="example">例字：${q.text}</span>${q.notation === 'ü' ? `<span class="example">・${q.exampleNote}</span>` : ''}` : ''}<div class="answer" aria-label="${reveal ? q.pinyin : `已輸入 ${q.pinyin.slice(0, enemy.progress) || '尚無'}`}">${answer}</div>${game.boss || enemy.maxRemaining > 1 ? `<div class="plates" aria-label="剩餘 ${game.boss ? game.bossHP : enemy.remaining} 題護甲">${Array.from({length: game.boss ? game.bossMax : enemy.maxRemaining}, (_,i) => `<i class="${i >= (game.boss ? game.bossHP : enemy.remaining) ? 'empty' : ''}"></i>`).join('')}</div>` : ''}</div>${creatureSVG(game.stage.region || 1, game.boss, enemy.variant || (enemy.lane % 3))}`;
 }
 function message(text, error = false, duration = 3) {
   $('#battle-message').textContent = text;
@@ -2313,6 +2531,9 @@ function multiplier() {
 }
 function updateHUD() {
   if (!game) return;
+  const gateImage=$('#gate .asset-img');
+  const gateFile=`assets/gate-${game.hp/game.maxHP<.5?'damaged':'intact'}.webp`;
+  if(gateImage.getAttribute('src')!==gateFile) {$('#gate').classList.remove('art-ready');gateImage.src=gateFile;}
   $('#hp-text').textContent = `${Math.ceil(game.hp)} / ${game.maxHP}`;
   $('#hp-fill').style.width = `${Math.max(0, game.hp / game.maxHP * 100)}%`;
   $('#hp-meter').setAttribute('aria-valuemin', '0');
@@ -2710,12 +2931,14 @@ function finishGame(won) {
     : '這是本關的第一份成績。再挑戰一次，就能看到速度與正確率的變化。';
   const mistakes = Object.entries(game.mistakes).sort((a, b) => b[1] - a[1]).slice(0, 3);
   const next = stages[stages.findIndex(s => s.id === game.stage.id) + 1];
-  $('#result-screen').innerHTML = `<article class="result-card"><p class="eyebrow">${escapeHTML(game.stage.title)} / ${won ? '城門仍然閃耀' : '這次先整理腳步'}</p><h1>${won ? '守住了，做得好。' : '城門失守，再試一次。'}</h1><div class="result-stars" aria-label="${stars} 顆星">${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</div><p class="muted">${won ? `獲得 ${coins} 金幣。${next && !game.stage.reviewOnly ? `下一站：${next.title}。` : game.stage.id === 'r5-boss' ? '五區旅程完成！仍可重玩與複習。' : '把這份熟練帶到下一次練習。'}` : '錯過的題已存入複習清單；本次不發金幣。'}</p><div class="result-stats"><div><small>正確率</small><b>${(accuracy * 100).toFixed(1)}%</b></div><div><small>${game.ime ? '中文字' : '擊倒題字母'}／分鐘</small><b>${speed.toFixed(1)}</b></div><div><small>最長連擊</small><b>${game.longest}</b></div><div><small>總得分</small><b>${last.score}</b></div></div><p class="comparison">${comparison}</p><p class="muted" style="font-size:12px">有效遊玩 ${Math.floor(elapsed / 60)} 分 ${Math.floor(elapsed % 60)} 秒・剩餘血量 ${Math.ceil(game.hp)}/${game.maxHP}。星等：通關 1 星，正確率 ≥90% 得 2 星，≥95% 且剩餘血量 ≥50% 得 3 星。${game.ime ? '中文字速度只計成功施放中答對的字；所有提交的錯字計入正確率。' : '速度計算完成題目的字母數，暫停時間不計。'}</p><div class="mistakes"><h3>這關最常打錯的 3 題</h3>${mistakes.length ? mistakes.map(([id, count]) => {
+  $('#result-screen').innerHTML = `<article class="result-card"><p class="eyebrow">${escapeHTML(game.stage.title)} / ${won ? '城門仍然閃耀' : '這次先整理腳步'}</p><h1>${won ? '守住了，做得好。' : '城門失守，再試一次。'}</h1><div class="result-stars" aria-label="${stars} 顆星">${Array.from({length:3},(_,i)=>`<span style="--i:${i}">${i<stars?'★':'☆'}</span>`).join('')}</div>${won ? imageArt('mage-cast',$('#mage .fallback-art').outerHTML,'result-mage') : ''}${won && (last.score>previous.bestScore || speed>previous.bestSpeed) ? `<p class="record-badge">${icon('star')}刷新最佳紀錄！</p>`:''}<p class="muted">${won ? `獲得 ${coins} 金幣。${next && !game.stage.reviewOnly ? `下一站：${next.title}。` : game.stage.id === 'r5-boss' ? '五區旅程完成！仍可重玩與複習。' : '把這份熟練帶到下一次練習。'}` : '錯過的題已存入複習清單；本次不發金幣。'}</p><div class="result-stats"><div><small>正確率</small><b>${(accuracy * 100).toFixed(1)}%</b></div><div><small>${game.ime ? '中文字' : '擊倒題字母'}／分鐘</small><b>${speed.toFixed(1)}</b></div><div><small>最長連擊</small><b>${game.longest}</b></div><div><small>總得分</small><b id="result-score" data-value="${last.score}">${last.score}</b></div></div><p class="comparison">${comparison}</p><p class="muted" style="font-size:12px">有效遊玩 ${Math.floor(elapsed / 60)} 分 ${Math.floor(elapsed % 60)} 秒・剩餘血量 ${Math.ceil(game.hp)}/${game.maxHP}。星等：通關 1 星，正確率 ≥90% 得 2 星，≥95% 且剩餘血量 ≥50% 得 3 星。${game.ime ? '中文字速度只計成功施放中答對的字；所有提交的錯字計入正確率。' : '速度計算完成題目的字母數，暫停時間不計。'}</p><div class="mistakes"><h3>這關最常打錯的 3 題</h3>${mistakes.length ? mistakes.map(([id, count]) => {
     const q = questionsById[id];
     return `<div class="mistake-row"><span>${escapeHTML(q.prompt || q.text)}<small class="muted">　錯 ${count} 次</small></span><b class="mono">${q.pinyin}</b></div>`;
-  }).join('') : '<p class="muted">這一關沒有錯題，讓準確繼續累積。</p>'}</div><div class="dialog-actions"><button data-action="map">回地圖</button><button data-action="restart">再挑戰一次</button>${won && next && !game.stage.reviewOnly ? `<button class="primary" data-action="next" data-id="${next.id}">下一關教學 Enter</button>` : '<button class="primary" data-action="review">看看複習清單</button>'}</div></article>`;
+  }).join('') : `<div class="empty-state">${icon('star')}<p>零錯題！把這份手感帶往下一站。</p></div>`}</div><div class="dialog-actions"><button data-action="map">返回地圖</button><button data-action="restart">再挑戰一次</button>${won && next && !game.stage.reviewOnly ? `<button class="primary" data-action="next" data-id="${next.id}">前往下一站 Enter</button>` : '<button class="primary" data-action="review">複習錯題</button>'}</div></article>`;
   showScreen('result');
-  $('#result-screen .primary')?.focus();
+  celebrateScore();
+  $('#result-screen .primary')?.focus({preventScroll:true});
+  window.scrollTo(0,0);
   if (won) { sound('win'); $('#result-screen').classList.add('celebrate'); setTimeout(() => $('#result-screen').classList.remove('celebrate'), 1600); }
   else sound('lose');
   audio.speak(won ? '守住了，做得好！' : '城門失守，再試一次。');
@@ -2897,6 +3120,7 @@ function configureInputs() {
     input.inputMode = useBuiltin() ? 'none' : english ? 'email' : 'text';
     input.readOnly = useBuiltin();
     input.autocomplete = 'off';
+    input.placeholder = game?.ime ? '選出繁體中文…' : '輸入拼音…';
   }
 }
 function rotateInput() {
@@ -2958,7 +3182,7 @@ function tutorialProgress() {
   $('#late-skip')?.remove();
   $('#battlefield').classList.remove('answer-nudge');
 }
-function sceneSVG(region) {
+function sceneFallbackSVG(region) {
   const colors = [
     ['#dff4ff','#bddbb0','#9cc58c','#74aa73'],
     ['#e7f5ec','#c5ddb2','#9ec895','#78ac80'],
@@ -2971,9 +3195,10 @@ function sceneSVG(region) {
 }
 function showSettings() {
   if (game?.running) pauseGame('設定期間已暫停。', false);
-  openModal('settings', `${dialogHeader('施法設定')}<div class="teach-rule"><h3>鍵盤模式</h3><p>第 1 區打字母；第 2～4 區可用拼音選字。第五區一律使用一般文字輸入框。</p><label for="keyboard-mode">選擇鍵盤</label><select id="keyboard-mode">${[['pinyin','手機拼音鍵盤（預設）'],['english','英文鍵盤'],['builtin','遊戲內建鍵盤']].map(([v,t]) => `<option value="${v}" ${save.settings.keyboardMode === v ? 'selected' : ''}>${t}</option>`).join('')}</select><p class="muted">手機拼音鍵盤會在命中或重試時換焦，清除組字。英文鍵盤只接受字母；內建鍵盤適用第 1～4 區。</p><label class="debug-switch"><input id="debug-toggle" type="checkbox" ${save.settings.debug ? 'checked' : ''}>偵錯資訊（最近 8 筆輸入事件）</label></div>${soundSettingsHTML()}<div class="dialog-actions"><button class="primary" data-action="close">完成</button></div>`);
+  openModal('settings', `${dialogHeader('施法設定')}<div class="teach-rule"><h3>鍵盤模式</h3><p>第 1 區打字母；第 2～4 區可用拼音選字。第五區一律使用一般文字輸入框。</p><label for="keyboard-mode">選擇鍵盤</label><select id="keyboard-mode">${[['pinyin','手機拼音鍵盤（預設）'],['english','英文鍵盤'],['builtin','遊戲內建鍵盤']].map(([v,t]) => `<option value="${v}" ${save.settings.keyboardMode === v ? 'selected' : ''}>${t}</option>`).join('')}</select><p class="muted">手機拼音鍵盤會在命中或重試時換焦，清除組字。英文鍵盤只接受字母；內建鍵盤適用第 1～4 區。</p><label class="debug-switch"><input id="debug-toggle" type="checkbox" ${save.settings.debug ? 'checked' : ''}>偵錯資訊（最近 8 筆輸入事件）</label></div>${soundSettingsHTML()}<label for="panel-theme">選擇介面色彩</label><select id="panel-theme"><option value="light" ${save.settings.theme==='light'?'selected':''}>晨光淺色</option><option value="dark" ${save.settings.theme==='dark'?'selected':''}>星夜深色</option></select><div class="dialog-actions"><button class="primary" data-action="close">儲存設定</button></div>`);
 }
 document.addEventListener('change', event => {
+  if(event.target.id==='panel-theme') {const el=$('#theme-select');el.value=event.target.value;el.dispatchEvent(new Event('change',{bubbles:true}));}
   if (event.target.id === 'keyboard-mode') {
     save.settings.keyboardMode = event.target.value;
     save.settings.builtin = save.settings.keyboardMode === 'builtin';
@@ -2992,7 +3217,7 @@ document.addEventListener('change', event => {
 function readyOverlay(reason, label = '開始', menu = false) {
   const panel = $('#start-overlay');
   panel.hidden = false;
-  panel.innerHTML = `<div class="start-card"><p id="start-reason">${escapeHTML(reason)}</p><button class="primary" data-action="ready">${label}</button>${menu ? '<div class="pause-actions"><button data-action="map">回地圖</button><button data-action="restart">重來</button><button data-action="settings">設定</button></div>' : ''}</div>`;
+  panel.innerHTML = `<div class="start-card"><p id="start-reason">${escapeHTML(reason)}</p><button class="primary" data-action="ready">${label}</button>${menu ? '<div class="pause-actions"><button data-action="map">返回地圖</button><button data-action="restart">重來</button><button data-action="settings">調整設定</button></div>' : ''}</div>`;
   audio.sync();
 }
 function cancelKeyboardWait() {
@@ -3141,7 +3366,7 @@ function renderGuide() {
   const labels = {look: '看・記住鍵位', follow: '跟・照著打一次', try: '試・自己想想看'};
   const group = soundGroups.find(x => x.id === game.stage.soundGroup);
   const hint = group?.commonMistake || (q.kind === 'phonics' ? `${q.exampleNote}。${q.wholeSyllable ? '這題打完整音節。' : `鍵位是 ${q.pinyin}，不要多加例字的其他聲韻。`}` : q.kind === 'sentence' ? '先練整句的拼音連打；戰鬥時用系統拼音選出繁體中文，再施放。' : '不加聲調。n／l 後的 ü 打 v；詞語連續打完。');
-  $('#guide-panel').innerHTML = `<div class="guide-top"><span class="eyebrow">引導練習・沒有怪物、不扣血</span><span>這關共 ${game.stage.pool.length} 個・新學／複習 ${g.index + 1} / ${g.items.length}</span></div><div class="guide-steps">${['look','follow','try'].map((v,i) => `<span class="${v === g.step ? 'active' : ''}">${i+1} ${labels[v].split('・')[0]}</span>`).join('')}</div><h2>${labels[g.step]}</h2><div class="lesson-card"><button type="button" class="replay" data-action="replay" aria-label="再唸一次">◖))</button><small>${q.zhuyin}</small><strong>${q.symbol || q.text}</strong><b class="mono">${known ? q.pinyin : '想想它的拼音'}</b>${q.kind === 'phonics' ? `<small>例字 ${q.text}${known ? ` · ${q.exampleNote || ''}` : ''}</small>` : ''}</div>${game.stage.region === 3 ? `<div class="pair-compare">${g.items.slice(0,4).map(v => `<span>${v.text}<b class="mono">${g.step === 'try' && !g.retry ? '？' : v.pinyin}</b></span>`).join('')}</div>` : ''}<p class="lesson-note">${g.retry ? `正解是 ${q.pinyin}。請從頭重打一次，記住再前進。` : g.step === 'try' ? '這次先不看答案。想好後直接輸入；答錯會顯示正解，再重打一次。' : hint}</p>${g.step === 'look' ? `<div class="demo-letters" aria-label="鍵位順序">${[...q.pinyin].map((c,i) => `<b style="animation-delay:${i * .35}s">${c}</b>`).join('')}</div><div class="mini-keys">${keyDiagram(q.pinyin[Math.floor(performance.now()/700)%q.pinyin.length])}</div><button class="primary" data-action="guide-next">${g.index < g.items.length - 1 ? '下一張' : '開始跟著練習'}</button>` : `<p class="guide-progress mono">${g.progress || '等待輸入'}</p>`}`;
+  $('#guide-panel').innerHTML = `<div class="guide-top"><span class="eyebrow">引導練習・沒有怪物、不扣血</span><span>這關共 ${game.stage.pool.length} 個・新學／複習 ${g.index + 1} / ${g.items.length}</span></div><div class="guide-steps">${['look','follow','try'].map((v,i) => `<span class="${v === g.step ? 'active' : ''}">${i+1} ${labels[v].split('・')[0]}</span>`).join('')}</div><h2>${labels[g.step]}</h2><div class="lesson-card"><button type="button" class="replay" data-action="replay" aria-label="再唸一次">${icon('sound')}</button><small>${q.zhuyin}</small><strong>${q.symbol || q.text}</strong><b class="mono">${known ? q.pinyin : '想想它的拼音'}</b>${q.kind === 'phonics' ? `<small>例字 ${q.text}${known ? ` · ${q.exampleNote || ''}` : ''}</small>` : ''}</div>${game.stage.region === 3 ? `<div class="pair-compare">${g.items.slice(0,4).map(v => `<span>${v.text}<b class="mono">${g.step === 'try' && !g.retry ? '？' : v.pinyin}</b></span>`).join('')}</div>` : ''}<p class="lesson-note">${g.retry ? `正解是 ${q.pinyin}。請從頭重打一次，記住再前進。` : g.step === 'try' ? '這次先不看答案。想好後直接輸入；答錯會顯示正解，再重打一次。' : hint}</p>${g.step === 'look' ? `<div class="demo-letters" aria-label="鍵位順序">${[...q.pinyin].map((c,i) => `<b style="animation-delay:${i * .35}s">${c}</b>`).join('')}</div><div class="mini-keys">${keyDiagram(q.pinyin[Math.floor(performance.now()/700)%q.pinyin.length])}</div><button class="primary" data-action="guide-next">${g.index < g.items.length - 1 ? '翻下一張' : '開始跟著練習'}</button>` : `<p class="guide-progress mono">${g.progress || '等待輸入'}</p>`}`;
   $('#guide-panel').dataset.step = g.step;
   const nextButton = $('#guide-panel [data-action="guide-next"]');
   if (nextButton) {
@@ -3218,11 +3443,11 @@ function renderOnboarding() {
   $('#battlefield').hidden = step === 3;
   $('#duel-panel').hidden = true;
   $('#tutorial-info').hidden = step !== 3;
-  const prompts = ['打出 b，擊倒這隻怪', '再一隻：打出 p', '兩隻一起來：先打哪個字母就鎖定哪一隻，也可以點怪。', '看完說明，按「我知道了」完成教學。'];
+  const prompts = ['打出 b，擊倒這隻怪', '再一隻：打出 p', '兩隻一起來：先打哪個字母就鎖定哪一隻，也可以點怪。', '看完說明，按「完成教學」完成教學。'];
   setInstruction(`操作 ${step + 1} / 4：${prompts[step]}`);
   if (step === 3) {
-    if (game.spokenTutorial !== step) { game.spokenTutorial = step; audio.speak('打錯會亮出正解，連擊歸零。偷看可以顯示答案。按暫停可以休息。看完說明，按我知道了。'); }
-    $('#tutorial-info').innerHTML = '<h3>施法小提醒</h3><p>打錯：怪物往前衝、亮出正解、連擊歸零；看清楚後從頭重打。</p><p>「偷看」可以顯示答案，這次不累積連擊。</p><p>按右上角「暫停」可休息，再點「點我繼續」。</p><button class="primary" data-action="onboarding-done">我知道了</button>';
+    if (game.spokenTutorial !== step) { game.spokenTutorial = step; audio.speak('打錯會亮出正解，連擊歸零。偷看可以顯示答案。按暫停可以休息。看完說明，按完成教學。'); }
+    $('#tutorial-info').innerHTML = '<h3>施法小提醒</h3><p>打錯：怪物往前衝、亮出正解、連擊歸零；看清楚後從頭重打。</p><p>「偷看」可以顯示答案，這次不累積連擊。</p><p>按右上角「暫停」可休息，再點「點我繼續」。</p><button class="primary" data-action="onboarding-done">完成教學</button>';
     castInput.blur();
     return;
   }
@@ -3500,6 +3725,8 @@ document.addEventListener('visibilitychange', () => { audio.suspend(); if (docum
 document.addEventListener('touchmove', event => { if (screen === 'play' && event.touches.length > 1) event.preventDefault(); }, {passive: false});
 window.addEventListener('pagehide', persist);
 
+document.querySelectorAll('img').forEach(img=>{if(img.complete&&img.naturalWidth)assetLoaded(img);});
+decorateIcons();
 refreshHeader();
 renderDebug();
 renderMap();
