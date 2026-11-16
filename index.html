@@ -533,6 +533,72 @@
     .tiny-view .debug-enabled #action-prompt { font-size:12px; padding:3px 7px; }
     #skip-onboarding { position:relative; z-index:31; }
     .builtin-mode .play-controls,.builtin-mode .battle-message { display:none; }
+    :root { --magic:#3b9b58; }
+    :root[data-region="2"] { --magic:#c58c21; }
+    :root[data-region="3"] { --magic:#6967d4; }
+    :root[data-region="4"] { --magic:#dd632e; }
+    :root[data-region="5"] { --magic:#c3a64e; }
+    #modal:has(.sound-settings) .dialog-actions { position:static; }
+    .sound-row { display:grid; grid-template-columns:1fr 1fr; align-items:center; gap:4px 12px; margin:14px 0; }
+    .sound-row input[type="range"] { width:100%; grid-column:1 / -1; min-height:44px; accent-color:var(--accent); }
+    .sound-row label { display:flex; align-items:center; gap:8px; }
+    .sound-row input[type="checkbox"] { width:24px; height:24px; }
+    .sound-tests { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    .lesson-card { position:relative; }
+    .replay { position:absolute; top:0; right:0; min-width:44px; min-height:44px; padding:3px; border:0; background:transparent; color:var(--accent); font-size:12px; z-index:5; }
+    .question-card .reading { padding-inline:22px; }
+    .guide-top { flex-wrap:wrap; }
+    .guide-top > span:last-child { font-size:11px; }
+    .pair-compare { flex-wrap:wrap; }
+    .battlefield::before { content:""; position:absolute; inset:0 22% 18px; border-left:2px dashed #ae91684a; border-right:2px dashed #ae91684a; background:#e6c99744; border-radius:30% 30% 10% 10%; pointer-events:none; }
+    .enemy .creature { margin-top:10px; animation:walk4 .48s ease-in-out infinite alternate; transform-origin:50% 90%; }
+    .tiny-view .enemy .reading { display:none; }
+    .tiny-view .enemy .creature { width:30px; height:30px; margin-top:8px; }
+    .enemy.hit .creature { animation:hit .19s ease-out; }
+    .enemy .eye { transform-box:fill-box; transform-origin:center; animation:blink4 4s infinite; }
+    .enemy.urgent .creature { animation-duration:.2s; }
+    .enemy.urgent .question-card { border-color:#bd4b32; box-shadow:0 0 0 2px #eeb77d; }
+    .enemy.locked .question-card { outline:2px dashed var(--magic); outline-offset:3px; animation:lock4 .7s infinite alternate; }
+    #target-line { position:absolute; height:2px; transform-origin:left center; background:repeating-linear-gradient(90deg,var(--magic) 0 7px,transparent 7px 12px); opacity:.65; pointer-events:none; z-index:1; }
+    .plates { flex-wrap:wrap; gap:3px; }
+    .plates i { height:7px; width:13px; border:1px solid var(--accent); transition:background .18s; }
+    .plates i.empty { background:transparent; opacity:.3; }
+    .magic-bolt { position:absolute; border-radius:50%; width:9px; height:9px; background:#fff5be; border:2px solid var(--magic); box-shadow:0 0 6px var(--magic); z-index:12; pointer-events:none; animation:bolt4 .15s linear forwards; }
+    .magic-bolt::after { content:""; position:absolute; width:22px; height:5px; right:5px; top:0; background:linear-gradient(90deg,transparent,var(--magic)); transform:rotate(var(--angle)); transform-origin:right; }
+    .fireball { width:21px; height:21px; border-width:4px; animation-duration:.19s; }
+    .fireball::after { width:46px; height:11px; }
+    .magic-explosion,.magic-spark { position:absolute; width:1px; height:1px; z-index:13; pointer-events:none; color:var(--magic); }
+    .magic-explosion::before { content:""; position:absolute; width:48px; height:48px; border:4px solid currentColor; border-radius:50%; margin:-24px; animation:ring4 .4s ease-out forwards; }
+    .magic-explosion i,.magic-spark i { position:absolute; width:6px; height:6px; border-radius:50%; background:currentColor; animation:particle4 .4s ease-out forwards; }
+    .combo-banner { position:absolute; top:5px; left:50%; transform:translateX(-50%); z-index:16; pointer-events:none; white-space:nowrap; font-size:var(--combo-size,24px); font-weight:950; color:#845323; text-shadow:0 2px #fff,2px 0 #fff,-2px 0 #fff; animation:combo4 1.3s both; }
+    .combo-banner small { display:block; text-align:center; font-size:14px; }
+    .tier-up { color:#ab4c13; }
+    .defeated { animation:none; }
+    .enemy.defeated .creature { animation:dissolve4 .26s .19s forwards; }
+    .enemy.defeated .question-card { animation:fade4 .26s forwards; }
+    .staff-flash { filter:drop-shadow(0 0 8px var(--magic)); }
+    .gate-hit { animation:gate4 .28s; }
+    .health-hit,.boss-impact { animation:impact4 .28s; }
+    .card-flip { animation:flip4 .28s; }
+    .magic-shake { animation:shake4 .22s; }
+    .feedback { left:50%!important; top:48%; transform:translateX(-50%); z-index:14; color:var(--magic); text-shadow:0 1px #fff; }
+    @keyframes walk4 { from { transform:translateY(-2px) rotate(-4deg); } to { transform:translateY(3px) rotate(4deg); } }
+    @keyframes blink4 { 0%,92%,98%,100% { transform:scaleY(1); } 95% { transform:scaleY(.08); } }
+    @keyframes lock4 { to { opacity:.86; } }
+    @keyframes bolt4 { to { transform:translate(var(--dx),var(--dy)); } }
+    @keyframes particle4 { to { transform:rotate(var(--angle)) translateX(32px) scale(.2); opacity:0; } }
+    @keyframes ring4 { to { transform:scale(1.7); opacity:0; } }
+    @keyframes combo4 { 0% { opacity:0; scale:.65; } 15%,75% { opacity:1; scale:1; } 100% { opacity:0; } }
+    @keyframes dissolve4 { to { transform:scale(.1) rotate(45deg); opacity:0; } }
+    @keyframes fade4 { to { opacity:0; } }
+    @keyframes gate4 { 50% { filter:sepia(1) saturate(5) hue-rotate(315deg); transform:translateX(4px); } }
+    @keyframes impact4 { 50% { filter:brightness(1.6); translate:4px; } }
+    @keyframes flip4 { 50% { transform:rotateX(25deg); opacity:.5; } }
+    @keyframes shake4 { 25% { translate:2px; } 75% { translate:-2px; } }
+    @media(prefers-reduced-motion:reduce) {
+      .enemy .creature,.enemy .eye,.enemy.locked .question-card,.magic-shake,.gate-hit,.boss-impact,.health-hit,.card-flip { animation:none!important; }
+      .magic-bolt { animation-duration:.01s; }
+    }
   </style>
 </head>
 <body>
@@ -545,7 +611,7 @@
     <div class="tools">
       <span class="wallet" id="wallet">金幣 0</span>
       <button data-action="reference">對照表</button>
-      <button data-action="settings">設定</button><button id="audio-toggle" aria-pressed="true" data-action="sound">音效 開</button>
+      <button data-action="settings">設定</button><button id="audio-toggle" aria-pressed="false" data-action="sound">總靜音</button>
       <select id="theme-select" aria-label="顯示色彩"><option value="light">淺色</option><option value="dark">深色</option></select>
     </div>
   </header>
@@ -557,7 +623,7 @@
         <aside>
           <div class="intro"><p class="eyebrow">一趟從注音出發的旅程</p><h1>拼出你的<br>第一道魔法。</h1><p>把熟悉的注音，化成指尖的拼音。<br>先跟著練習，再用拼音對抗怪物。</p></div>
           <nav id="region-nav" class="region-nav" aria-label="選擇地區"></nav>
-          <p class="side-note">使用系統拼音或英文鍵盤。<br>不用聲調，n／l 後的 ü 打 v。<br>第 5 區選出繁體中文整句。</p>
+          <p id="audio-hint" class="side-note">點任何按鈕後開始播放聲音</p><p class="side-note">使用系統拼音或英文鍵盤。<br>不用聲調，n／l 後的 ü 打 v。<br>第 5 區選出繁體中文整句。</p>
         </aside>
         <div class="map-panel">
           <div id="map-heading" class="map-heading"></div>
@@ -567,7 +633,7 @@
       </div>
     </section>
     <section id="play-screen" aria-label="遊戲戰場" hidden>
-      <div class="play-heading"><div><p id="play-eyebrow" class="eyebrow">聲韻草原</p><h2 id="play-title"></h2></div><button data-action="skip-onboarding" id="skip-onboarding" hidden>跳過</button><button data-action="pause">暫停 <kbd>Esc</kbd></button></div>
+      <div class="play-heading"><div><p id="play-eyebrow" class="eyebrow">聲韻草原</p><h2 id="play-title"></h2></div><button data-action="skip-onboarding" id="skip-onboarding" hidden>跳過</button><button data-action="sound" aria-pressed="false">總靜音</button><button data-action="pause">暫停 <kbd>Esc</kbd></button></div>
       <div class="hud">
         <div class="stat"><div class="hp-text"><span>血量 </span><b id="hp-text"></b></div><div class="meter" role="progressbar" aria-label="城門血量" id="hp-meter"><i id="hp-fill"></i></div></div>
         <div class="stat"><small>得分</small><strong id="score-value">0</strong></div>
@@ -587,10 +653,10 @@
         <svg id="gate" class="gate" viewBox="0 0 110 100" aria-hidden="true"><path d="M8 96V36h18V18h18v18h24V18h18v18h16v60Z" fill="#a9b898" stroke="#60785d" stroke-width="3"/><path d="M39 98V62q16-25 32 0v36" fill="#a97949" stroke="#60785d" stroke-width="3"/><path d="M55 54v44M14 48h14m53 0h14M13 72h14m54 0h14" stroke="#e9efda" stroke-width="4"/><path d="m48 14 8-12 8 12-8 12Z" fill="#ddb75c"/><circle cx="50" cy="77" r="2" fill="#fff1bd"/><circle cx="61" cy="77" r="2" fill="#fff1bd"/></svg>
         <svg id="mage" class="mage" viewBox="0 0 70 100" aria-label="拼鬥魔法師"><path d="M19 96 26 54h26l12 42Z" fill="#447d8b" stroke="#315862" stroke-width="2"/><path d="m27 57 12 15 12-15" fill="#f3dc8b"/><path d="M28 88h22" stroke="#e7d297" stroke-width="3"/><circle cx="40" cy="41" r="15" fill="#f2d5af"/><path d="M25 41q-2-23 18-20 17 5 12 24l-8-15-20 15" fill="#5a4c3b"/><path d="m16 29 22-27 12 26 12 7H15Z" fill="#447d8b" stroke="#315862" stroke-width="2"/><path d="m25 22 25 3" stroke="#e7c66c" stroke-width="4"/><circle cx="36" cy="43" r="2" fill="#2e443f"/><circle cx="47" cy="43" r="2" fill="#2e443f"/><path d="m38 51 5 2 4-3" fill="none" stroke="#8e624f" stroke-width="2"/><path d="M9 97V50" stroke="#947044" stroke-width="4"/><path d="m9 35 8 12-8 12-8-12Z" fill="#edbf5b" stroke="#9c7634" stroke-width="2"/><path d="m28 68-15 6" stroke="#447d8b" stroke-width="8"/></svg>
         <span class="gate-label">光種城門</span>
-        <div id="enemy-layer"></div>
+        <div id="target-line" hidden></div><div id="enemy-layer"></div>
       </div>
       <div id="duel-panel" class="duel-panel" hidden>
-        <div class="duel-top"><div id="duel-art"></div><div><small class="eyebrow">照著咒語輸入繁體中文，再按 Enter</small><div id="spell-target" class="spell-target"></div><div id="spell-hint" class="spell-hint"></div></div></div>
+        <div class="duel-top"><div id="duel-art"></div><div><small class="eyebrow">照著咒語輸入繁體中文，再按 Enter</small><div id="spell-target" class="spell-target"></div><button type="button" data-action="replay">再唸一次</button><div id="spell-hint" class="spell-hint"></div></div></div>
 
         <div id="spell-feedback" class="spell-feedback" aria-live="polite"></div>
       </div>
@@ -1538,9 +1604,9 @@ function mapArt(region) {
 
 function freshSave() {
   return {
-    version: CONFIG.version, coins: 0, records: {}, review: {},
+    version: CONFIG.version, coins: 0, records: {}, review: {}, learned: [],
     upgrades: { gate: 0, peek: 0, guard: 0 },
-    settings: { sound: true, theme: 'light', builtin: false, keyboardMode: 'pinyin', debug: false, onboarding: false },
+    settings: { sound: true, muted: false, speech: true, music: true, effects: true, speechVolume: 90, musicVolume: 45, effectsVolume: 65, speechRate: 1, theme: 'light', builtin: false, keyboardMode: 'pinyin', debug: false, onboarding: false },
   };
 }
 let storageAvailable = true;
@@ -1549,11 +1615,18 @@ function loadSave() {
   try {
     const raw = JSON.parse(localStorage.getItem(CONFIG.storageKey) || 'null');
     if (!raw || raw.version !== CONFIG.version) return clean;
+    clean.learned = Array.isArray(raw.learned) ? raw.learned.filter(id => questionsById[id]) : [];
     clean.coins = clamp(Math.floor(Number(raw.coins) || 0), 0, 10000000);
     for (const key of ['gate', 'peek', 'guard']) {
       clean.upgrades[key] = clamp(Math.floor(Number(raw.upgrades?.[key]) || 0), 0, key === 'guard' ? 1 : 3);
     }
     clean.settings.sound = raw.settings?.sound !== false;
+    clean.settings.muted = raw.settings?.muted === true || raw.settings?.sound === false;
+    for (const key of ['speech', 'music', 'effects']) clean.settings[key] = raw.settings?.[key] !== false;
+    for (const key of ['speechVolume', 'musicVolume', 'effectsVolume']) {
+      if (Number.isFinite(raw.settings?.[key])) clean.settings[key] = clamp(raw.settings[key], 0, 100);
+    }
+    if ([.8, 1, 1.2].includes(raw.settings?.speechRate)) clean.settings.speechRate = raw.settings.speechRate;
     clean.settings.keyboardMode = ['pinyin', 'english', 'builtin'].includes(raw.settings?.keyboardMode) ? raw.settings.keyboardMode : raw.settings?.builtin === true ? 'builtin' : 'pinyin';
     clean.settings.builtin = clean.settings.keyboardMode === 'builtin';
     clean.settings.debug = raw.settings?.debug === true;
@@ -1595,7 +1668,7 @@ let game = null;
 let pendingStage = null;
 let modalKind = '';
 let lastTime = 0;
-let audioContext = null;
+let lastJudgment = '尚未輸入';
 let toastTimer;
 let globallyComposing = false;
 let compositionEndedAt = -Infinity;
@@ -1613,8 +1686,10 @@ function persist() {
 }
 function refreshHeader() {
   $('#wallet').textContent = `金幣 ${save.coins}`;
-  $('#audio-toggle').textContent = `音效 ${save.settings.sound ? '開' : '關'}`;
-  $('#audio-toggle').setAttribute('aria-pressed', String(save.settings.sound));
+  document.querySelectorAll('[data-action="sound"]').forEach(button => {
+    button.textContent = save.settings.muted ? '聲音已靜音' : '總靜音';
+    button.setAttribute('aria-pressed', String(save.settings.muted));
+  });
   $('#theme-select').value = save.settings.theme;
   document.documentElement.dataset.theme = save.settings.theme;
 }
@@ -1624,31 +1699,297 @@ function toast(message) {
   $('#toast').hidden = false;
   toastTimer = setTimeout(() => { $('#toast').hidden = true; }, 3000);
 }
-function sound(type) {
-  if (!save.settings.sound) return;
-  try {
-    const AudioEngine = window.AudioContext || window.webkitAudioContext;
-    if (!AudioEngine) return;
-    audioContext ||= new AudioEngine();
-    if (audioContext.state === 'suspended') audioContext.resume().catch(() => {});
-    const notes = { hit: [510, 780, .055], defeat: [390, 960, .14],
-      wrong: [170, 95, .12], hurt: [130, 65, .2], win: [540, 1100, .3] };
-    const [start, end, duration] = notes[type] || notes.hit;
-    const oscillator = audioContext.createOscillator();
-    const gain = audioContext.createGain();
-    oscillator.type = type === 'wrong' || type === 'hurt' ? 'triangle' : 'sine';
-    oscillator.frequency.setValueAtTime(start, audioContext.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(end, audioContext.currentTime + duration);
-    gain.gain.setValueAtTime(.075, audioContext.currentTime);
-    gain.gain.exponentialRampToValueAtTime(.001, audioContext.currentTime + duration);
-    oscillator.connect(gain);
-    gain.connect(audioContext.destination);
-    oscillator.start();
-    oscillator.stop(audioContext.currentTime + duration);
-  } catch {
-    // 沒有音效裝置也不影響遊戲。
+// Original procedural score: eight 4/4 bars per theme, sixteen steps per bar.
+// Scheduling uses the audio clock; the timer only fills a short lookahead window.
+const SCORE = [
+  {name: '地圖・晨光', key: 'C 大調', bpm: 76, root: 60, scale: [0,2,4,5,7,9,11], chords: [0,3,5,4,0,5,3,4], melody: [4,-1,2,1,0,-1,2,4,5,4,2,-1,1,2,4,-1,2,0,1,2,4,-1,5,4,2,1,0,-1,1,2,0,-1]},
+  {name: '草原・芽風', key: 'D 大調', bpm: 108, root: 62, scale: [0,2,4,5,7,9,11], chords: [0,4,5,3,0,5,3,4], melody: [0,2,4,2,5,4,2,-1,1,3,4,6,5,3,1,-1,2,4,5,2,0,2,4,-1,5,4,2,1,3,1,0,-1]},
+  {name: '森林・木間光', key: 'F 大調', bpm: 88, root: 65, scale: [0,2,4,5,7,9,11], chords: [0,5,3,4,2,5,3,0], melody: [2,-1,4,5,4,2,1,-1,0,2,3,-1,5,4,2,-1,4,6,5,4,2,-1,3,1,0,2,4,3,2,1,0,-1]},
+  {name: '沼澤・霧珠', key: 'A 多利安調式', bpm: 82, root: 57, scale: [0,2,3,5,7,9,10], chords: [0,3,1,4,0,5,3,0], melody: [0,-1,4,2,5,-1,3,1,2,4,6,-1,5,3,2,-1,1,3,5,4,2,-1,0,2,4,3,1,-1,2,1,0,-1]},
+  {name: '山道・踏石', key: 'G 大調', bpm: 116, root: 55, scale: [0,2,4,5,7,9,11], chords: [0,4,5,3,2,5,3,4], melody: [0,4,2,5,3,6,4,-1,2,5,3,4,1,3,2,-1,4,5,6,4,2,4,5,-1,3,2,4,1,2,1,0,-1]},
+  {name: '神殿・書光', key: 'E♭ 大調', bpm: 72, root: 63, scale: [0,2,4,5,7,9,11], chords: [0,3,5,4,2,3,4,0], melody: [0,-1,4,-1,2,3,5,-1,4,-1,6,5,3,-1,2,-1,5,4,2,-1,3,1,4,-1,2,-1,1,3,2,1,0,-1]},
+];
+const audio = (() => {
+  let context, master, limiter, musicGate, musicVolume, duckGain, effectsVolume;
+  let filter, delay, feedback, timer = 0, nextTime = 0, step = 0, theme = -1, boss = false;
+  let unlocked = false, failed = false, paused = false, speaking = false, utterance, speechTimer;
+  let voice = null, voiceReason = '正在載入中文語音…', speechBroken = false, speechTicket = 0;
+  const active = new Set();
+  const stats = {created: 0, released: 0, peak: 0, scheduled: 0};
+  const synth = (() => { try { return window.speechSynthesis; } catch { return null; } })();
+  function voices() {
+    try {
+      const list = synth?.getVoices() || [];
+      voice = list.find(v => /^zh[-_]TW$/i.test(v.lang)) || list.find(v => /^zh(?:[-_]|$)/i.test(v.lang) && !/[-_]HK(?:$|[-_])/i.test(v.lang)) || null;
+      voiceReason = !synth || !window.SpeechSynthesisUtterance ? '此瀏覽器不支援語音提示' : speechBroken ? '此裝置無法播放語音，已自動停用' : !voice ? '此裝置沒有可用的中文語音，已自動停用語音提示；載入後會自動恢復' : /^zh[-_]TW$/i.test(voice.lang) ? `台灣中文語音：${voice.name}` : `此裝置沒有台灣中文語音，使用 ${voice.lang}：${voice.name}`;
+    } catch { voice = null; voiceReason = '無法讀取中文語音，已自動停用語音提示'; }
+    const status = $('#voice-status');
+    if (status) status.textContent = voiceReason;
   }
+  voices();
+  try { synth?.addEventListener('voiceschanged', () => { voices(); target(true); }); } catch { /* Optional API. */ }
+  function ramp(param, value, seconds = .12) {
+    if (!context || !param) return;
+    const now = context.currentTime;
+    param.cancelScheduledValues(now);
+    param.setValueAtTime(param.value, now);
+    param.linearRampToValueAtTime(value, now + seconds);
+  }
+  function apply() {
+    if (!context) return;
+    ramp(master.gain, save.settings.muted ? 0 : .72);
+    ramp(musicVolume.gain, save.settings.music ? save.settings.musicVolume / 100 * .45 : 0);
+    ramp(effectsVolume.gain, save.settings.effects ? save.settings.effectsVolume / 100 * .65 : 0);
+    ramp(duckGain.gain, speaking ? .24 : 1, speaking ? .06 : .25);
+  }
+  function release(item) {
+    if (!active.delete(item)) return;
+    item.osc.onended = null;
+    try { item.osc.disconnect(); item.gain.disconnect(); } catch { /* Already disconnected. */ }
+    stats.released++;
+  }
+  function stopNotes(channel, at = context?.currentTime || 0) {
+    for (const item of [...active]) if (!channel || item.channel === channel) {
+      try { item.gain.gain.cancelScheduledValues(at); item.gain.gain.setTargetAtTime(.0001, at, .025); item.osc.stop(at + .1); } catch { release(item); }
+    }
+  }
+  function note(midi, at, duration, volume, type = 'sine', channel = 'music', endMidi = midi) {
+    if (!context || active.size >= 48) return;
+    let osc, gain, item;
+    try {
+      osc = context.createOscillator(); gain = context.createGain();
+      item = {osc, gain, channel}; active.add(item); stats.created++; stats.peak = Math.max(stats.peak, active.size);
+      osc.type = type;
+      osc.frequency.setValueAtTime(440 * 2 ** ((midi - 69) / 12), at);
+      osc.frequency.exponentialRampToValueAtTime(440 * 2 ** ((endMidi - 69) / 12), at + duration);
+      gain.gain.setValueAtTime(0, at);
+      gain.gain.linearRampToValueAtTime(volume, at + Math.min(.012, duration / 4));
+      gain.gain.exponentialRampToValueAtTime(.0001, at + duration);
+      osc.connect(gain); gain.connect(channel === 'music' ? filter : effectsVolume);
+      osc.onended = () => release(item);
+      osc.start(at); osc.stop(at + duration + .025);
+    } catch { if (item) release(item); else { try { osc?.disconnect(); gain?.disconnect(); } catch {} } }
+  }
+  const degree = (score, d) => score.root + score.scale[((d % 7) + 7) % 7] + Math.floor(d / 7) * 12;
+  function scheduleStep(at) {
+    const score = SCORE[theme];
+    if (!score) return;
+    const beat = 60 / (score.bpm * (boss ? 1.2 : 1));
+    const bar = Math.floor(step / 16) % 8, tick = step % 16;
+    const chord = score.chords[bar];
+    // Each bar has a distinct phrase; the second half answers the first.
+    if (tick % 2 === 0) {
+      const d = score.melody[(bar % 4) * 8 + tick / 2];
+      if (d >= 0) note(degree(score, d + (bar >= 4 && tick === 6 ? 2 : 0)) + 12, at, beat * .65, theme ? .105 : .065, 'sine');
+    }
+    if (tick === 0 || tick === 8) for (const d of [chord, chord + 2, chord + 4]) note(degree(score, d), at, beat * 1.85, .025, 'triangle');
+    if (tick % 4 === 0) note(degree(score, chord + (tick === 8 ? 4 : 0)) - 24, at, beat * .7, boss ? .12 : .075, 'triangle');
+    if (tick % (boss ? 2 : 4) === 2) note(86, at, .045, theme ? .022 : .009, 'triangle', 'music', 62);
+    if (boss && tick % 4 === 0) note(43, at, .14, .09, 'sine', 'music', 26);
+    if (screen === 'play' && game?.hp / game?.maxHP < .3 && tick % 4 === 0) note(score.root - 12, at, .1, .065, 'triangle', 'music', score.root - 13);
+    step = (step + 1) % 128; stats.scheduled++;
+  }
+  function pump() {
+    clearTimeout(timer); timer = 0;
+    if (!context || paused || !unlocked || context.state !== 'running' || document.hidden) return;
+    // Discard missed time after suspension; never build a catch-up backlog.
+    if (nextTime < context.currentTime) nextTime = context.currentTime + .025;
+    const score = SCORE[theme];
+    if (!score) return;
+    while (nextTime < context.currentTime + .18) {
+      scheduleStep(nextTime);
+      nextTime += 60 / (score.bpm * (boss ? 1.2 : 1)) / 4;
+    }
+    timer = setTimeout(pump, 25);
+  }
+  function sync() {
+    const wanted = screen === 'play' ? game?.stage.region || 1 : 0;
+    const isBoss = screen === 'play' && !!game?.boss && !game?.training && !game?.guide;
+    const shouldPause = document.hidden || (screen === 'play' && !!game?.paused && (game?.guide?.step !== 'look' || !$('#start-overlay').hidden));
+    if (wanted !== theme || isBoss !== boss) {
+      stopNotes('music'); theme = wanted; boss = isBoss; step = 0; nextTime = (context?.currentTime || 0) + .12;
+    }
+    if (shouldPause && !paused) stopNotes('music');
+    const changed = paused !== shouldPause;
+    paused = shouldPause;
+    if (context) ramp(musicGate.gain, paused ? 0 : 1, .16);
+    if (changed && !paused) nextTime = (context?.currentTime || 0) + .03;
+    apply(); pump();
+  }
+  function unlock() {
+    unlocked = true;
+    $('#audio-hint').hidden = true;
+    if (!context && !failed) {
+      try {
+        const Engine = window.AudioContext || window.webkitAudioContext;
+        if (!Engine) throw Error('WebAudio unavailable');
+        context = new Engine();
+        master = context.createGain(); limiter = context.createDynamicsCompressor();
+        limiter.threshold.value = -12; limiter.knee.value = 8; limiter.ratio.value = 12; limiter.attack.value = .003; limiter.release.value = .18;
+        master.gain.value = 0; master.connect(limiter); limiter.connect(context.destination);
+        musicGate = context.createGain(); musicVolume = context.createGain(); duckGain = context.createGain(); effectsVolume = context.createGain();
+        musicGate.gain.value = 0; musicVolume.gain.value = 0; effectsVolume.gain.value = 0;
+        musicGate.connect(musicVolume); musicVolume.connect(duckGain); duckGain.connect(master); effectsVolume.connect(master);
+        filter = context.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 2600; filter.Q.value = .5;
+        delay = context.createDelay(.5); delay.delayTime.value = .19; feedback = context.createGain(); feedback.gain.value = .13;
+        filter.connect(musicGate); filter.connect(delay); delay.connect(feedback); feedback.connect(delay); feedback.connect(musicGate);
+        context.onstatechange = () => { if (context.state === 'running') sync(); };
+      } catch { failed = true; try { context?.close()?.catch(() => {}); } catch {} context = null; }
+    }
+    try { if (context && !['running', 'closed'].includes(context.state)) context.resume()?.then(sync).catch(() => {}); } catch { /* Gesture may still be denied. */ }
+    // iOS speech unlock is synchronous in the start/button gesture, even when voices load later.
+    if (!audio.speechUnlocked && synth && window.SpeechSynthesisUtterance) {
+      audio.speechUnlocked = true;
+      try { const silent = new SpeechSynthesisUtterance('嗯'); silent.volume = 0; silent.rate = 2; synth.speak(silent); } catch { /* Speech remains optional. */ }
+    }
+    sync();
+  }
+  function stopSpeech() {
+    ++speechTicket; clearTimeout(speechTimer); utterance = null; speaking = false;
+    try { synth?.cancel(); } catch { /* Optional API. */ }
+    apply();
+  }
+  function speak(text) {
+    if (!unlocked || document.hidden || save.settings.muted || !save.settings.speech || !save.settings.speechVolume || !voice || speechBroken || !synth || !window.SpeechSynthesisUtterance) return false;
+    stopSpeech();
+    const ticket = speechTicket;
+    try {
+      const u = new SpeechSynthesisUtterance(String(text)); utterance = u;
+      u.voice = voice; u.lang = voice.lang; u.rate = save.settings.speechRate; u.volume = save.settings.speechVolume / 100;
+      const ended = () => { if (ticket !== speechTicket) return; clearTimeout(speechTimer); speaking = false; utterance = null; apply(); };
+      u.onstart = () => { if (ticket === speechTicket) { speaking = true; apply(); } };
+      u.onend = ended;
+      u.onerror = event => {
+        if (ticket !== speechTicket) return;
+        ended();
+        if (!['canceled', 'interrupted'].includes(event.error)) { speechBroken = true; voices(); }
+      };
+      speaking = true; apply(); synth.speak(u);
+      // Some embedded browsers never emit end/error. Bound ducking duration.
+      speechTimer = setTimeout(ended, Math.max(4000, text.length * 750 / u.rate));
+      return true;
+    } catch { stopSpeech(); speechBroken = true; voices(); return false; }
+  }
+  function target(force = false, id) {
+    if (!game?.running || (game.paused && (game.guide?.step !== 'look' || !$('#start-overlay').hidden))) return;
+    if (game.guide) { if (force) speak(game.guide.items[game.guide.index].text); return; }
+    if (game.ime) {
+      if (game.currentSpell && (force || game.spokenSpell !== game.currentSpell)) {
+        if (speak(game.currentSpell.text)) game.spokenSpell = game.currentSpell;
+      }
+      return;
+    }
+    const e = id ? game.enemies.find(e => e.id === Number(id)) : game.enemies.find(e => e.id === game.locked) || closestEnemy();
+    if (e && (force || e.spokenQuestion !== e.q)) {
+      if (speak(e.q.text)) e.spokenQuestion = e.q;
+    }
+  }
+  function effect(type, progress = 0) {
+    if (!context || !unlocked || document.hidden || save.settings.muted || !save.settings.effects || !save.settings.effectsVolume) return;
+    const at = context.currentTime + .005;
+    const patterns = {
+      type: [62 + Math.min(12, progress * 2)], hit: [58,70], wrong: [49,43], lock: [69,76],
+      defeat: [67 + Math.min(12, game?.combo || 0),74 + Math.min(12, game?.combo || 0),79],
+      combo: [72,76,79,84], hurt: [43,38,31], warning: [61,61,68], boss: [40,33,28],
+      peek: [83,78,74], count: [67], start: [67,74,79], click: [76], unlock: [60,67,72,76],
+      star: [79 + progress * 2,86 + progress * 2], buy: [64,71,76,83], win: [60,64,67,72,79,76,84], lose: [60,55,51,48],
+    };
+    const notes = patterns[type] || patterns.click;
+    const spacing = ['win','lose','unlock'].includes(type) ? .13 : type === 'count' ? .08 : .045;
+    notes.forEach((midi, i) => note(midi, at + i * spacing, type === 'type' || type === 'click' ? .045 : ['win','lose'].includes(type) ? .32 : .14, type === 'type' ? .045 : .1, ['wrong','hurt','boss'].includes(type) ? 'triangle' : 'sine', 'effects', ['wrong','hurt','boss'].includes(type) ? midi - 5 : midi));
+  }
+  function settingsChanged() {
+    if (save.settings.muted || !save.settings.speech || !save.settings.speechVolume) stopSpeech();
+    apply(); sync();
+  }
+  function suspend() { stopSpeech(); sync(); }
+  return {unlock, sync, speak, target, stopSpeech, suspend, effect, voices, settingsChanged,
+    get status() { return voiceReason; },
+    get diagnostics() { return {unlocked, failed, theme, boss, paused, speaking, voice: voice?.lang || null, active: active.size, ...stats}; },
+  };
+})();
+function sound(type, progress) { audio.effect(type, progress); }
+function soundSettingsHTML() {
+  return `<section class="sound-settings"><h3>聲音</h3><p id="voice-status" class="muted" role="status">${escapeHTML(audio.status)}</p>${[['speech','語音'],['music','音樂'],['effects','音效']].map(([key,label]) => `<div class="sound-row"><label><input type="checkbox" data-sound-setting="${key}" ${save.settings[key] ? 'checked' : ''}>${label}</label><label for="${key}-volume">音量 <output id="${key}-percent">${save.settings[key+'Volume']}%</output></label><input id="${key}-volume" aria-label="${label}音量" type="range" min="0" max="100" value="${save.settings[key+'Volume']}" data-sound-setting="${key}Volume"></div>`).join('')}<label for="speech-rate">語速</label><select id="speech-rate" data-sound-setting="speechRate">${[.8,1,1.2].map(rate => `<option value="${rate}" ${save.settings.speechRate === rate ? 'selected' : ''}>${rate.toFixed(1)}</option>`).join('')}</select><div class="sound-tests"><button data-action="test-speech">測試語音</button><button data-action="test-sound">測試音效</button></div><p class="muted">總靜音會關閉所有聲音；裝置未提供中文語音時，遊戲仍可照常練習。iPhone 側邊靜音鍵開啟時，WebAudio 音樂／音效可能沒有聲音；請關閉靜音並調整媒體音量。</p></section>`;
 }
+
+function judge(enemy, reason) {
+  lastJudgment = `raw=${inputState.raw || '∅'} consumed=${inputState.consumed} 目標 ${enemy?.q.pinyin || '—'}：${reason}`;
+  renderDebug();
+}
+function comboBanner(text, count = 0) {
+  const field = game.ime ? $('#duel-panel') : $('#battlefield');
+  field.querySelector('.combo-banner')?.remove();
+  const banner = document.createElement('div');
+  banner.className = `combo-banner${[5,10,15].includes(count) ? ' tier-up' : ''}`;
+  banner.style.setProperty('--combo-size', `${Math.min(46, 32 + count * .7)}px`);
+  banner.textContent = text;
+  if (count >= 5) {
+    const label = document.createElement('small');
+    label.textContent = `得分 ×${multiplier().toFixed(1)}`;
+    banner.append(label);
+  }
+  field.append(banner);
+  // Keep the celebration in the upper field without covering a question card.
+  const bounds = field.getBoundingClientRect();
+  const center = bounds.left + bounds.width / 2;
+  const cards = [...field.querySelectorAll('.enemy:not(.defeated) .question-card')]
+    .map(card => card.getBoundingClientRect()).filter(r => r.left < center + 95 && r.right > center - 95).sort((a,b)=>a.top-b.top);
+  let top = 5;
+  for (const r of cards) if (r.top - bounds.top < top + 48 && r.bottom - bounds.top > top) top = r.bottom - bounds.top + 12;
+  banner.style.top = `${top}px`;
+  setTimeout(() => banner.remove(), 1300);
+}
+function magic(enemy, large = false) {
+  const field = game.ime ? $('#duel-panel') : $('#battlefield');
+  const bolts = field.querySelectorAll('.magic-bolt');
+  if (bolts.length >= 12) {
+    if (!large) return;
+    // A coalesced IME update may create many small shots at once. Reserve the
+    // finishing fireball even when the visual budget has already been filled.
+    bolts[0].remove();
+  }
+  const battle = game;
+  const rect = field.getBoundingClientRect();
+  const targetRect = (enemy?.element.querySelector('.creature') || $('#duel-art')).getBoundingClientRect();
+  const mageRect = $('#mage').getBoundingClientRect();
+  const sx = game.ime ? rect.width * .55 : mageRect.left - rect.left + mageRect.width * .13;
+  const sy = game.ime ? rect.height - 15 : mageRect.top - rect.top + mageRect.height * .45;
+  const tx = targetRect.left - rect.left + targetRect.width / 2;
+  const ty = targetRect.top - rect.top + targetRect.height / 2;
+  const bolt = document.createElement('i');
+  bolt.className = `magic-bolt${large ? ' fireball' : ''}`;
+  bolt.style.cssText = `left:${sx}px;top:${sy}px;--dx:${tx-sx}px;--dy:${ty-sy}px;--angle:${Math.atan2(ty-sy,tx-sx)}rad`;
+  field.append(bolt);
+  animate($('#mage'), 'staff-flash');
+  setTimeout(() => {
+    bolt.remove();
+    // A finished/restarted battle must never receive delayed damage or effects.
+    if (!field.isConnected || screen !== 'play' || game !== battle) return;
+    const burst = document.createElement('div');
+    burst.className = large ? 'magic-explosion' : 'magic-spark';
+    burst.style.cssText = `left:${tx}px;top:${ty}px`;
+    burst.innerHTML = Array.from({length: large ? 10 : 4}, (_,i) => `<i style="--angle:${i * 360 / (large ? 10 : 4)}deg"></i>`).join('');
+    field.append(burst);
+    if (enemy?.element.isConnected) animate(enemy.element, game.boss ? 'boss-impact' : 'hit');
+    if (large) animate(field, 'magic-shake');
+    setTimeout(() => burst.remove(), 430);
+  }, large ? 190 : 150);
+}
+document.addEventListener('input', event => {
+  const key = event.target.dataset.soundSetting;
+  if (!key) return;
+  audio.unlock();
+  save.settings[key] = event.target.type === 'checkbox' ? event.target.checked : Number(event.target.value);
+  const percent = $(`#${key.replace('Volume','')}-percent`);
+  if (percent && key.endsWith('Volume')) percent.textContent = `${save.settings[key]}%`;
+  audio.settingsChanged(); persist();
+});
+// Unlock before native focus/button handlers; do not create audio on page load.
+document.addEventListener('pointerdown', event => {
+  if (event.isTrusted && event.target.closest('button')) audio.unlock();
+}, true);
+
 function animate(element, className) {
   if (!element) return;
   element.classList.remove(className);
@@ -1658,6 +1999,7 @@ function animate(element, className) {
 }
 function showScreen(name) {
   screen = name;
+  audio.stopSpeech(); audio.sync();
   if (name !== 'play') document.body.classList.remove('learning');
   document.body.classList.toggle('playing', name === 'play');
   if (name !== 'play') { cancelKeyboardWait(); $('#start-overlay').hidden = true; castInput.blur(); }
@@ -1790,17 +2132,18 @@ function buy(key) {
   persist();
   showShop();
   toast(`${item.title}升級完成`);
+  sound('buy');
 }
 
 function stagePool(stage) {
   if (stage.reviewOnly) return [...stage.pool];
   const validKind = stage.region === 1 ? 'phonics' : stage.region === 4 ? 'word' : stage.region === 5 ? 'sentence' : 'character';
-  const previous = stages.slice(0, stages.findIndex(s => s.id === stage.id) + 1).flatMap(s => s.pool);
-  const known = new Set(previous);
+  const known = new Set(save.learned);
   const review = Object.entries(save.review).filter(([id, item]) => item.mastered < 3 && known.has(id) && questionsById[id].kind === validKind).map(([id]) => id);
   return [...new Set([...stage.pool, ...review])];
 }
 function startGame(stage = pendingStage, skipGuide = false) {
+  audio.unlock();
   if (!stage || !isUnlocked(stage)) return;
   cancelKeyboardWait();
   closeModal();
@@ -1821,7 +2164,7 @@ function startGame(stage = pendingStage, skipGuide = false) {
     completedCharacters: 0, elapsed: 0, mistakes: {}, kills: 0, spawned: 0,
     total, enemies: [], parked: [], locked: null, serial: 0, spawnIn: .35,
     maxEnemies: Math.min(3, stage.maxSimultaneous, firsts.size),
-    speed: (2.4 + order * .18) * (stage.movementScale || 1),
+    speed: 96 / (stage.id === 'r1-1' ? 16 : stage.region === 4 ? 14 : Math.max(9, 14 - order * .15)),
     spawnInterval: Math.max(1.15, 3.0 - order * .065),
     bossMax: CONFIG.bossSegments * CONFIG.bossSegmentHP,
     bossHP: CONFIG.bossSegments * CONFIG.bossSegmentHP,
@@ -1910,10 +2253,11 @@ function spawnEnemy(forcedQuestion = null) {
   const element = document.createElement('div');
   const enemy = {
     id: ++game.serial, q, progress: 0, x: game.boss ? 72 : 96,
-    lane: 0, variant: (game.serial - 1) % 3, remaining: game.boss || game.training ? 1 : Math.max(game.stage.questionsPerMonster || 1, (game.serial - 1) % 3 === 2 ? 2 : 1),
+    lane: 0, variant: (game.serial - 1) % 3, remaining: game.boss || game.training || game.stage.region !== 4 ? 1 : (game.stage.questionsPerMonster || 2),
     clean: true, peeked: false, reveal: 0, element,
   };
   enemy.lane = lane;
+  enemy.maxRemaining = enemy.remaining;
   element.className = `enemy${game.boss ? ' boss' : ''}${q.kind === 'word' ? ' word' : ''}`;
   element.dataset.enemyId = enemy.id;
   $('#enemy-layer').append(element);
@@ -1921,6 +2265,7 @@ function spawnEnemy(forcedQuestion = null) {
   game.spawned++;
   renderEnemy(enemy);
   positionEnemy(enemy);
+  if (!game.training) audio.target();
   return true;
 }
 function positionEnemy(enemy) {
@@ -1936,9 +2281,18 @@ function positionEnemy(enemy) {
   const actualWidth = element.offsetWidth;
   const track = (width - 12) / count;
   const left = count === 1 ? (width - actualWidth) / 2 : 6 + track * enemy.lane + (track - actualWidth) / 2;
-  const travel = Math.max(0, height - element.offsetHeight - 54);
+  const travel = Math.max(0, height - element.offsetHeight - 8);
   const top = 4 + (1 - enemy.x / 100) * travel;
   element.style.transform = `translate(${left.toFixed(1)}px,${top.toFixed(1)}px)`;
+  element.classList.toggle('urgent', enemy.x < 25);
+  const line = $('#target-line');
+  if (game.locked === enemy.id && line) {
+    const mage = $('#mage');
+    const sx = mage.offsetLeft + mage.clientWidth / 2, sy = height - 24;
+    const tx = left + actualWidth / 2, ty = top + element.offsetHeight;
+    line.style.cssText = `left:${sx}px;top:${sy}px;width:${Math.hypot(tx-sx,ty-sy)}px;transform:rotate(${Math.atan2(ty-sy,tx-sx)}rad)`;
+    line.hidden = false;
+  } else if (!game.locked && line) line.hidden = true;
 
 }
 function renderEnemy(enemy) {
@@ -1947,7 +2301,7 @@ function renderEnemy(enemy) {
   const answer = [...q.pinyin].map((letter, i) => `<span class="${i < enemy.progress ? 'typed' : reveal ? 'pending' : 'unknown'}">${i < enemy.progress || reveal ? letter : '·'}</span>`).join('');
   enemy.element.classList.toggle('locked', game.locked === enemy.id);
   enemy.element.classList.toggle('reveal', enemy.reveal > 0);
-  enemy.element.innerHTML = `<div class="question-card"><span class="lock-label">已鎖定</span><span class="reading">${escapeHTML(q.kind === 'phonics' ? (q.wholeSyllable ? '請打完整音節' : '請打注音片段') : q.zhuyin)}</span><span class="prompt">${escapeHTML(q.symbol || q.text)}</span>${q.kind === 'phonics' ? `<span class="example">例字：${q.text}</span>${q.notation === 'ü' ? `<span class="example">・${q.exampleNote}</span>` : ''}` : ''}<div class="answer" aria-label="${reveal ? q.pinyin : `已輸入 ${q.pinyin.slice(0, enemy.progress) || '尚無'}`}">${answer}</div>${enemy.remaining > 1 ? `<div class="plates" aria-label="剩餘 ${enemy.remaining} 題護甲">${Array.from({ length: enemy.remaining }, () => '<i></i>').join('')}</div>` : ''}</div>${creatureSVG(game.stage.region || 1, game.boss, enemy.variant || (enemy.lane % 3))}`;
+  enemy.element.innerHTML = `<div class="question-card"><span class="lock-label">已鎖定</span><button type="button" class="replay" data-action="replay" data-id="${enemy.id}" aria-label="再唸一次">◖))</button><span class="reading">${escapeHTML(q.kind === 'phonics' ? (q.wholeSyllable ? '請打完整音節' : '請打注音片段') : q.zhuyin)}</span><span class="prompt">${escapeHTML(q.symbol || q.text)}</span>${q.kind === 'phonics' ? `<span class="example">例字：${q.text}</span>${q.notation === 'ü' ? `<span class="example">・${q.exampleNote}</span>` : ''}` : ''}<div class="answer" aria-label="${reveal ? q.pinyin : `已輸入 ${q.pinyin.slice(0, enemy.progress) || '尚無'}`}">${answer}</div>${game.boss || enemy.maxRemaining > 1 ? `<div class="plates" aria-label="剩餘 ${game.boss ? game.bossHP : enemy.remaining} 題護甲">${Array.from({length: game.boss ? game.bossMax : enemy.maxRemaining}, (_,i) => `<i class="${i >= (game.boss ? game.bossHP : enemy.remaining) ? 'empty' : ''}"></i>`).join('')}</div>` : ''}</div>${creatureSVG(game.stage.region || 1, game.boss, enemy.variant || (enemy.lane % 3))}`;
 }
 function message(text, error = false, duration = 3) {
   $('#battle-message').textContent = text;
@@ -1974,10 +2328,13 @@ function updateHUD() {
   $('#guard-label').textContent = game.guard ? '連擊保護 ×1' : save.upgrades.guard ? '連擊保護已用完' : '';
   if (game.boss || game.ime) {
     const segmentHP = game.bossMax / CONFIG.bossSegments;
-    $('#boss-bars').innerHTML = Array.from({ length: CONFIG.bossSegments }, (_, index) => {
+    const bars = $('#boss-bars');
+    if (bars.children.length !== CONFIG.bossSegments) bars.innerHTML = Array.from({length: CONFIG.bossSegments}, (_, index) => `<div class="meter" role="progressbar" aria-label="第 ${index + 1} 段王血量" aria-valuemin="0" aria-valuemax="100"><i></i></div>`).join('');
+    [...bars.children].forEach((bar, index) => {
       const percent = clamp((game.bossHP - index * segmentHP) / segmentHP, 0, 1) * 100;
-      return `<div class="meter" role="progressbar" aria-label="第 ${index + 1} 段王血量" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${percent.toFixed(0)}"><i style="width:${percent}%"></i></div>`;
-    }).join('');
+      bar.setAttribute('aria-valuenow', percent.toFixed(0));
+      bar.firstElementChild.style.width = `${percent}%`;
+    });
     $('#charge-fill').style.width = `${game.charge * 100}%`;
     $('#charge-label').textContent = `王蓄力 ${Math.floor(game.charge * 100)}% · 約 ${Math.ceil((1 - game.charge) * game.chargeSeconds)} 秒後攻擊`;
   }
@@ -1998,6 +2355,7 @@ function unlockTarget() {
   if (!game?.locked) return false;
   const enemy = game.enemies.find(e => e.id === game.locked);
   game.locked = null;
+  $('#target-line').hidden = true;
   if (enemy) {
     enemy.progress = 0;
     renderEnemy(enemy);
@@ -2025,6 +2383,7 @@ function breakCombo(allowGuard = true) {
     game.guard--;
     return true;
   }
+  if (game.combo >= 2) comboBanner('連擊中斷');
   game.combo = 0;
   return false;
 }
@@ -2036,6 +2395,8 @@ function wrongKey(enemy) {
     enemy.reveal = CONFIG.revealSeconds;
     if (!game.boss) enemy.x = Math.max(0, enemy.x - 5);
     recordMistake(enemy.q);
+    audio.speak(enemy.q.text);
+    judge(enemy, '不符合前綴，請重打');
     renderEnemy(enemy);
     animate(enemy.element, 'hurt');
     enemy.progress = 0;
@@ -2074,7 +2435,8 @@ function attack(letter) {
     const following = game.enemies.filter(e => e !== enemy && e.lane === enemy.lane && e.x > enemy.x).sort((a, b) => a.x - b.x)[0];
     enemy.x = Math.min(following ? following.x - 24 : 96, enemy.x + 1.1);
   }
-  sound('hit');
+  sound('type', enemy.progress);
+  magic(enemy);
   renderEnemy(enemy);
   animate(enemy.element, 'hit');
   animate($('#mage'), 'hit');
@@ -2089,9 +2451,18 @@ function nextEnemyQuestion(enemy) {
   enemy.reveal = 0;
   enemy.peeked = false;
   game.locked = null;
+  $('#target-line').hidden = true;
   renderEnemy(enemy);
+  animate(enemy.element.querySelector('.question-card'), 'card-flip');
+  audio.target();
 }
 function completeQuestion(enemy) {
+  const defeats = !game.boss && enemy.remaining <= 1;
+  judge(enemy, defeats ? '完整符合，擊倒！' : '完整符合，命中扣一格');
+  magic(enemy, true);
+  sound('hit');
+  message(defeats ? '擊倒！' : `命中！還差 ${game.boss ? Math.max(0, game.bossHP - 1) : enemy.remaining - 1} 題！`);
+  floating(defeats ? '擊倒！' : '命中！', enemy);
   const clean = enemy.clean && !enemy.peeked;
   game.letters += enemy.q.pinyin.length;
   recordMastery(enemy.q, clean);
@@ -2100,10 +2471,11 @@ function completeQuestion(enemy) {
     game.kills++;
     if (clean) addCombo();
     game.score += Math.round(100 * multiplier());
-    floating('護甲 -1', enemy);
+    floating(`命中！還差 ${game.bossHP} 題！`, enemy);
+    animate($('#boss-bars'), 'health-hit');
     sound('defeat');
     if (game.bossHP <= 0) {
-      finishGame(true);
+      completeVictory();
       return;
     }
     enemy.clean = true;
@@ -2113,7 +2485,9 @@ function completeQuestion(enemy) {
   enemy.remaining--;
   game.score += Math.round(50 * multiplier());
   if (enemy.remaining > 0) {
-    floating('破甲！再一題', enemy);
+    sound('hit');
+    floating(`命中！還差 ${enemy.remaining} 題！`, enemy);
+    animate(enemy.element, 'health-hit');
     nextEnemyQuestion(enemy);
   } else {
     game.kills++;
@@ -2129,20 +2503,22 @@ function addCombo() {
   game.combo++;
   game.longest = Math.max(game.longest, game.combo);
   animate($('#combo-value'), 'combo-pop');
+  if (game.combo >= 2) comboBanner(`COMBO ×${game.combo}`, game.combo);
+  if ([5,10,15].includes(game.combo)) sound('combo');
   if (game.combo % CONFIG.comboStep === 0) message(`${game.combo} 連擊！得分倍率 ×${multiplier().toFixed(1)}`);
 }
 function removeEnemy(enemy, defeated = false) {
   game.enemies = game.enemies.filter(e => e !== enemy);
-  if (game.locked === enemy.id) game.locked = null;
+  if (game.locked === enemy.id) { game.locked = null; $('#target-line').hidden = true; }
   if (defeated) {
     enemy.element.classList.add('defeated');
-    setTimeout(() => enemy.element.remove(), 260);
+    setTimeout(() => enemy.element.remove(), 450);
   } else enemy.element.remove();
 }
 function hurt(amount) {
   game.hp = Math.max(0, game.hp - amount);
   breakCombo(false);
-  animate($('#gate'), 'hurt');
+  animate($('#gate'), 'gate-hit');
   animate(game.ime ? $('#duel-panel') : $('#battlefield'), 'hurt');
   sound('hurt');
   message(`城門受到 ${amount} 點傷害，穩住節奏！`, true);
@@ -2151,7 +2527,7 @@ function hurt(amount) {
 }
 function checkWaves() {
   restoreTracks();
-  if (game.running && !game.boss && !game.ime && game.spawned >= game.total && !game.enemies.length && !game.parked.length) finishGame(true);
+  if (game.running && !game.boss && !game.ime && game.spawned >= game.total && !game.enemies.length && !game.parked.length) completeVictory();
 }
 function peek() {
   if (!game?.running || game.paused || game.peeks <= 0) return;
@@ -2168,6 +2544,7 @@ function peek() {
   }
   game.peeks--;
   breakCombo(false);
+  sound('peek');
   message('手札已顯示正確拼音；這次答對不累積連擊。');
   updateHUD();
 }
@@ -2213,6 +2590,7 @@ function nextSpell() {
   $('#spell-hint').textContent = question.zhuyin;
   castInput.value = '';
   castInput.readOnly = false;
+  audio.target();
 }
 
 function castSpell() {
@@ -2244,7 +2622,7 @@ function castSpell() {
     game.charge = Math.min(.99, game.charge + (game.boss ? .12 : .07));
     if (game.boss) game.bossHP = Math.min(game.bossMax, game.bossHP + .3);
     message(`已逐字標錯，正確率 ${(result.ratio * 100).toFixed(0)}%。${protectedCombo ? '連擊護符已生效。' : '請留意紅色標記。'}`, true, 5);
-    sound('wrong');
+    sound('wrong'); audio.speak(q.text);
   }
   if (result.ratio < .8) {
     $('#spell-feedback').insertAdjacentHTML('beforeend', '<small class="muted" style="display:block;font-size:12px">未達 80%，這次未造成傷害；請對照題句重新輸入。</small>');
@@ -2265,12 +2643,14 @@ function castSpell() {
   game.score += Math.round((result.errors === 0 ? 300 : 150) * multiplier());
   game.charge = Math.max(0, game.charge - .12);
   animate($('#duel-art'), 'hit');
+  magic(null, true);
+  lastJudgment = `整句正確率 ${(result.ratio*100).toFixed(0)}%，命中扣 ${damage} 格`; renderDebug();
   sound('defeat');
   $('#spell-feedback').insertAdjacentHTML('beforeend', `<small class="muted" style="display:block;font-size:12px">咒語命中，護甲 -${damage}；${result.errors ? '可對照紅字記住正確用字。' : '全句正確！'}</small>`);
   resetInput();
   rotateInput();
   if (game.bossHP <= 0) {
-    finishGame(true);
+    completeVictory();
     return;
   }
   game.spellAdvance = result.errors ? 2.7 : 1.2;
@@ -2281,6 +2661,7 @@ function castSpell() {
 function pauseGame(reason = '怪物與王的蓄力已停止。', showMenu = true) {
   if (!game?.running) return;
   game.paused = true;
+  audio.suspend();
   cancelKeyboardWait();
   if (showMenu) showPauseMenu(reason);
 }
@@ -2288,9 +2669,18 @@ function showPauseMenu(reason = '怪物與王的蓄力已停止。') {
   readyOverlay(reason, '點我繼續', true);
 }
 function resumeGame() {
-  if (!game?.running) return;
+  if (!game?.running || game.completing) return;
   closeModal();
   beginKeyboard();
+}
+function completeVictory() {
+  if (!game?.running || game.completing) return;
+  const battle = game;
+  game.completing = true;
+  game.paused = true;
+  audio.suspend();
+  // Let the final projectile land and its explosion paint before the result.
+  setTimeout(() => { if (game === battle && battle.running) finishGame(true); }, 450);
 }
 function finishGame(won) {
   if (!game?.running) return;
@@ -2327,13 +2717,20 @@ function finishGame(won) {
   showScreen('result');
   $('#result-screen .primary')?.focus();
   if (won) { sound('win'); $('#result-screen').classList.add('celebrate'); setTimeout(() => $('#result-screen').classList.remove('celebrate'), 1600); }
-  else sound('hurt');
+  else sound('lose');
+  audio.speak(won ? '守住了，做得好！' : '城門失守，再試一次。');
+  if (won) {
+    const resultGame = game;
+    for (let i = 0; i < stars; i++) setTimeout(() => { if (game === resultGame && screen === 'result') sound('star', i); }, 600 + i * 300);
+    if (next && !previous.stars) setTimeout(() => { if (game === resultGame && screen === 'result') sound('unlock'); }, 1700);
+  }
 }
 
 function tick(time) {
   const dt = lastTime ? Math.min((time - lastTime) / 1000, .06) : 0;
   lastTime = time;
   if (game?.running && !game.paused && game.training && game.onboarding < 3) {
+    for (const enemy of game.enemies) { enemy.x = Math.max(38, enemy.x - dt * 3.5); positionEnemy(enemy); }
     game.idleSeconds = (game.idleSeconds || 0) + dt;
     $('#battlefield').classList.toggle('answer-nudge', game.idleSeconds >= 8);
     if (game.idleSeconds >= 20 && !$('#late-skip')) $('#action-prompt').insertAdjacentHTML('beforeend', ' <button id="late-skip" data-action="skip-onboarding">跳過教學</button>');
@@ -2347,7 +2744,9 @@ function tick(time) {
     }
     if (game.boss || game.ime) {
       game.charge += dt / game.chargeSeconds;
+      if (game.charge >= .75 && !game.chargeWarned) { game.chargeWarned = true; sound('warning'); }
       if (game.charge >= 1) {
+        sound('boss'); game.chargeWarned = false;
         game.charge = 0;
         hurt(game.ime ? 22 : 25);
       }
@@ -2360,7 +2759,7 @@ function tick(time) {
         }
       }
       for (const enemy of [...game.enemies]) {
-        if (!game.boss) enemy.x -= dt * game.speed * (enemy.variant === 1 ? 1.18 : enemy.variant === 2 ? .85 : 1);
+        if (!game.boss) enemy.x -= dt * game.speed;
         if (enemy.reveal > 0) {
           enemy.reveal -= dt;
           if (enemy.reveal <= 0) renderEnemy(enemy);
@@ -2380,7 +2779,7 @@ function tick(time) {
       game.spellAdvance -= dt;
       if (game.spellAdvance <= 0) nextSpell();
     }
-    if (game.running) updateHUD();
+    if (game.running) { updateHUD(); audio.target(); }
   }
   requestAnimationFrame(tick);
 }
@@ -2421,7 +2820,10 @@ function handleAction(action, id) {
     case 'shop': showShop(); break;
     case 'buy': buy(id); break;
     case 'peek': peek(); break;
-    case 'sound': save.settings.sound = !save.settings.sound; persist(); if (save.settings.sound) sound('hit'); break;
+    case 'sound': save.settings.muted = !save.settings.muted; save.settings.sound = !save.settings.muted; audio.settingsChanged(); persist(); break;
+    case 'replay': audio.target(true, id); break;
+    case 'test-speech': audio.speak('你好，跟著聲音一起練習拼音。'); break;
+    case 'test-sound': sound('combo'); break;
     case 'reset': resetProgress(); break;
     case 'reset-confirm': resetProgress(2); break;
     case 'reset-final':
@@ -2438,6 +2840,8 @@ document.addEventListener('click', event => {
   if (!button || button.disabled) return;
   // 遊戲過程中的地圖功能必須先暫停，避免藏在視窗後繼續扣血。
   if (game?.running && screen === 'play' && ['review', 'shop'].includes(button.dataset.action)) pauseGame('遊戲已暫停。', false);
+  audio.unlock();
+  if (!['sound', 'replay'].includes(button.dataset.action)) sound('click');
   handleAction(button.dataset.action, button.dataset.id);
 });
 $('#theme-select').addEventListener('change', event => {
@@ -2533,7 +2937,7 @@ function renderDebug() {
   if (!save.settings.debug) return;
   const ua = /iPhone|iPad|Android/.exec(navigator.userAgent)?.[0] || navigator.platform;
   const browser = /(?:CriOS|Chrome|Version|Firefox)\/[\d.]+/.exec(navigator.userAgent)?.[0] || 'WebView';
-  $('#debug-context').textContent = `vv/window ${Math.round(window.visualViewport?.height || innerHeight)}/${innerHeight} active=${document.activeElement?.dataset.slot || document.activeElement?.tagName}\nUA ${ua} ${browser} · D=data C=isComposing V=value R=raw N=consumed T=target`;
+  $('#debug-context').textContent = `vv/window ${Math.round(window.visualViewport?.height || innerHeight)}/${innerHeight} active=${document.activeElement?.dataset.slot || document.activeElement?.tagName}\n判定 ${lastJudgment}\nUA ${ua} ${browser} · D=data C=isComposing V=value R=raw N=consumed T=target`;
   $('#debug-events').textContent = debugEvents.join('\n');
 }
 function logInput(event, input) {
@@ -2567,7 +2971,7 @@ function sceneSVG(region) {
 }
 function showSettings() {
   if (game?.running) pauseGame('設定期間已暫停。', false);
-  openModal('settings', `${dialogHeader('施法設定')}<div class="teach-rule"><h3>鍵盤模式</h3><p>第 1 區打字母；第 2～4 區可用拼音選字。第五區一律使用一般文字輸入框。</p><label for="keyboard-mode">選擇鍵盤</label><select id="keyboard-mode">${[['pinyin','手機拼音鍵盤（預設）'],['english','英文鍵盤'],['builtin','遊戲內建鍵盤']].map(([v,t]) => `<option value="${v}" ${save.settings.keyboardMode === v ? 'selected' : ''}>${t}</option>`).join('')}</select><p class="muted">手機拼音鍵盤會在命中或重試時換焦，清除組字。英文鍵盤只接受字母；內建鍵盤適用第 1～4 區。</p><label class="debug-switch"><input id="debug-toggle" type="checkbox" ${save.settings.debug ? 'checked' : ''}>偵錯資訊（最近 8 筆輸入事件）</label></div><div class="dialog-actions"><button class="primary" data-action="close">完成</button></div>`);
+  openModal('settings', `${dialogHeader('施法設定')}<div class="teach-rule"><h3>鍵盤模式</h3><p>第 1 區打字母；第 2～4 區可用拼音選字。第五區一律使用一般文字輸入框。</p><label for="keyboard-mode">選擇鍵盤</label><select id="keyboard-mode">${[['pinyin','手機拼音鍵盤（預設）'],['english','英文鍵盤'],['builtin','遊戲內建鍵盤']].map(([v,t]) => `<option value="${v}" ${save.settings.keyboardMode === v ? 'selected' : ''}>${t}</option>`).join('')}</select><p class="muted">手機拼音鍵盤會在命中或重試時換焦，清除組字。英文鍵盤只接受字母；內建鍵盤適用第 1～4 區。</p><label class="debug-switch"><input id="debug-toggle" type="checkbox" ${save.settings.debug ? 'checked' : ''}>偵錯資訊（最近 8 筆輸入事件）</label></div>${soundSettingsHTML()}<div class="dialog-actions"><button class="primary" data-action="close">完成</button></div>`);
 }
 document.addEventListener('change', event => {
   if (event.target.id === 'keyboard-mode') {
@@ -2589,6 +2993,7 @@ function readyOverlay(reason, label = '開始', menu = false) {
   const panel = $('#start-overlay');
   panel.hidden = false;
   panel.innerHTML = `<div class="start-card"><p id="start-reason">${escapeHTML(reason)}</p><button class="primary" data-action="ready">${label}</button>${menu ? '<div class="pause-actions"><button data-action="map">回地圖</button><button data-action="restart">重來</button><button data-action="settings">設定</button></div>' : ''}</div>`;
+  audio.sync();
 }
 function cancelKeyboardWait() {
   clearTimeout(keyboardTimer);
@@ -2599,9 +3004,11 @@ function cancelKeyboardWait() {
 }
 function beginKeyboard() {
   if (!game?.running) return;
+  audio.unlock();
   cancelKeyboardWait();
   const ticket = keyboardTicket;
   game.paused = true;
+  audio.suspend();
   keyboardSeen = false;
   $('#builtin-keyboard').hidden = !useBuiltin();
   if (useBuiltin()) { keyboardSeen = false; }
@@ -2623,23 +3030,26 @@ function runCountdown(ticket) {
   keyboardTimer = 0;
   if (countdownTimer) return;
   let count = 3;
+  sound('count');
   readyOverlay('3');
   $('#start-overlay button').hidden = true;
   $('#start-overlay').classList.add('counting');
   countdownTimer = setInterval(() => {
     if (ticket !== keyboardTicket || !game?.running) { clearInterval(countdownTimer); countdownTimer = 0; return; }
     count--;
-    if (count > 0) { $('#start-reason').textContent = count; return; }
+    if (count > 0) { $('#start-reason').textContent = count; sound('count'); return; }
     clearInterval(countdownTimer);
     countdownTimer = 0;
     $('#start-overlay').hidden = true;
     $('#start-overlay').classList.remove('counting');
     game.paused = false;
+    sound('start'); audio.sync();
     lastTime = performance.now();
     if (game.training) renderOnboarding();
     else if (game.guide) renderGuide();
     else if (game.boss && !game.enemies.length && !game.ime) spawnEnemy();
     if (!game.training && !game.guide) setInstruction(game.ime ? '選出完整繁體中文，再按施放。' : '點怪或打首字母鎖定，再打完拼音。');
+    audio.target();
     message(game.ime ? '選出完整繁體中文，再按施放。' : '點怪或打首字母鎖定，連續打完拼音！', false, 5);
   }, 1000);
 }
@@ -2691,13 +3101,13 @@ window.visualViewport?.addEventListener('resize', updateViewport);
 window.visualViewport?.addEventListener('scroll', updateViewport);
 window.addEventListener('resize', updateViewport);
 updateViewport();
-function guideItems(stage) {
-  if (stage.region === 3) {
-    const pairs = [ ['知','字','吃','次'], ['南','藍','女','綠'], ['山','上','安','昂'], ['分','風','真','正'], ['心','星','金','京'], ['女','綠','去','學'], ['牛','對','春','水'], ['一','五','魚','月'] ];
-    const pair = pairs[Number(stage.id.split('-')[1]) - 1] || pairs[0];
-    return pair.map(t => stage.pool.map(id => questionsById[id]).find(q => q.text === t) || characters.find(q => q.text === t)).filter(Boolean).slice(0,4);
-  }
-  return stage.pool.slice(0, Math.min(4, stage.pool.length)).map(id => questionsById[id]);
+// Every newly introduced item is taught before it can enter combat.
+function guideItems(stage, learned = save.learned) {
+  const known = new Set(learned);
+  const group = soundGroups.find(g => g.id === stage.soundGroup);
+  const anchors = group ? group.exampleTexts.map(t => stage.pool.find(id => questionsById[id].text === t)).filter(Boolean) : [];
+  const ids = [...new Set([...anchors, ...stage.pool.filter(id => !known.has(id))])];
+  return (ids.length ? ids : stage.pool.slice(0,4)).map(id => questionsById[id]);
 }
 function beginGuide() {
   document.body.classList.add('learning');
@@ -2713,6 +3123,7 @@ function beginGuide() {
   $('#guide-panel').hidden = false;
   $('#builtin-keyboard').hidden = true;
   renderGuide();
+  audio.sync();
 }
 function keyDiagram(next) {
   return ['qwertyuiop','asdfghjkl','zxcvbnm'].map(row => `<div class="key-row">${[...row].map(c => `<i class="${c === next ? 'next-key' : ''}">${c}</i>`).join('')}</div>`).join('');
@@ -2722,10 +3133,15 @@ function renderGuide() {
   if (!g) return;
   const q = g.items[g.index];
   const known = g.step !== 'try' || g.retry;
+  const cue = `${g.step}:${g.index}:${g.retry}`;
+  if (g.spokenCue !== cue) {
+    g.spokenCue = cue;
+    audio.speak(g.retry || g.step === 'look' ? q.text : g.step === 'follow' ? '照著打一次。' : '想想拼音，自己試試看。');
+  }
   const labels = {look: '看・記住鍵位', follow: '跟・照著打一次', try: '試・自己想想看'};
   const group = soundGroups.find(x => x.id === game.stage.soundGroup);
   const hint = group?.commonMistake || (q.kind === 'phonics' ? `${q.exampleNote}。${q.wholeSyllable ? '這題打完整音節。' : `鍵位是 ${q.pinyin}，不要多加例字的其他聲韻。`}` : q.kind === 'sentence' ? '先練整句的拼音連打；戰鬥時用系統拼音選出繁體中文，再施放。' : '不加聲調。n／l 後的 ü 打 v；詞語連續打完。');
-  $('#guide-panel').innerHTML = `<div class="guide-top"><span class="eyebrow">引導練習・沒有怪物、不扣血</span><span>${g.index + 1} / ${g.items.length}</span></div><div class="guide-steps">${['look','follow','try'].map((v,i) => `<span class="${v === g.step ? 'active' : ''}">${i+1} ${labels[v].split('・')[0]}</span>`).join('')}</div><h2>${labels[g.step]}</h2><div class="lesson-card"><small>${q.zhuyin}</small><strong>${q.symbol || q.text}</strong><b class="mono">${known ? q.pinyin : '想想它的拼音'}</b>${q.kind === 'phonics' ? `<small>例字 ${q.text}${known ? ` · ${q.exampleNote || ''}` : ''}</small>` : ''}</div>${game.stage.region === 3 ? `<div class="pair-compare">${g.items.map(v => `<span>${v.text}<b class="mono">${g.step === 'try' && !g.retry ? '？' : v.pinyin}</b></span>`).join('')}</div>` : ''}<p class="lesson-note">${g.retry ? `正解是 ${q.pinyin}。請從頭重打一次，記住再前進。` : g.step === 'try' ? '這次先不看答案。想好後直接輸入；答錯會顯示正解，再重打一次。' : hint}</p>${g.step === 'look' ? `<div class="demo-letters" aria-label="鍵位順序">${[...q.pinyin].map((c,i) => `<b style="animation-delay:${i * .35}s">${c}</b>`).join('')}</div><div class="mini-keys">${keyDiagram(q.pinyin[Math.floor(performance.now()/700)%q.pinyin.length])}</div><button class="primary" data-action="guide-next">${g.index < g.items.length - 1 ? '下一張' : '開始跟著練習'}</button>` : `<p class="guide-progress mono">${g.progress || '等待輸入'}</p>`}`;
+  $('#guide-panel').innerHTML = `<div class="guide-top"><span class="eyebrow">引導練習・沒有怪物、不扣血</span><span>這關共 ${game.stage.pool.length} 個・新學／複習 ${g.index + 1} / ${g.items.length}</span></div><div class="guide-steps">${['look','follow','try'].map((v,i) => `<span class="${v === g.step ? 'active' : ''}">${i+1} ${labels[v].split('・')[0]}</span>`).join('')}</div><h2>${labels[g.step]}</h2><div class="lesson-card"><button type="button" class="replay" data-action="replay" aria-label="再唸一次">◖))</button><small>${q.zhuyin}</small><strong>${q.symbol || q.text}</strong><b class="mono">${known ? q.pinyin : '想想它的拼音'}</b>${q.kind === 'phonics' ? `<small>例字 ${q.text}${known ? ` · ${q.exampleNote || ''}` : ''}</small>` : ''}</div>${game.stage.region === 3 ? `<div class="pair-compare">${g.items.slice(0,4).map(v => `<span>${v.text}<b class="mono">${g.step === 'try' && !g.retry ? '？' : v.pinyin}</b></span>`).join('')}</div>` : ''}<p class="lesson-note">${g.retry ? `正解是 ${q.pinyin}。請從頭重打一次，記住再前進。` : g.step === 'try' ? '這次先不看答案。想好後直接輸入；答錯會顯示正解，再重打一次。' : hint}</p>${g.step === 'look' ? `<div class="demo-letters" aria-label="鍵位順序">${[...q.pinyin].map((c,i) => `<b style="animation-delay:${i * .35}s">${c}</b>`).join('')}</div><div class="mini-keys">${keyDiagram(q.pinyin[Math.floor(performance.now()/700)%q.pinyin.length])}</div><button class="primary" data-action="guide-next">${g.index < g.items.length - 1 ? '下一張' : '開始跟著練習'}</button>` : `<p class="guide-progress mono">${g.progress || '等待輸入'}</p>`}`;
   $('#guide-panel').dataset.step = g.step;
   const nextButton = $('#guide-panel [data-action="guide-next"]');
   if (nextButton) {
@@ -2771,6 +3187,7 @@ function guideText(raw) {
   g.progress = raw;
   if (raw === q.pinyin) {
     consumeInput(inputState.raw);
+    if (g.step === 'try' && !save.learned.includes(q.id)) { save.learned.push(q.id); persist(); }
     if (++g.index >= g.items.length) {
       g.index = 0;
       if (g.step === 'follow') g.step = 'try';
@@ -2804,6 +3221,7 @@ function renderOnboarding() {
   const prompts = ['打出 b，擊倒這隻怪', '再一隻：打出 p', '兩隻一起來：先打哪個字母就鎖定哪一隻，也可以點怪。', '看完說明，按「我知道了」完成教學。'];
   setInstruction(`操作 ${step + 1} / 4：${prompts[step]}`);
   if (step === 3) {
+    if (game.spokenTutorial !== step) { game.spokenTutorial = step; audio.speak('打錯會亮出正解，連擊歸零。偷看可以顯示答案。按暫停可以休息。看完說明，按我知道了。'); }
     $('#tutorial-info').innerHTML = '<h3>施法小提醒</h3><p>打錯：怪物往前衝、亮出正解、連擊歸零；看清楚後從頭重打。</p><p>「偷看」可以顯示答案，這次不累積連擊。</p><p>按右上角「暫停」可休息，再點「點我繼續」。</p><button class="primary" data-action="onboarding-done">我知道了</button>';
     castInput.blur();
     return;
@@ -2814,11 +3232,15 @@ function renderOnboarding() {
       spawnEnemy();
       const e = game.enemies.at(-1);
       e.q = phonics.find(q => q.pinyin === answer);
-      e.progress = 0; e.lane = lane; e.x = 90; e.remaining = 1;
+      e.progress = 0; e.lane = lane; e.x = 90; e.remaining = 1; e.maxRemaining = 1;
       renderEnemy(e);
     }
   }
   game.enemies.forEach(positionEnemy);
+  if (game.spokenTutorial !== step) {
+    game.spokenTutorial = step;
+    if (audio.speak(`${prompts[step]}。例字：${game.enemies.map(e => e.q.text).join('、')}`)) game.enemies.forEach(e => { e.spokenQuestion = e.q; });
+  }
   updateHUD();
 }
 function finishOnboarding() {
@@ -2934,10 +3356,12 @@ function processText(value, composing = globallyComposing, fromBuiltin = false, 
   const previous = game.enemies.find(e => e.id === game.locked);
   if (previous && previous !== enemy) { previous.progress = 0; renderEnemy(previous); }
   game.locked = enemy.id;
+  if (previous !== enemy) { sound('lock'); if (enemy.spokenQuestion === enemy.q) audio.stopSpeech(); else audio.target(); }
+  judge(enemy, pending === enemy.q.pinyin ? '完整符合' : '前綴符合，尚未完成');
   const added = Math.max(0, pending.length - enemy.progress);
   game.correct += added;
   enemy.progress = pending.length;
-  if (added) { sound('hit'); animate(enemy.element, 'hit'); enemy.x = Math.min(98, enemy.x + .5); }
+  if (added) { for (let i=0;i<added;i++) { sound('type', enemy.progress - added + i); magic(enemy); } animate(enemy.element, 'hit'); }
   renderEnemy(enemy); positionEnemy(enemy);
   if (pending === enemy.q.pinyin) {
     const credit = enemy.q.text;
@@ -3000,17 +3424,18 @@ document.addEventListener('pointerdown', event => {
   if (useBuiltin() && event.target === castInput) event.preventDefault();
   const enemyNode = event.target.closest('.enemy');
   const action = event.target.closest('[data-action]')?.dataset.action;
+  if (action === 'replay' || action === 'sound') { event.preventDefault(); audio.unlock(); return; }
   if (enemyNode && game?.running && !game.paused) {
     event.preventDefault();
     const e = game.enemies.find(e => e.id === Number(enemyNode.dataset.enemyId));
     if (!e) return;
     if (game.locked === e.id) { if (!useBuiltin()) castInput.focus({preventScroll: true}); return; }
     if (globallyComposing) { inputState.consumed = inputState.raw.length; inputState.credits = []; } else resetInput();
-    unlockTarget(); game.locked = e.id; renderEnemy(e);
+    unlockTarget(); game.locked = e.id; renderEnemy(e); sound('lock'); if (e.spokenQuestion === e.q) audio.stopSpeech(); else audio.target();
     if (!useBuiltin()) castInput.focus({preventScroll: true});
 
   }
-  if (['peek','unlock','ready','guide-next'].includes(action) || event.target.closest('#cast-button')) event.preventDefault();
+  if (['peek','unlock','ready','guide-next','replay','sound'].includes(action) || event.target.closest('#cast-button')) event.preventDefault();
 });
 function builtinLetter(key) {
   if (!game?.running || (game.paused && game.guide?.step !== 'look') || (game.ime && !game.training && !game.guide)) return;
@@ -3070,7 +3495,7 @@ document.addEventListener('keydown', event => {
 });
 modal.addEventListener('cancel', event => { event.preventDefault(); closeOrResumeMenu(); });
 window.addEventListener('blur', () => { if (game?.running && (!game.paused || countdownTimer || keyboardTimer)) pauseGame('視窗已失焦，已自動暫停。'); });
-document.addEventListener('visibilitychange', () => { if (document.hidden && game?.running && (!game.paused || countdownTimer || keyboardTimer)) pauseGame('分頁暫時離開，已自動暫停。'); });
+document.addEventListener('visibilitychange', () => { audio.suspend(); if (document.hidden && game?.running && (!game.paused || countdownTimer || keyboardTimer)) pauseGame('分頁暫時離開，已自動暫停。'); });
 
 document.addEventListener('touchmove', event => { if (screen === 'play' && event.touches.length > 1) event.preventDefault(); }, {passive: false});
 window.addEventListener('pagehide', persist);

@@ -3,6 +3,7 @@ import {spawn} from 'node:child_process';
 import {readFile, writeFile, rm, mkdir} from 'node:fs/promises';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 import assert from 'node:assert/strict';
+if (process.argv.includes('--audio')) { await import('./browser-audio4.mjs'); process.exit(process.exitCode || 0); }
 const root = fileURLToPath(new URL('.', import.meta.url));
 const html = await readFile(new URL('index.html', import.meta.url), 'utf8');
 const bankSource = html.match(/\/\/ BEGIN QUESTION BANK\n([\s\S]*?)\n\/\/ END QUESTION BANK/u)[1];
@@ -11,7 +12,7 @@ const results = [];
 const errors = [];
 const check = (condition, label) => { assert.ok(condition, label); results.push(`PASS ${label}`); console.log(`PASS ${label}`); };
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-const profile = process.argv.includes('--extra') ? '.chrome-extra-profile3' : process.argv.includes('--final') ? '.chrome-final-profile3' : '.chrome-test-profile3';
+const profile = process.argv.includes('--extra') ? '.chrome-extra-profile4' : process.argv.includes('--final') ? '.chrome-final-profile4' : '.chrome-test-profile4';
 const chrome = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', [
   '--headless=new', '--no-first-run', '--no-default-browser-check', '--disable-background-networking',
   '--disable-component-update', '--disable-sync', '--disable-default-apps', '--hide-scrollbars',
@@ -81,7 +82,7 @@ async function screenshot(name) {
   await evaluate(`window.getSelection()?.removeAllRanges()`);
   await delay(300); // Let native touch feedback paint out before capturing the layout.
   const {data} = await send('Page.captureScreenshot', {format: 'png', captureBeyondViewport: false});
-  await writeFile(new URL(`shots3/${name}.png`, import.meta.url), Buffer.from(data, 'base64'));
+  await writeFile(new URL(`shots4/main/${name}.png`, import.meta.url), Buffer.from(data, 'base64'));
 }
 async function load() {
   await evaluate(`window.__smokeBeforeNavigation=true`);
@@ -107,7 +108,7 @@ async function seed({onboarding=true, builtin=false, keyboardMode=builtin?'built
   // Finish the previous pagehide save before installing a new saved-game fixture.
   await send('Page.navigate', {url:'about:blank'});
   await waitFor(`location.href==='about:blank'&&document.readyState==='complete'`);
-  const {identifier}=await send('Page.addScriptToEvaluateOnNewDocument',{source:`(() => {const s=JSON.parse(localStorage.getItem('pinyin-keep-save-v2'))||{version:2,settings:{},records:{},upgrades:{},review:{}};s.coins=1000;s.settings.onboarding=${onboarding};s.settings.builtin=${builtin};s.settings.keyboardMode=${JSON.stringify(keyboardMode)};s.settings.debug=${debug};s.settings.sound=false;s.review=${JSON.stringify(review)};for(const id of ${JSON.stringify(data.stages.map(s=>s.id))})s.records[id]={stars:3,bestSpeed:1,bestScore:0,attempts:1,last:{speed:1,accuracy:1,score:0}};localStorage.setItem('pinyin-keep-save-v2',JSON.stringify(s));})()`});
+  const {identifier}=await send('Page.addScriptToEvaluateOnNewDocument',{source:`(() => {const s=JSON.parse(localStorage.getItem('pinyin-keep-save-v2'))||{version:2,settings:{},records:{},upgrades:{},review:{}};s.coins=1000;s.learned=[];s.settings.onboarding=${onboarding};s.settings.builtin=${builtin};s.settings.keyboardMode=${JSON.stringify(keyboardMode)};s.settings.debug=${debug};s.settings.sound=false;s.review=${JSON.stringify(review)};for(const id of ${JSON.stringify(data.stages.map(s=>s.id))})s.records[id]={stars:3,bestSpeed:1,bestScore:0,attempts:1,last:{speed:1,accuracy:1,score:0}};localStorage.setItem('pinyin-keep-save-v2',JSON.stringify(s));})()`});
   await load();
   await send('Page.removeScriptToEvaluateOnNewDocument',{identifier});
 }
@@ -160,7 +161,7 @@ async function geometry(label) {
   check(report.scroll<=report.width&&!report.overlap&&report.bounds&&report.inputBottom<=report.visible+1&&report.fieldBottom<=report.inputBottom,label+' '+JSON.stringify(report));
 }
 try {
-  await mkdir(new URL('shots3',import.meta.url),{recursive:true});
+  await mkdir(new URL('shots4/main',import.meta.url),{recursive:true});
   await send('Runtime.enable');await send('Log.enable');await send('Page.enable');
   const version=await cdp('Browser.getVersion');
   results.push(`環境：${process.version}，${version.product}，手機 DPR 3／觸控模擬`);
@@ -183,7 +184,7 @@ try {
   await delay(8500);
   check(await evaluate(`document.querySelector('#battlefield').classList.contains('answer-nudge')&&parseFloat(getComputedStyle(document.querySelector('.answer')).fontSize)>=25&&document.querySelector('.answer').textContent==='b'`),'8 秒沒有有效輸入，題卡答案放大閃動');
   await delay(12000);
-  check(await evaluate(`!!document.querySelector('#late-skip')&&document.querySelector('#hp-text').textContent===${JSON.stringify(hpStart)}&&document.querySelector('.enemy').style.transform===${JSON.stringify(trainingPosition)}`),'20 秒沒有進展提供跳過教學，怪物不前進也不扣血');
+  check(await evaluate(`!!document.querySelector('#late-skip')&&document.querySelector('#hp-text').textContent===${JSON.stringify(hpStart)}&&document.querySelector('.enemy').style.transform!==${JSON.stringify(trainingPosition)}`),'20 秒沒有進展提供跳過教學，怪物緩慢前進但不到城門也不扣血');
   await screenshot('00-tutorial-idle');
   await touch('.enemy');check(await evaluate(`!!document.querySelector('.enemy.locked')&&document.activeElement.classList.contains('active-input')`),'點怪鎖定保持焦點，正確輸入仍可前進');
   // Keep the physical editor reference: trailing input belongs to the editor
@@ -205,14 +206,15 @@ try {
   await touch('[data-action="onboarding-done"]');
   check(await evaluate(`document.querySelector('#guide-panel').dataset.step==='look'&&JSON.parse(localStorage.getItem('pinyin-keep-save-v2')).settings.onboarding`),'我知道了結束四步教學，記住完成狀態並進入引導');
   await mockKeyboard(844);await screenshot('02-guide-look');
-  for(let i=0;i<4;i++)await touch('[data-action="guide-next"]');
+  for(let i=0;i<8;i++)await touch('[data-action="guide-next"]');
   await ready({keyboard:true});await screenshot('03-guide-follow');
-  for(const q of data.phonics.slice(0,4))await textInput(q.pinyin);
+  for(const q of data.phonics.slice(0,8))await textInput(q.pinyin);
   check(await evaluate(`document.querySelector('#guide-panel').dataset.step==='try'&&!/[a-z]/i.test(document.querySelector('.lesson-note').textContent)`),'跟著打完後進入隱藏答案的試，訣竅文字也不洩漏拼音');
   await screenshot('04-guide-try');
   await textInput('x');check(await evaluate(`document.querySelector('.lesson-note').textContent.includes('請從頭重打')&&!document.querySelector('.enemy:not(.defeated)')`),'試答錯立即揭答並要求重打，沒有怪物與扣血');
-  for(const q of data.phonics.slice(0,4))await textInput(q.pinyin);
+  for(const q of data.phonics.slice(0,8))await textInput(q.pinyin);
   check(await evaluate(`!document.querySelector('#start-overlay').hidden&&document.querySelector('#start-reason').textContent.includes('引導完成')`),'全部試答正確後才提供戰鬥開始');
+  check(await evaluate(`JSON.parse(localStorage.getItem('pinyin-keep-save-v2')).learned.length===8`),'八個聲母完成試練後逐題存檔為實際學過');
   await ready();await waitFor(`document.querySelector('.enemy:not(.defeated)')`);await screenshot('05-battle');await geometry('手機戰場、題卡位於鍵盤上方');
   await solve();check(await evaluate(`document.querySelector('.result-stars').textContent==='★★★'`),'以一般 beforeinput/input 字母事件完整通過第一關三星');
   await mockKeyboard(844);await screenshot('06-result');await backMap();
@@ -235,10 +237,10 @@ try {
       await textInput('b');
       check(await evaluate(`document.querySelector('#guide-panel .guide-top').textContent.includes('2 /')`),`${mode} 看階段直接答對也前進`);
     }
-    for(let i=0;i<3;i++)await touch('[data-action="guide-next"]');
+    for(let i=0;i<7;i++)await touch('[data-action="guide-next"]');
     await ready({keyboard:mode!=='builtin'});
     check(await evaluate(`document.querySelector('.active-input').type===${JSON.stringify(mode==='english'?'email':'text')}&&document.querySelector('.active-input').inputMode===${JSON.stringify(mode==='english'?'email':mode==='builtin'?'none':'text')}`),`${mode} 輸入框屬性正確`);
-    for(let round=0;round<2;round++)for(const q of data.phonics.slice(0,4)) {
+    for(let round=0;round<2;round++)for(const q of data.phonics.slice(0,8)) {
       if(mode==='builtin')for(const c of q.pinyin)await touch(`[data-key="${c}"]`);
       else await textInput(q.pinyin);
     }
@@ -366,6 +368,7 @@ try {
     const target=await evaluate(`document.querySelector('#spell-target').textContent`);
     await composition('start','');await textInput(target,true);await composition('end',target);await delay(120);if(i===0) await touch('#cast-button'); else await press('Enter');
   }
+  await waitFor(`!document.querySelector('#result-screen').hidden`,1500); // Final impact now paints before results.
   check(await evaluate(`!document.querySelector('#result-screen').hidden&&document.querySelector('.result-stars').textContent==='★★★'`),'第五區完整中文組字、Enter 施放至三星通關');await screenshot('12-temple-result');await backMap();
   for(const [w,h] of [[360,640],[430,932]]) {
     await metrics(w,h);await load();check(await evaluate(`document.documentElement.scrollWidth<=innerWidth`),`${w}×${h} 地圖無水平捲動`);
@@ -390,7 +393,7 @@ try {
     await screenshot('00-tutorial-idle');await touch('#skip-onboarding');
     for(const [id,mode] of [['r2-1','pinyin'],['r5-1','english']]) {
       await seed({keyboardMode:mode});await stage(id,false);
-      const items=data.stages.find(s=>s.id===id).pool.slice(0,4).map(id=>data.questionsById[id]);
+      const items=data.stages.find(s=>s.id===id).pool.map(id=>data.questionsById[id]);
       for(const q of items)await textInput(q.text);
       check(await evaluate(`document.querySelector('#guide-panel').dataset.step==='follow'`),`${id} 看階段正確國字／整句也會前進`);
       await ready({keyboard:true});
@@ -440,8 +443,12 @@ try {
 } catch(error) {
   await screenshot('failure').catch(()=>{});results.push(`FAIL ${error.stack}`);console.error(error);process.exitCode=1;
 } finally {
-  await writeFile(new URL(process.argv.includes('--intro')?'browser-intro3-output.txt':process.argv.includes('--extra')?'browser-extra3-output.txt':process.argv.includes('--tail')?'browser-tail3-output.txt':'browser-test3-output.txt',import.meta.url),results.join('\n')+'\nConsole errors: '+JSON.stringify(errors)+'\n');
+  await writeFile(new URL(process.argv.includes('--intro')?'browser-intro4-output.txt':process.argv.includes('--extra')?'browser-extra4-output.txt':process.argv.includes('--tail')?'browser-tail4-output.txt':'browser-smoke4-output.txt',import.meta.url),results.join('\n')+'\nConsole errors: '+JSON.stringify(errors)+'\n');
   await cdp('Browser.close').catch(()=>{});ws.close();
   if(chrome.exitCode===null)await new Promise(resolve=>chrome.once('exit',resolve));
   await rm(new URL(profile,import.meta.url),{recursive:true,force:true});
+  // Chrome helpers may keep the inherited stderr pipe open after browser exit.
+  chrome.stderr.destroy(); chrome.unref();
 }
+
+if (!process.exitCode && !process.argv.slice(2).length) await import('./browser-audio4.mjs');

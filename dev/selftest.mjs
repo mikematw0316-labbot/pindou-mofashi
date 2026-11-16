@@ -32,6 +32,17 @@ function unique(values, label) {
   }
 }
 
+// TASK4: run the actual planner, then prove combat pools contain only taught items.
+const plannerSource = html.match(/function guideItems\(stage, learned = save.learned\) \{([\s\S]*?)\n\}/u);
+check(!!plannerSource, '存在完整引導規劃器');
+const planGuide = new Function('stage', 'learned', 'soundGroups', 'questionsById', plannerSource[1]);
+const previouslyTaught = new Set();
+for (const stage of stages) {
+  if (!stage.kind.includes('boss')) for (const q of planGuide(stage, [...previouslyTaught], soundGroups, questionsById)) previouslyTaught.add(q.id);
+  check(stage.pool.every(id => previouslyTaught.has(id)), `${stage.id} 打怪題池包含於本關及之前實際教過的項目`);
+}
+check(planGuide(stages[0], [], soundGroups, questionsById).length === 8, '第一關引導涵蓋全部八個聲母');
+
 // 答案獨立寫出，不以 FINALS／INITIALS 產生期望值。
 const regression = [
   ['ㄅㄚ','ba'],['ㄆㄛ','po'],
@@ -288,6 +299,8 @@ const thirdHTML = readFileSync(new URL('index.html', import.meta.url), 'utf8');
 const secondHTML = readFileSync(new URL('v2.html', import.meta.url), 'utf8');
 const bankBlock = text => text.match(/\/\/ BEGIN QUESTION BANK\n([\s\S]*?)\n\/\/ END QUESTION BANK/u)[1];
 equal(bankBlock(thirdHTML), bankBlock(secondHTML), '第三版與 v2.html 題庫逐位元相同');
+equal(bankBlock(thirdHTML), bankBlock(readFileSync(new URL('v3.html', import.meta.url),'utf8')), '第四版與 v3.html 題庫逐位元相同');
+check(!/<(?:script|img|audio|video|source)[^>]+src\s*=/iu.test(thirdHTML), '單檔沒有外部 script、圖片或音訊資源');
 const prefixFunction = thirdHTML.slice(thirdHTML.indexOf('function pendingLetters('), thirdHTML.indexOf('function configureInputs('));
 const state = {raw: 'b', consumed: 1};
 const pendingLettersTest = new Function('inputState', 'normalizeLetters', prefixFunction + '; return pendingLetters;')(state, text => text.toLowerCase().replace(/[\s’']/gu, '').replace(/ü/g, 'v'));
