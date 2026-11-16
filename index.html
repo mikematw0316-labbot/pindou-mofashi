@@ -2673,7 +2673,9 @@ function updateViewport() {
   document.documentElement.style.setProperty('--visible-top', `${top}px`);
   if (screen !== 'play') viewportBaseline = Math.max(innerHeight, h);
   const lowered = h < viewportBaseline - 120;
-  if (game?.running && !useBuiltin() && game.guide?.step !== 'look') {
+  // 說明卡（操作教學第 4 步）不需要鍵盤：收起鍵盤不可觸發暫停。
+  const noKeyboardNeeded = game?.training && game.onboarding === 3;
+  if (game?.running && !useBuiltin() && game.guide?.step !== 'look' && !noKeyboardNeeded) {
     if (lowered && game.paused && keyboardTimer) { keyboardSeen = true; runCountdown(keyboardTicket); }
     if (keyboardSeen && !lowered && h > lastViewportHeight + 80) pauseGame('鍵盤已收起，點我繼續並重新開啟鍵盤。');
   }
