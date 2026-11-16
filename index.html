@@ -1890,6 +1890,22 @@ function refreshHeader() {
   $('#theme-select').value = save.settings.theme;
   document.documentElement.dataset.theme = save.settings.theme;
 }
+// 第 1 區考的是注音符號：語音唸「注音本身的讀法」而不是例字（使用者 11/17 回饋）。
+const ZHUYIN_SOUND = {
+  ㄅ:'玻', ㄆ:'坡', ㄇ:'摸', ㄈ:'佛', ㄉ:'德', ㄊ:'特', ㄋ:'呢', ㄌ:'樂',
+  ㄍ:'哥', ㄎ:'科', ㄏ:'喝', ㄐ:'基', ㄑ:'欺', ㄒ:'希',
+  ㄓ:'知', ㄔ:'吃', ㄕ:'詩', ㄖ:'日', ㄗ:'資', ㄘ:'疵', ㄙ:'思',
+  ㄚ:'啊', ㄛ:'喔', ㄜ:'鵝', ㄝ:'耶', ㄧ:'衣', ㄨ:'烏', ㄩ:'迂',
+  ㄞ:'哀', ㄟ:'誒', ㄠ:'凹', ㄡ:'歐', ㄢ:'安', ㄣ:'恩', ㄤ:'骯', ㄥ:'鞥', ㄦ:'兒',
+  ㄧㄚ:'鴨', ㄧㄝ:'耶', ㄧㄠ:'腰', ㄧㄡ:'優', ㄧㄢ:'煙', ㄧㄣ:'因', ㄧㄤ:'央', ㄧㄥ:'英', ㄩㄥ:'雍',
+  ㄨㄚ:'蛙', ㄨㄛ:'窩', ㄨㄞ:'歪', ㄨㄟ:'威', ㄨㄢ:'彎', ㄨㄣ:'溫', ㄨㄤ:'汪', ㄨㄥ:'翁',
+  ㄩㄝ:'約', ㄩㄢ:'冤', ㄩㄣ:'暈',
+};
+function spoken(q) {
+  if (!q) return '';
+  if (q.kind === 'phonics') return ZHUYIN_SOUND[q.symbol || q.zhuyin] || q.symbol || q.text;
+  return q.text;
+}
 function toast(message) {
   clearTimeout(toastTimer);
   $('#toast').textContent = message;
@@ -2069,7 +2085,7 @@ const audio = (() => {
   }
   function target(force = false, id) {
     if (!game?.running || (game.paused && (game.guide?.step !== 'look' || !$('#start-overlay').hidden))) return;
-    if (game.guide) { if (force) speak(game.guide.items[game.guide.index].text); return; }
+    if (game.guide) { if (force) speak(spoken(game.guide.items[game.guide.index])); return; }
     if (game.ime) {
       if (game.currentSpell && (force || game.spokenSpell !== game.currentSpell)) {
         if (speak(game.currentSpell.text)) game.spokenSpell = game.currentSpell;
@@ -2078,7 +2094,7 @@ const audio = (() => {
     }
     const e = id ? game.enemies.find(e => e.id === Number(id)) : game.enemies.find(e => e.id === game.locked) || closestEnemy();
     if (e && (force || e.spokenQuestion !== e.q)) {
-      if (speak(e.q.text)) e.spokenQuestion = e.q;
+      if (speak(spoken(e.q))) e.spokenQuestion = e.q;
     }
   }
   function effect(type, progress = 0) {
@@ -2616,7 +2632,7 @@ function wrongKey(enemy) {
     enemy.reveal = CONFIG.revealSeconds;
     if (!game.boss) enemy.x = Math.max(0, enemy.x - 5);
     recordMistake(enemy.q);
-    audio.speak(enemy.q.text);
+    audio.speak(spoken(enemy.q));
     judge(enemy, '不符合前綴，請重打');
     renderEnemy(enemy);
     animate(enemy.element, 'hurt');
@@ -2843,7 +2859,7 @@ function castSpell() {
     game.charge = Math.min(.99, game.charge + (game.boss ? .12 : .07));
     if (game.boss) game.bossHP = Math.min(game.bossMax, game.bossHP + .3);
     message(`已逐字標錯，正確率 ${(result.ratio * 100).toFixed(0)}%。${protectedCombo ? '連擊護符已生效。' : '請留意紅色標記。'}`, true, 5);
-    sound('wrong'); audio.speak(q.text);
+    sound('wrong'); audio.speak(spoken(q));
   }
   if (result.ratio < .8) {
     $('#spell-feedback').insertAdjacentHTML('beforeend', '<small class="muted" style="display:block;font-size:12px">未達 80%，這次未造成傷害；請對照題句重新輸入。</small>');
@@ -3361,7 +3377,7 @@ function renderGuide() {
   const cue = `${g.step}:${g.index}:${g.retry}`;
   if (g.spokenCue !== cue) {
     g.spokenCue = cue;
-    audio.speak(g.retry || g.step === 'look' ? q.text : g.step === 'follow' ? '照著打一次。' : '想想拼音，自己試試看。');
+    audio.speak(g.retry || g.step === 'look' ? spoken(q) : g.step === 'follow' ? '照著打一次。' : '想想拼音，自己試試看。');
   }
   const labels = {look: '看・記住鍵位', follow: '跟・照著打一次', try: '試・自己想想看'};
   const group = soundGroups.find(x => x.id === game.stage.soundGroup);
@@ -3464,7 +3480,7 @@ function renderOnboarding() {
   game.enemies.forEach(positionEnemy);
   if (game.spokenTutorial !== step) {
     game.spokenTutorial = step;
-    if (audio.speak(`${prompts[step]}。例字：${game.enemies.map(e => e.q.text).join('、')}`)) game.enemies.forEach(e => { e.spokenQuestion = e.q; });
+    if (audio.speak(`${prompts[step]}。${game.enemies.map(e => spoken(e.q)).join('、')}`)) game.enemies.forEach(e => { e.spokenQuestion = e.q; });
   }
   updateHUD();
 }
