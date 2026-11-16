@@ -338,6 +338,48 @@ check(thirdHTML.includes('function creatureFallbackSVG')&&thirdHTML.includes('fu
 check(thirdHTML.includes('prefers-reduced-motion:reduce')&&thirdHTML.includes('class="bottom-toolbar"'),'新動畫尊重 reduced-motion，具備底部工具列');
 console.log(`TASK5 圖片：${imageFiles5.length} 張，${artBytes5} bytes`);
 
+// TASK6 exercises the production scoring and budget functions.
+const config6 = html.slice(html.indexOf('const CONFIG ='), html.indexOf('const $ ='));
+const rules6 = html.slice(html.indexOf('function battleLimits('), html.indexOf('function starConditions('));
+const api6 = new Function(`${config6}\nfunction normalizeSpell(value) { return value.normalize('NFKC').replace(/[\\p{P}\\p{Z}\\s]/gu, ''); }\n${rules6}\nreturn {CONFIG, battleLimits, earnedStars, bestClearTime, timeStatus};`)();
+const {earnedStars: grade6, bestClearTime: best6, battleLimits: limits6, timeStatus: status6} = api6;
+for (const [elapsed, expected] of [[45,3],[45.01,2],[72,2],[72.01,1]]) equal(grade6(true,1,1,elapsed,72,45),expected,`時間邊界 ${elapsed}`);
+equal(grade6(false,1,1,0,72,45),0,'失敗 0 星');
+equal(grade6(true,.95,.5,45,72,45),3,'三星正確率與血量剛好達標');
+equal(grade6(true,.9499,.5,45,72,45),2,'正確率低於三星邊界');
+equal(grade6(true,.95,.4999,45,72,45),2,'血量低於三星邊界');
+equal(grade6(true,.9,0,72,72,45),2,'兩星正確率剛好達標');
+equal(grade6(true,.8999,1,1,72,45),1,'正確率低於兩星邊界');
+equal(grade6(true,1,1,10000,null,null),3,'無時限沿用舊三星規則');
+equal(grade6(true,.9,.1,10000,null,null),2,'無時限沿用舊兩星規則');
+equal(Math.max(3,grade6(true,1,1,73,72,45)),3,'歷史較高星等不降低');
+equal(best6(null,52,true),52,'舊存檔首次通關建立最佳時間');
+equal(best6(50,52,true),50,'重玩變慢保留最佳時間');
+equal(best6(50,49,true),49,'重玩變快刷新最佳時間');
+equal(best6(50,10,false),50,'失敗不刷新最佳時間');
+equal(best6(null,10,false),null,'失敗不建立最佳時間');
+for (const stage of stages) {
+ const plan = [[questionsById[stage.pool[0]]]];
+ const limits = limits6(stage,plan,stage.region===5,stage.kind.includes('boss'));
+ const timed = !['r1-1','r1-2','r1-3'].includes(stage.id);
+ equal(limits.star3Seconds!==null,timed,`${stage.id} 時限適用範圍`);
+ if(timed) {
+  check(limits.star2Seconds>limits.star3Seconds,`${stage.id} 兩星時限較長`);
+  const double=limits6(stage,[...plan,...plan],stage.region===5,stage.kind.includes('boss'));
+  check(double.star3Seconds>limits.star3Seconds,`${stage.id} 依實抽題量計算`);
+ }
+}
+equal(limits6(reviewStage,[[phonics[0]]],false,false).star3Seconds,null,'複習關沿用無時限');
+equal(status6({elapsed:33,star3Seconds:45,star2Seconds:72}).text,'三星 還剩 12 秒','HUD 三星階段');
+equal(status6({elapsed:52,star3Seconds:45,star2Seconds:72}).text,'兩星 還剩 20 秒','HUD 兩星階段');
+equal(status6({elapsed:72.01,star3Seconds:45,star2Seconds:72}).text,'已超時','HUD 超時階段');
+equal(status6({elapsed:100,star3Seconds:null,star2Seconds:null}).text,'','無時限不顯示倒數');
+check(status6({elapsed:40,star3Seconds:45,star2Seconds:72}).urgent,'最後五秒變色');
+check(!status6({elapsed:39.99,star3Seconds:45,star2Seconds:72}).urgent,'五秒以前正常顏色');
+check(html.includes('const noKeyboardNeeded = game?.training && game.onboarding === 3;'),'保留說明卡不檢查鍵盤修正');
+check(html.includes('const ZHUYIN_SOUND')&&html.includes('function spoken(q)'),'保留注音讀法修正');
+equal(source,readFileSync(new URL('./v5.html',import.meta.url),'utf8').match(/\/\/ BEGIN QUESTION BANK\n([\s\S]*?)\n\/\/ END QUESTION BANK/u)[1],'TASK6 題庫與 v5 備份逐位元一致');
+
 console.log('拼鬥魔法師・內嵌題庫與素材自我檢查');
 console.log(`第 1 區：${phonics.length} 題（聲母 ${phonics.filter(q=>q.mode==='initial').length}、韻母 ${phonics.filter(q=>q.mode==='final').length}；含 ㄝ／ㄦ 補充）`);
 console.log(`第 2 區：${characters.length} 個不重複單字`);

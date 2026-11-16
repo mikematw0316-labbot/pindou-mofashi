@@ -452,3 +452,5 @@ try {
 }
 
 if (!process.exitCode && !process.argv.slice(2).length) await import('./browser-audio4.mjs');
+
+if (!process.exitCode && !process.argv.slice(2).length) await import('./browser-time6.mjs');
