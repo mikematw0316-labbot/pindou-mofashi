@@ -2,10 +2,10 @@
 <html lang="zh-Hant-TW">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="離線拼音打字冒險：從注音到真實拼音輸入法，守住你的城門。">
-  <title>拼音守城｜鍵起，守住每一道光</title>
+  <meta name="description" content="拼鬥魔法師：先練拼音，再用真實拼音輸入法施法對抗怪物。">
+  <title>拼鬥魔法師｜拼音施法，展開冒險</title>
   <style>
     :root {
       --paper: #f5f3ec;
@@ -278,30 +278,246 @@
       .result-stats { grid-template-columns: repeat(2,1fr); }
       footer { padding: 12px 14px; flex-wrap: wrap; }
     }
+    /* Mobile layout uses the visual viewport, keeping the cast bar above the OS keyboard. */
+    :root { --paper:#fff8ea; --panel:#fffef9; --ink:#293e39; --muted:#52685f; --line:#d7dfd1; --accent:#326b52; --soft:#e9f0dd; --gold:#946017; --danger:#aa382e; --visible-height:100dvh; --visible-top:0px; font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",sans-serif; }
+    @media (prefers-color-scheme:dark) { :root:not([data-theme="dark"]) { --paper:#fff8ea; --panel:#fffef9; --ink:#293e39; --muted:#52685f; --line:#d7dfd1; --accent:#326b52; --soft:#e9f0dd; --gold:#946017; --danger:#aa382e; color-scheme:light; } }
+    html { overscroll-behavior:none; touch-action:manipulation; }
+    body { overscroll-behavior:none; overflow-x:hidden; }
+    button, select, summary { min-height:44px; min-width:44px; touch-action:manipulation; }
+    button { border-radius:14px; }
+    header { max-width:720px; margin:auto; padding: max(14px,env(safe-area-inset-top)) 18px 14px; flex-wrap:wrap; gap:12px; border:0; }
+    .brand strong { font-size:23px; letter-spacing:.08em; }
+    .brand small { font-size:10px; letter-spacing:.12em; }
+    .brand-mark { width:38px; height:42px; }
+    .tools { gap:6px; }
+    header .tools { width:100%; }
+    header .tools button, header select { padding:8px 10px; font-size:12px; flex:1; }
+    .wallet { font-size:13px; padding:6px; }
+    main { max-width:720px; padding:12px 16px 24px; }
+    .mobile-note { display:none; }
+    .map-layout { display:block; }
+    .intro { padding:12px 4px; }
+    .intro h1 { font-size:38px; letter-spacing:0; margin-bottom:14px; }
+    .intro p { font-size:14px; }
+    .intro .eyebrow { margin-bottom:8px; }
+    .region-nav { grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; margin-bottom:20px; }
+    .region-tab { display:block; padding:8px 2px; text-align:center; font-size:12px; min-height:78px; }
+    .region-tab small,.side-note { display:none; }
+    .region-number { display:block; margin-bottom:4px; font-size:17px; opacity:1; }
+    .map-panel { padding:16px; border-radius:24px; background:var(--panel); box-shadow:0 10px 30px #5c744715; }
+    .map-heading { gap:8px; }
+    .map-heading .eyebrow { font-size:10px; letter-spacing:.04em; }
+    .map-heading h2 { font-size:25px; }
+    .map-art { width:82px; height:90px; position:relative; overflow:hidden; isolation:isolate; border-radius:16px; }
+    .map-art .creature { width:60px; height:70px; margin:10px auto; }
+    :root:not([data-theme="dark"])[data-region="2"] { --accent:#35694d; }
+    :root:not([data-theme="dark"])[data-region="3"] { --accent:#566b36; }
+    :root:not([data-theme="dark"])[data-region="4"] { --accent:#855e38; }
+    :root:not([data-theme="dark"])[data-region="5"] { --accent:#876526; }
+    .stage-grid { grid-template-columns:1fr; gap:10px; }
+    .stage-node { min-height:104px; padding:14px 16px; border-radius:17px; }
+    .stage-node strong { font-size:16px; }
+    .stage-node .stars { position:absolute; right:14px; top:12px; font-size:15px; letter-spacing:1px; }
+    .stage-node .node-no { max-width:75%; font-size:10px; }
+    .map-footer { display:block; margin-top:16px; }
+    .map-footer .tools { display:grid; grid-template-columns:1fr 1fr; margin-bottom:12px; }
+    .map-footer button { width:auto; }
+    footer { max-width:720px; margin:auto; padding:12px 18px max(18px,env(safe-area-inset-bottom)); display:block; font-size:11px; }
+    footer .tools { margin-top:8px; justify-content:space-between; }
+    dialog { width:min(540px,calc(100% - 24px)); max-height:calc(var(--visible-height) - 24px); padding:20px; border-radius:24px; overscroll-behavior:contain; }
+    dialog h2 { font-size:23px; }
+    dialog::backdrop { background:#253c345c; backdrop-filter:blur(4px); }
+    .dialog-top button { flex-shrink:0; white-space:nowrap; padding:10px 12px; }
+    .dialog-actions { position:sticky; bottom:0; background:var(--panel); padding:12px 0; display:flex; gap:8px; }
+    .dialog-actions button { flex:1 1 44%; }
+    .example-grid,.ref-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .shop-grid { grid-template-columns:1fr; }
+    .shop-item { padding:16px; }
+    .shop-item p { margin-bottom:12px; }
+    .review-list li { flex-wrap:wrap; gap:8px; }
+    .result-card { padding:22px 18px; border-radius:24px; }
+    .result-card h1 { font-size:28px; }
+    .result-layout { padding:0; }
+    .result-stats { grid-template-columns:repeat(2,1fr); }
+    .result-stars { font-size:42px; }
+    #toast { pointer-events:none; }
+    .playing { position:fixed; inset:0; height:100dvh; overflow:hidden; }
+    .playing > header,.playing > footer,.playing > .notice { display:none; }
+    .playing main { padding:0; max-width:560px; width:100%; margin:0 auto; height:var(--visible-height); position:relative; top:var(--visible-top); }
+    #play-screen { height:100%; padding:max(6px,env(safe-area-inset-top)) 10px max(4px,env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:6px; position:relative; }
+    .play-heading { margin:0; flex-shrink:0; gap:6px; min-height:44px; }
+    .play-heading .eyebrow { font-size:10px; letter-spacing:0; margin:0 0 2px; }
+    .play-heading h2 { font-size:14px; max-width:320px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .play-heading button { padding:8px 10px; font-size:12px; }
+    .play-heading kbd { display:none; }
+    .hud { grid-template-columns:1.2fr 1fr 1fr; gap:0; margin:0; flex-shrink:0; min-height:44px; border-radius:12px; }
+    .stat { padding:5px 8px; }
+    .stat:first-child { grid-column:auto; border-bottom:0; }
+    .stat:nth-child(2),.stat:nth-child(5) { display:none; }
+    .stat small { font-size:10px; margin:0 0 3px; }
+    .stat strong { font-size:16px; }
+    .stat strong em { font-size:10px; }
+    .hp-text { font-size:10px; margin:0 0 4px; }
+    .hp-text span { font-size:10px; }
+    .boss-status { grid-template-columns:1fr 1fr; gap:10px; margin:0; flex-shrink:0; }
+    .boss-status small { font-size:9px; margin:0 0 3px; }
+    .boss-bar .meter { height:6px; }
+    .battlefield,.battlefield.crowded { height:auto; flex:1 1 0; min-height:140px; width:100%; border:1px solid #a9c69d; border-radius:20px; background:#dff4ff; }
+    .landscape { z-index:-1; opacity:1; inset:0; }
+    .scene-far { animation:drift 12s ease-in-out infinite alternate; }
+    .scene-mid { animation:drift 8s ease-in-out infinite alternate-reverse; }
+    .scene-front { animation:drift 6s ease-in-out infinite alternate; }
+    .ground { display:none; }
+    .gate { width:72px; height:65px; left:calc(50% - 58px); bottom:-3px; color:#57745f; filter:drop-shadow(0 3px 2px #314a3229); }
+    .mage { width:48px; height:64px; left:calc(50% + 12px); bottom:0; color:#356c78; animation:breathe 2.8s ease-in-out infinite; }
+    .gate-label { display:none; }
+    .enemy,.enemy.word,.enemy.boss { width:calc((100% - 24px) / 3); max-width:220px; min-width:0; cursor:pointer; }
+    .battlefield:not(.crowded) .enemy { width:min(78%,220px); }
+    .enemy .question-card,.battlefield.crowded .question-card { padding:6px 3px; border-radius:13px; box-shadow:0 4px 0 #58754820,0 7px 18px #365e4b12; border-color:#bdcfae; }
+    .enemy.locked .question-card,.battlefield.crowded .locked .question-card { border-width:2px; padding:5px 2px; box-shadow:0 3px 0 var(--accent); }
+    .question-card .prompt { font-size:34px; line-height:1.2; white-space:normal; overflow-wrap:anywhere; letter-spacing:0; }
+    .enemy.word .prompt { font-size:34px; }
+    .question-card .reading,.battlefield.crowded .reading { font-size:10px; line-height:1.35; word-break:normal; overflow-wrap:anywhere; }
+    .question-card .example,.battlefield.crowded .example { font-size:10px; line-height:1.3; display:block; }
+    .answer,.enemy.word .answer,.battlefield.crowded .answer { font-size:13px; letter-spacing:0; line-height:1.25; margin-top:3px; min-height:17px; }
+    .answer .pending { opacity:1; color:var(--muted); }
+    .answer .unknown { color:var(--muted); }
+    .lock-label { font-size:9px; letter-spacing:0; line-height:12px; }
+    .creature,.battlefield.crowded .creature { width:44px; height:44px; margin:2px auto 0; animation:breathe 2.4s ease-in-out infinite; }
+    .enemy.boss .creature { width:70px; height:72px; }
+    .eye { animation:blink 5s infinite; transform-origin:center; }
+    .battle-message { flex-shrink:0; margin:0; font-size:11px; line-height:1.4; min-height:15px; max-height:32px; overflow:hidden; }
+    .play-controls { flex-shrink:0; display:flex; gap:8px; justify-content:space-between; }
+    .play-controls button { padding:5px 12px; font-size:12px; }
+    #control-help { display:none; }
+    #guard-label { font-size:10px; }
+    .cast-bar { display:flex; flex-shrink:0; gap:8px; align-items:center; border:1px solid var(--line); border-radius:15px; background:var(--panel); padding:3px 9px; min-height:48px; }
+    .cast-bar label { font-size:11px; white-space:nowrap; color:var(--muted); }
+    #spell-input { min-width:0; width:100%; min-height:40px; max-height:none; height:40px; margin:0; padding:6px; border:0; background:transparent; font:18px ui-monospace,monospace; color:var(--ink); }
+    #spell-input:focus { outline:0; }
+    .cast-bar:focus-within { border-color:var(--accent); box-shadow:0 0 0 2px #326b521c; }
+    #cast-button { flex:0 0 auto; white-space:nowrap; min-width:64px; padding:5px 10px; }
+    #builtin-keyboard { flex-shrink:0; touch-action:none; user-select:none; padding:3px 0; }
+    .key-row { display:flex; justify-content:center; gap:0; }
+    #builtin-keyboard button { padding:0; min-width:0; flex:1; height:44px; min-height:44px; margin:0; border-radius:7px; border:2px solid var(--paper); background:var(--panel); font:17px ui-monospace,monospace; box-shadow:inset 0 -2px 0 var(--line); }
+    #builtin-keyboard .key-row:nth-child(2) { padding:0 10px; }
+    #builtin-keyboard .key-row:nth-child(3) { padding:0 28px; }
+    #builtin-keyboard .key-row:not(.key-tools) button { flex:0 0 44px; width:44px; min-width:44px; margin-left:calc((100% - 44px * var(--key-count)) / (2 * var(--key-count))); margin-right:calc((100% - 44px * var(--key-count)) / (2 * var(--key-count))); }
+    #builtin-keyboard .key-tools button { font:12px -apple-system,sans-serif; }
+    #builtin-keyboard .next-key,.next-key { background:#326b52 !important; color:#fff !important; }
+    #builtin-keyboard .pressed { background:#c5dfaa; color:#293e39; transform:translateY(2px); }
+    #start-overlay { position:absolute; inset:0; z-index:30; display:grid; place-items:center; background:#edf5e5c9; padding:18px; border-radius:18px; backdrop-filter:blur(3px); }
+    .start-card { width:100%; max-width:340px; background:var(--panel); border:1px solid var(--line); border-radius:24px; padding:22px; text-align:center; box-shadow:var(--shadow); max-height:100%; overflow:auto; }
+    .start-card > .primary { width:100%; font-size:18px; min-height:52px; }
+    #start-reason { font-size:16px; line-height:1.6; }
+    .counting #start-reason { font:64px ui-monospace,monospace; margin:10px; color:var(--accent); }
+    .pause-actions { display:flex; justify-content:center; gap:6px; margin-top:14px; }
+    .pause-actions button { padding:8px; font-size:12px; }
+    .keyboard-help { font-size:12px; line-height:1.6; text-align:left; }
+    .keyboard-help p { margin-bottom:10px; }
+    #guide-panel { flex:1 1 0; min-height:0; overflow:auto; background:var(--panel); border:1px solid var(--line); border-radius:20px; padding:14px; text-align:center; overscroll-behavior:contain; }
+    .guide-top { display:flex; justify-content:space-between; gap:6px; font-size:11px; }
+    .guide-top .eyebrow { font-size:10px; letter-spacing:0; }
+    .guide-steps { display:flex; gap:8px; justify-content:center; margin:0 0 10px; }
+    .guide-steps span { padding:5px 16px; background:var(--soft); border-radius:20px; font-size:12px; }
+    .guide-steps .active { background:var(--accent); color:var(--panel); }
+    #guide-panel h2 { font-size:20px; margin-bottom:10px; }
+    .lesson-card { background:var(--paper); border-radius:18px; padding:12px; display:grid; gap:4px; }
+    .lesson-card strong { font-size:42px; line-height:1.3; }
+    .lesson-card b { overflow-wrap:anywhere; min-width:0; font-size:24px; color:var(--accent); }
+    .lesson-card small { font-size:11px; line-height:1.5; }
+    .lesson-note { font-size:12px; line-height:1.6; margin:10px 0; }
+    .demo-letters { display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin:8px 0; }
+    .demo-letters b { font:20px ui-monospace,monospace; border:1px solid var(--line); padding:5px 10px; border-radius:8px; animation:key-demo 2s infinite; }
+    .mini-keys { width:158px; margin:5px auto; }
+    .mini-keys i { width:15px; height:15px; font:9px ui-monospace,monospace; font-style:normal; display:grid; place-items:center; border:1px solid #c3cdbb; background:#f9f9ee; color:#293e39; border-radius:3px; }
+    #keyboard-hint { flex-shrink:0; display:flex; align-items:center; justify-content:space-between; gap:8px; border-radius:12px; background:var(--soft); padding:4px 10px; font-size:12px; }
+    #keyboard-hint span { line-height:1.5; }
+    #keyboard-hint b { font-size:28px; margin-left:6px; }
+    #keyboard-hint .mini-keys { margin:0; flex-shrink:0; }
+    .guide-progress { overflow-wrap:anywhere; font-size:18px; color:var(--accent); margin:8px 0; }
+    .pair-compare { display:flex; justify-content:center; gap:6px; margin-top:10px; }
+    .pair-compare span { flex:1; padding:8px 3px; border-radius:10px; background:var(--soft); }
+    .pair-compare b { display:block; font-size:15px; margin-top:4px; }
+    .duel-panel { position:relative; isolation:isolate; background:#fffdf3; flex:1 1 0; min-height:0; overflow:auto; padding:12px; }
+    .duel-panel > .landscape { opacity:.26; }
+    :root[data-theme="dark"] .duel-panel { background:var(--panel); }
+    :root[data-theme="dark"] .duel-panel > .landscape { opacity:.05; }
+    .duel-top { display:block; }
+    .duel-top .creature { width:48px; height:50px; float:right; }
+    .duel-top .eyebrow { font-size:10px; letter-spacing:0; }
+    .spell-target { font-size:25px; line-height:1.5; letter-spacing:.03em; margin-top:8px; }
+    .spell-hint { font-size:11px; }
+    .spell-feedback { font-size:16px; line-height:1.7; margin:8px 0 0; min-height:0; }
+    @media (max-height:470px) { .wide-card .creature { position:absolute; right:-24px; bottom:0; width:40px; height:42px; } .wide-card .reading { font-size:10px; } .wide-card .question-card { padding:4px; } .gate,.mage { height:48px; } }
+    .feedback { background:var(--panel); padding:3px 7px; border-radius:8px; left:50% !important; top:45% !important; font-size:16px; }
+    .feedback::before,.feedback::after { content:""; position:absolute; width:6px; height:6px; border-radius:2px; background:#d48830; left:-15px; top:5px; box-shadow:42px -14px #f0b441,-15px 15px #719c67; animation:particle .5s ease-out forwards; }
+    .celebrate::before { content:""; position:fixed; inset:0; pointer-events:none; background:radial-gradient(circle at 15% 20%,#dfaa45 3px,transparent 4px),radial-gradient(circle at 73% 12%,#78a889 4px,transparent 5px),radial-gradient(circle at 40% 9%,#e5b251 4px,transparent 5px); background-size:120px 180px; animation:confetti 1.5s both; }
+    @keyframes breathe { 50% { transform:translateY(-2px) rotate(1deg); } }
+    @keyframes blink { 0%,46%,50%,100% { opacity:1; } 48% { opacity:0; } }
+    @keyframes drift { to { transform:translateX(4px); } }
+    @keyframes key-demo { 20%,45% { background:#326b52; color:white; transform:translateY(2px); } }
+    @keyframes particle { to { transform:translate(-15px,-20px) rotate(70deg); opacity:0; } }
+    @keyframes confetti { from { transform:translateY(-150px); opacity:1; } to { transform:translateY(220px); opacity:0; } }
+    @media (max-height:570px) { #play-screen { gap:4px; } .play-heading .eyebrow { display:none; } .lesson-card { padding:6px; } .lesson-card strong { font-size:34px; } #guide-panel h2 { font-size:16px; } #guide-panel { padding:8px; } .lesson-note { margin:6px 0; } .battle-message { font-size:10px; } }
+    .learning .hud,.learning .play-controls,.learning .battle-message { display:none; }
+    .learning #guide-panel[data-step="look"] { display:flex; flex-direction:column; overflow:hidden; }
+    .guide-scroll { flex:1 1 0; min-height:0; overflow:auto; overscroll-behavior:contain; }
+    .learning #guide-panel .primary { min-width:160px; flex-shrink:0; position:static; display:block; margin:8px auto 0; width:100%; }
+    .compact-view #guide-panel { padding:10px; }
+    .compact-view #guide-panel h2 { font-size:17px; margin:0 0 6px; }
+    .compact-view .guide-steps { margin-bottom:6px; }
+    .compact-view .guide-steps span { padding:3px 12px; }
+    .compact-view .lesson-card { padding:8px; gap:2px; }
+    .compact-view .lesson-card strong { font-size:34px; }
+    .compact-view .lesson-card b { font-size:22px; }
+    .compact-view .lesson-note { font-size:11px; margin:6px 0; }
+    .compact-view .guide-top .eyebrow { margin:0 0 6px; }
+    .tiny-view #guide-panel[data-step="follow"] h2,.tiny-view #guide-panel[data-step="try"] h2 { display:none; }
+    .tiny-view .lesson-card { grid-template-columns:1fr 1fr; }
+    .tiny-view .lesson-card small { grid-column:1/-1; }
+    .tiny-view .wide-card .creature { position:absolute; right:-24px; bottom:0; width:40px; height:42px; }
+    .tiny-view .gate,.tiny-view .mage { height:48px; }
+    .tiny-view .play-heading .eyebrow { display:none; }
+    .tiny-view .hud { min-height:32px; }
+    .tiny-view .stat { padding:3px 6px; }
+    .tiny-view .stat strong { font-size:14px; }
+    .tiny-view .stat small { font-size:9px; margin:0; }
+    .tiny-view .hp-text { margin-bottom:2px; }
+    .tiny-view .battlefield { min-height:125px; }
+    .tiny-view .cast-bar { margin-right:86px; }
+    .tiny-view .play-controls { position:absolute; right:10px; bottom:max(4px,env(safe-area-inset-bottom)); height:48px; }
+    .tiny-view .play-controls button { height:48px; min-width:78px; }
+    .tiny-view .play-controls kbd,.tiny-view #guard-label,.tiny-view #battle-message { display:none; }
+    .tiny-view.learning .cast-bar { margin-right:0; }
+    .play-controls kbd { display:none; }
+    button,.question-card,.guide-steps,.key-row { user-select:none; -webkit-user-select:none; }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none !important; transition:none !important; scroll-behavior:auto !important; } }
+
   </style>
 </head>
 <body>
   <header>
     <div class="brand">
       <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true"><path d="M6 42V17h8V8h7v9h6V8h7v9h8v25H30V29a6 6 0 0 0-12 0v13Z" fill="currentColor"/><path d="m24 2 3 5-3 5-3-5Z" fill="currentColor"/></svg>
-      <div><strong>拼音守城</strong><small>PINYIN · KEEP THE LIGHT</small></div>
+      <div><strong>拼鬥魔法師</strong><small>拼音施法・明亮冒險</small></div>
     </div>
     <div class="tools">
       <span class="wallet" id="wallet">金幣 0</span>
       <button data-action="reference">對照表</button>
-      <button id="audio-toggle" aria-pressed="true" data-action="sound">音效：開</button>
-      <select id="theme-select" aria-label="顯示色彩"><option value="auto">跟隨系統</option><option value="light">淺色</option><option value="dark">深色</option></select>
+      <button data-action="settings">設定</button><button id="audio-toggle" aria-pressed="true" data-action="sound">音效 開</button>
+      <select id="theme-select" aria-label="顯示色彩"><option value="light">淺色</option><option value="dark">深色</option></select>
     </div>
   </header>
-  <div class="mobile-note">請用電腦鍵盤遊玩。手機仍可瀏覽地圖、教學與對照表。</div>
+  <div class="mobile-note">使用拼音或英文鍵盤施法；也可在設定開啟內建鍵盤。</div>
   <div id="storage-notice" class="notice" hidden>瀏覽器無法儲存進度，目前使用暫存模式；遊戲仍可正常進行。</div>
   <main>
     <section id="map-screen" aria-label="關卡地圖">
       <div class="map-layout">
         <aside>
-          <div class="intro"><p class="eyebrow">一趟從注音出發的旅程</p><h1>鍵起，<br>守住每道光。</h1><p>把熟悉的注音，化成指尖的拼音。<br>每一次打對，都讓城門更堅定。</p></div>
+          <div class="intro"><p class="eyebrow">一趟從注音出發的旅程</p><h1>拼出你的<br>第一道魔法。</h1><p>把熟悉的注音，化成指尖的拼音。<br>先跟著練習，再用拼音對抗怪物。</p></div>
           <nav id="region-nav" class="region-nav" aria-label="選擇地區"></nav>
-          <p class="side-note">第 1–4 區請切英文鍵盤。<br>不用聲調，n／l 後的 ü 打 v。<br>第 5 區才切換系統拼音輸入法。</p>
+          <p class="side-note">使用系統拼音或英文鍵盤。<br>不用聲調，n／l 後的 ü 打 v。<br>第 5 區選出繁體中文整句。</p>
         </aside>
         <div class="map-panel">
           <div id="map-heading" class="map-heading"></div>
@@ -320,19 +536,29 @@
         <div class="stat"><small id="speed-label">字母 / 分鐘</small><strong id="speed-value">0</strong></div>
       </div>
       <div id="boss-status" class="boss-status" hidden><div><small id="boss-name">守關者・三段護甲</small><div id="boss-bars" class="boss-bar"></div></div><div class="charge"><small id="charge-label">王正在蓄力</small><div class="meter"><i id="charge-fill"></i></div></div></div>
+      <section id="guide-panel" hidden aria-label="引導練習"></section>
+      <div id="keyboard-hint" hidden></div>
+      <div id="start-overlay" hidden><p id="start-reason"></p><button class="primary" data-action="ready">開始</button></div>
       <div id="battlefield" class="battlefield">
         <svg class="landscape" viewBox="0 0 1200 350" preserveAspectRatio="none" aria-hidden="true"><path d="M0 220 120 140 240 210 420 90 600 210 770 125 950 210 1100 100 1200 180V350H0Z" fill="currentColor"/><path d="M0 270Q300 210 600 275T1200 240" fill="none" stroke="currentColor" stroke-width="3"/></svg>
         <div class="ground"></div>
-        <svg id="gate" class="gate" viewBox="0 0 100 160" aria-hidden="true"><path d="M5 160V38h18V15h17v23h20V15h17v23h18v122H65v-58a15 15 0 0 0-30 0v58Z" fill="currentColor"/><path d="M14 64h14m44 0h14M14 90h10m52 0h10M16 125h10m48 0h10" stroke="var(--paper)" stroke-width="4"/><path d="m50 1 7 10-7 10-7-10Z" fill="var(--gold)"/></svg>
-        <svg id="mage" class="mage" viewBox="0 0 65 100" aria-hidden="true"><path d="m15 97 9-48h23l12 48Z" fill="currentColor"/><circle cx="35" cy="37" r="14" fill="var(--panel)" stroke="currentColor" stroke-width="4"/><path d="m12 29 26-27 9 27Z" fill="currentColor"/><path d="M7 47v50m-5-51 5-9 5 9-5 9Z" fill="var(--gold)" stroke="var(--gold)" stroke-width="3"/><circle cx="37" cy="37" r="2" fill="currentColor"/></svg>
+        <svg id="gate" class="gate" viewBox="0 0 110 100" aria-hidden="true"><path d="M8 96V36h18V18h18v18h24V18h18v18h16v60Z" fill="#a9b898" stroke="#60785d" stroke-width="3"/><path d="M39 98V62q16-25 32 0v36" fill="#a97949" stroke="#60785d" stroke-width="3"/><path d="M55 54v44M14 48h14m53 0h14M13 72h14m54 0h14" stroke="#e9efda" stroke-width="4"/><path d="m48 14 8-12 8 12-8 12Z" fill="#ddb75c"/><circle cx="50" cy="77" r="2" fill="#fff1bd"/><circle cx="61" cy="77" r="2" fill="#fff1bd"/></svg>
+        <svg id="mage" class="mage" viewBox="0 0 70 100" aria-label="拼鬥魔法師"><path d="M19 96 26 54h26l12 42Z" fill="#447d8b" stroke="#315862" stroke-width="2"/><path d="m27 57 12 15 12-15" fill="#f3dc8b"/><path d="M28 88h22" stroke="#e7d297" stroke-width="3"/><circle cx="40" cy="41" r="15" fill="#f2d5af"/><path d="M25 41q-2-23 18-20 17 5 12 24l-8-15-20 15" fill="#5a4c3b"/><path d="m16 29 22-27 12 26 12 7H15Z" fill="#447d8b" stroke="#315862" stroke-width="2"/><path d="m25 22 25 3" stroke="#e7c66c" stroke-width="4"/><circle cx="36" cy="43" r="2" fill="#2e443f"/><circle cx="47" cy="43" r="2" fill="#2e443f"/><path d="m38 51 5 2 4-3" fill="none" stroke="#8e624f" stroke-width="2"/><path d="M9 97V50" stroke="#947044" stroke-width="4"/><path d="m9 35 8 12-8 12-8-12Z" fill="#edbf5b" stroke="#9c7634" stroke-width="2"/><path d="m28 68-15 6" stroke="#447d8b" stroke-width="8"/></svg>
         <span class="gate-label">光種城門</span>
         <div id="enemy-layer"></div>
       </div>
       <div id="duel-panel" class="duel-panel" hidden>
         <div class="duel-top"><div id="duel-art"></div><div><small class="eyebrow">照著咒語輸入繁體中文，再按 Enter</small><div id="spell-target" class="spell-target"></div><div id="spell-hint" class="spell-hint"></div></div></div>
-        <form id="spell-form"><textarea id="spell-input" aria-label="咒語輸入框" placeholder="切換系統拼音輸入法，在這裡輸入中文…" autocomplete="off" spellcheck="false" rows="2"></textarea><div class="duel-meta"><span id="composition-state" role="status">等待輸入・標點與全半形不影響判定</span><button type="submit" class="primary">施放咒語 Enter</button></div></form>
+
         <div id="spell-feedback" class="spell-feedback" aria-live="polite"></div>
       </div>
+      <form id="spell-form" class="cast-bar">
+        <label for="spell-input" id="input-label">施法列</label>
+        <input id="spell-input" type="text" aria-label="施法列" placeholder="在這裡輸入拼音…" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" enterkeyhint="done">
+        <button id="cast-button" type="submit" class="primary" hidden>施放</button>
+        <span id="composition-state" role="status" hidden></span>
+      </form>
+      <div id="builtin-keyboard" hidden aria-label="遊戲內建鍵盤"></div>
       <p id="battle-message" class="battle-message" role="status" aria-live="polite"></p>
       <div class="play-controls"><button data-action="peek" id="peek-button">偷看 <kbd>Tab</kbd> <span id="peek-count"></span></button><span id="control-help">英文字母 攻擊　<kbd>Backspace</kbd> 解除鎖定　<kbd>Esc</kbd> 解除／暫停</span><span id="guard-label"></span></div>
     </section>
@@ -1242,7 +1468,7 @@ const shuffle = array => {
 };
 const regionCopy = [
   ['從一個字母開始', '先認聲母，再熟悉韻母。前兩關會顯示淡色答案；題目旁的國字是例字；yuan、yun、weng 打完整音節，其餘打指定片段。'],
-  ['讓字音長成森林', '看國字與注音，連續鍵入整個音節。不加聲調；由一隻怪，逐步練到四隻怪的鎖定戰。'],
+  ['讓字音長成森林', '看國字與注音，連續鍵入整個音節。不加聲調；由一隻怪，逐步練到三隻怪的鎖定戰。'],
   ['辨清相似的聲音', '捲舌、鼻音與 ü 規則各有專項。別急著猜，先看清注音的最後一個符號。'],
   ['把音節接成一條路', '兩到四字的詞一口氣連打，不加空白。山道怪有兩層護甲，移動較慢。'],
   ['用真正的輸入法施法', '開啟系統拼音輸入法，選出繁體中文並施放整句咒語。在王蓄滿力之前，守住城門。'],
@@ -1250,7 +1476,7 @@ const regionCopy = [
 const artNames = ['芽甲獸', '枝耳獸', '苔壺獸', '岩匣獸', '墨冠守望者'];
 
 // 全部圖形為本遊戲原創內嵌 SVG，各區有不同輪廓；不依賴字型圖示。
-function creatureSVG(region = 1, boss = false) {
+function creatureSVG(region = 1, boss = false, variant = 0) {
   const shapes = [
     '<path d="M23 43Q8 20 26 14L43 35Q52 7 70 12L64 40Q85 43 82 67L75 87H26L16 67Q13 52 23 43Z"/>',
     '<path d="m22 39-8-27 26 17 10-23 12 23 25-17-8 28 11 31-17 20H26L10 71Z"/>',
@@ -1259,17 +1485,17 @@ function creatureSVG(region = 1, boss = false) {
     '<path d="m18 42 4-25 17 13L50 8l14 22 17-13 3 25-8 42-26 12-26-12Z"/><path d="m31 70 19 12 19-12" fill="none" stroke="var(--panel)" stroke-width="3"/>',
   ];
   const crown = boss ? '<path d="m17 22-8-18 25 10L50 0l16 14L91 4l-8 18Z" fill="var(--gold)"/><path d="M9 54 1 46v31l16 7m74-30 8-8v31l-16 7" fill="var(--gold)"/>' : '';
-  return `<svg class="creature" viewBox="0 0 100 108" role="img" aria-label="${boss ? '三段護甲・' : ''}${artNames[region - 1] || artNames[0]}"><g fill="currentColor">${shapes[region - 1] || shapes[0]}${crown}<path d="m26 85-8 17h20l4-15m17 0 4 15h20l-9-17"/></g><path d="M31 51h13v13H31Zm25 0h13v13H56Z" fill="var(--panel)"/><circle cx="39" cy="58" r="3" fill="var(--ink)"/><circle cx="61" cy="58" r="3" fill="var(--ink)"/><path d="m43 76 7 4 7-4" fill="none" stroke="var(--panel)" stroke-width="3"/></svg>`;
+  return `<svg class="creature" viewBox="0 0 100 108" role="img" aria-label="${boss ? '三段護甲・' : ''}${artNames[region - 1] || artNames[0]}"><g fill="currentColor">${shapes[region - 1] || shapes[0]}${variant === 1 ? '<path d="m12 48-11-9 4 27 15 4m65-22 14-9-4 27-15 4" fill="#e6a03d"/>' : variant === 2 ? '<path d="m21 42 29-16 29 16-4 37-25 13-25-13Z" fill="#d69243"/><path d="M50 32v53M27 49h46" stroke="#fff4d0" stroke-width="4"/>' : '<path d="M23 36Q12 12 33 19m35 17Q88 13 68 18" fill="none" stroke="#a0c76e" stroke-width="6"/>'}${crown}<path d="m26 85-8 17h20l4-15m17 0 4 15h20l-9-17"/></g><path d="M31 51h13v13H31Zm25 0h13v13H56Z" fill="var(--panel)"/><circle class="eye" cx="39" cy="58" r="3" fill="var(--ink)"/><circle class="eye" cx="61" cy="58" r="3" fill="var(--ink)"/><path d="m43 76 7 4 7-4" fill="none" stroke="var(--panel)" stroke-width="3"/></svg>`;
 }
 function mapArt(region) {
-  return `<div class="map-art" aria-hidden="true">${creatureSVG(region, true)}</div>`;
+  return `<div class="map-art" aria-hidden="true">${sceneSVG(region)}${creatureSVG(region, true)}</div>`;
 }
 
 function freshSave() {
   return {
     version: CONFIG.version, coins: 0, records: {}, review: {},
     upgrades: { gate: 0, peek: 0, guard: 0 },
-    settings: { sound: true, theme: 'auto' },
+    settings: { sound: true, theme: 'light', builtin: false, onboarding: false },
   };
 }
 let storageAvailable = true;
@@ -1283,7 +1509,9 @@ function loadSave() {
       clean.upgrades[key] = clamp(Math.floor(Number(raw.upgrades?.[key]) || 0), 0, key === 'guard' ? 1 : 3);
     }
     clean.settings.sound = raw.settings?.sound !== false;
-    if (['auto', 'light', 'dark'].includes(raw.settings?.theme)) clean.settings.theme = raw.settings.theme;
+    clean.settings.builtin = raw.settings?.builtin === true;
+    clean.settings.onboarding = raw.settings?.onboarding === true;
+    if (['light', 'dark'].includes(raw.settings?.theme)) clean.settings.theme = raw.settings.theme;
     for (const [id, record] of Object.entries(raw.records || {})) {
       if ((stages.some(s => s.id === id) || id.startsWith('review')) && record && typeof record === 'object') {
         clean.records[id] = {
@@ -1338,7 +1566,7 @@ function persist() {
 }
 function refreshHeader() {
   $('#wallet').textContent = `金幣 ${save.coins}`;
-  $('#audio-toggle').textContent = `音效：${save.settings.sound ? '開' : '關'}`;
+  $('#audio-toggle').textContent = `音效 ${save.settings.sound ? '開' : '關'}`;
   $('#audio-toggle').setAttribute('aria-pressed', String(save.settings.sound));
   $('#theme-select').value = save.settings.theme;
   document.documentElement.dataset.theme = save.settings.theme;
@@ -1383,6 +1611,9 @@ function animate(element, className) {
 }
 function showScreen(name) {
   screen = name;
+  if (name !== 'play') document.body.classList.remove('learning');
+  document.body.classList.toggle('playing', name === 'play');
+  if (name !== 'play') { cancelKeyboardWait(); $('#start-overlay').hidden = true; $('#spell-input').blur(); }
   window.scrollTo(0, 0);
   for (const value of ['map', 'play', 'result']) $(`#${value}-screen`).hidden = value !== name;
 }
@@ -1393,19 +1624,20 @@ function isUnlocked(stage) {
 }
 function renderMap() {
   const region = regions[selectedRegion - 1];
+  document.documentElement.dataset.region = selectedRegion;
   const allStars = stages.reduce((n, stage) => n + (save.records[stage.id]?.stars || 0), 0);
   $('#region-nav').innerHTML = regions.map(r => {
     const completed = r.stageIds.filter(id => (save.records[id]?.stars || 0) > 0).length;
     return `<button class="region-tab" data-action="region" data-id="${r.id}" aria-pressed="${r.id === selectedRegion}"><span class="region-number">0${r.id}</span><span>${r.title}<small>${completed} / ${r.stageIds.length} 關通過</small></span></button>`;
   }).join('');
-  $('#map-heading').innerHTML = `<div><p class="eyebrow">REGION 0${region.id} · ${regionCopy[region.id - 1][0]}</p><h2>${region.title}</h2><p>${regionCopy[region.id - 1][1]}</p></div>${mapArt(region.id)}`;
+  $('#map-heading').innerHTML = `<div><p class="eyebrow">第 0${region.id} 區 · ${regionCopy[region.id - 1][0]}</p><h2>${region.title}</h2><p>${regionCopy[region.id - 1][1]}</p></div>${mapArt(region.id)}`;
   const next = stages.find(s => !save.records[s.id]?.stars);
   $('#stage-grid').innerHTML = region.stageIds.map((id, i) => {
     const stage = stages.find(s => s.id === id);
     const record = save.records[id];
     const unlocked = isUnlocked(stage);
     const boss = stage.kind.includes('boss');
-    return `<button class="stage-node ${boss ? 'boss-node' : ''} ${next?.id === id ? 'next-node' : ''}" data-action="stage" data-id="${id}" aria-disabled="${!unlocked}" aria-label="${escapeHTML(stage.title)}，${unlocked ? '可挑戰' : '尚未解鎖，可預覽教學'}"><span class="node-no">${boss ? '守關挑戰 / BOSS' : `第 ${i + 1} 小關 / ${String(i + 1).padStart(2, '0')}`}${!unlocked ? ' · 待解鎖' : ''}</span><strong>${escapeHTML(stage.title)}</strong><span class="stars" aria-label="${record?.stars || 0} 顆星">${'★'.repeat(record?.stars || 0)}${'☆'.repeat(3 - (record?.stars || 0))}</span><span class="best">${record?.bestSpeed ? `最佳 ${record.bestSpeed.toFixed(0)} ${region.id === 5 ? '中文字' : '字母'}／分` : unlocked ? '準備好，按此查看教學' : '通過前一關後解鎖'}</span></button>`;
+    return `<button class="stage-node ${boss ? 'boss-node' : ''} ${next?.id === id ? 'next-node' : ''}" data-action="stage" data-id="${id}" aria-disabled="${!unlocked}" aria-label="${escapeHTML(stage.title)}，${unlocked ? '可挑戰' : '尚未解鎖，可預覽教學'}"><span class="node-no">${boss ? '守關挑戰 / 王關' : `第 ${i + 1} 小關 / ${String(i + 1).padStart(2, '0')}`}${!unlocked ? ' · 待解鎖' : ''}</span><strong>${escapeHTML(stage.title)}</strong><span class="stars" aria-label="${record?.stars || 0} 顆星">${'★'.repeat(record?.stars || 0)}${'☆'.repeat(3 - (record?.stars || 0))}</span><span class="best">${record?.bestSpeed ? `最佳 ${record.bestSpeed.toFixed(0)} ${region.id === 5 ? '中文字' : '字母'}／分` : unlocked ? '準備好，按此查看教學' : '通過前一關後解鎖'}</span></button>`;
   }).join('');
   const activeReview = Object.values(save.review).filter(r => r.mastered < 3).length;
   $('#review-count').textContent = activeReview;
@@ -1460,13 +1692,13 @@ function teach(stage) {
       ? '只考實際鍵入的片段；ㄩㄢ、ㄩㄣ、零聲母 ㄨㄥ 打完整音節 yuan、yun、weng。ü 有三種打法：n/l 後打 v（nv、lv、nve、lve）；j q x 後打 u（juan、qun）；單獨成音節寫 yu/yue/yuan/yun。按第一個字母鎖定怪物，繼續打完答案即可攻擊。'
       : stage.region === 4
         ? '將整個詞的拼音連打，不加空白或聲調。一般岩匣獸要打完兩題才擊倒；王有三段護甲。'
-        : '請先切回英文鍵盤。看注音，連打不含聲調的完整拼音。第一個字母自動鎖定最靠近城門的符合目標。');
+        : '使用拼音或英文鍵盤。看注音，連打不含聲調的完整拼音。第一個字母自動鎖定最靠近城門的符合目標。');
   const common = group?.commonMistake || (ime
     ? '候選字還在組字時，Enter 只用來選字；完成選字後，再按 Enter 施放。用拼音詞語連打，再用空白或數字選字。'
     : region === 1 ? '依題卡標示輸入：ㄅ（八）只打 b，ㄓ（知）只打 zh；元、雲、翁則打 yuan、yun、weng。'
       : '不要加聲調、空格或把 ü 打成 u；女為 nv，去為 qu。打錯會立刻亮出正解 1.5 秒。');
   const systemHelp = ime ? `<details open><summary>新增與切換繁體拼音輸入法</summary><div class="hint-box"><b>macOS：</b>系統設定 → 鍵盤 → 文字輸入 → 編輯 → ＋ → 繁體中文 → 拼音。用地球鍵／Control＋空白鍵切換；選擇繁體拼音，鍵入拼音後用空白或數字選字。不同系統版本的名稱可能略有差異。<br><b>Windows：</b>設定 → 時間與語言 → 語言與地區 → 中文（繁體，台灣）→ 語言選項 → Microsoft 注音 → 鍵盤選項 → 按鍵指派／鍵盤配置，選漢語拼音。用 Win＋空白鍵切換、Shift 切中英。也可在已有的 Microsoft 拼音設定啟用繁體輸出；請確認輸入框產生的是繁體字。<br><b>連打：</b>先練「我們」women，再連成詞句；候選不對時重新選字。本頁無法替你安裝或判斷輸入法種類。</div></details>` : '';
-  openModal('teach', `${dialogHeader(`${stage.region ? `第 ${stage.region} 區・` : ''}${escapeHTML(stage.title)}`)}<p class="eyebrow">怪物圖鑑 / ${artNames[region - 1]}${stage.kind.includes('boss') ? '・王有三段血條' : ''}</p><div class="teach-rule">${rules}</div><div class="example-grid">${examples.filter(Boolean).map(exampleHTML).join('')}</div><p class="hint-box"><b>常見錯誤：</b>${common}<br>${ime ? '王的蓄力不會在組字時停止；按暫停可安全休息。' : '每個正確字母會擊退怪物；Tab 消耗偷看且不累積本次連擊。Backspace／Esc 解除鎖定；未鎖定時 Esc 暫停。'}</p>${systemHelp}${region === 1 ? `<details><summary>完整注音 ↔ 拼音對照表</summary>${referenceHTML()}</details>` : ''}<p class="muted" style="font-size:12px">${stage.kind.includes('boss') ? '王題目優先選本區易錯題與你的錯題；打錯會回復少量護甲並加速蓄力。' : `本關同場最多 ${stage.maxSimultaneous} 隻；通過後解鎖下一關。`} ${!unlocked ? '目前尚未解鎖，請先通過前一關。' : ''}</p><div class="dialog-actions"><button data-action="close">回地圖</button><button class="primary" data-action="start" ${unlocked ? '' : 'disabled'}>Enter 開始挑戰</button></div>`, unlocked ? '[data-action="start"]' : '[data-action="close"]');
+  openModal('teach', `${dialogHeader(`${stage.region ? `第 ${stage.region} 區・` : ''}${escapeHTML(stage.title)}`)}<p class="eyebrow">怪物圖鑑 / ${artNames[region - 1]}${stage.kind.includes('boss') ? '・王有三段血條' : ''}</p><div class="teach-rule">${rules}</div><div class="example-grid">${examples.filter(Boolean).map(exampleHTML).join('')}</div><p class="hint-box"><b>常見錯誤：</b>${common}<br>${ime ? '王的蓄力不會在組字時停止；按暫停可安全休息。' : '每個正確字母會擊退怪物；Tab 消耗偷看且不累積本次連擊。Backspace／Esc 解除鎖定；未鎖定時 Esc 暫停。'}</p>${systemHelp}${region === 1 ? `<details><summary>完整注音 ↔ 拼音對照表</summary>${referenceHTML()}</details>` : ''}<p class="muted" style="font-size:12px">${stage.kind.includes('boss') ? '王題目優先選本區易錯題與你的錯題；打錯會回復少量護甲並加速蓄力。' : `本關同場最多 ${Math.min(3, stage.maxSimultaneous)} 隻；通過後解鎖下一關。`} ${!unlocked ? '目前尚未解鎖，請先通過前一關。' : ''}</p><div class="dialog-actions"><button data-action="close">回地圖</button>${(save.records[stage.id]?.stars === 3 && !stage.kind.includes('boss')) ? '<button data-action="skip-guide">跳過教學</button>' : ''}<button class="primary" data-action="start" ${unlocked ? '' : 'disabled'}>${stage.kind.includes('boss') || stage.reviewOnly ? '準備挑戰' : '開始引導練習'}</button></div>`, unlocked ? '[data-action="start"]' : '[data-action="close"]');
 }
 function showReference() {
   if (screen === 'play' && game?.running && !game.paused) pauseGame('已暫停，安心查看對照表。', false);
@@ -1521,8 +1753,9 @@ function stagePool(stage) {
   const review = Object.entries(save.review).filter(([id, item]) => item.mastered < 3 && known.has(id) && questionsById[id].kind === validKind).map(([id]) => id);
   return [...new Set([...stage.pool, ...review])];
 }
-function startGame(stage = pendingStage) {
+function startGame(stage = pendingStage, skipGuide = false) {
   if (!stage || !isUnlocked(stage)) return;
+  cancelKeyboardWait();
   closeModal();
   globallyComposing = false;
   compositionEndedAt = -Infinity;
@@ -1539,8 +1772,8 @@ function startGame(stage = pendingStage) {
     peeks: CONFIG.basePeeks + save.upgrades.peek, guard: save.upgrades.guard,
     score: 0, combo: 0, longest: 0, correct: 0, wrong: 0, letters: 0,
     completedCharacters: 0, elapsed: 0, mistakes: {}, kills: 0, spawned: 0,
-    total, enemies: [], locked: null, serial: 0, spawnIn: .35,
-    maxEnemies: Math.min(stage.maxSimultaneous, firsts.size),
+    total, enemies: [], parked: [], locked: null, serial: 0, spawnIn: .35,
+    maxEnemies: Math.min(3, stage.maxSimultaneous, firsts.size),
     speed: (2.4 + order * .18) * (stage.movementScale || 1),
     spawnInterval: Math.max(1.15, 3.0 - order * .065),
     bossMax: CONFIG.bossSegments * CONFIG.bossSegmentHP,
@@ -1563,18 +1796,29 @@ function startGame(stage = pendingStage) {
   $('#spell-feedback').replaceChildren();
   $('#spell-input').value = '';
   $('#spell-input').classList.remove('composing');
-  $('#spell-input').disabled = false;
+  $('#spell-input').readOnly = false;
   $('#composition-state').textContent = '等待輸入・標點與全半形不影響判定';
   showScreen('play');
   message(ime ? '請切換系統拼音輸入法，輸入繁體中文。' : '請切英文鍵盤，打出怪物的拼音！', false, 6);
-  if (ime) {
-    $('#duel-art').innerHTML = creatureSVG(5, true);
-    nextSpell();
-    $('#spell-input').focus();
+  $('#cast-button').hidden = !ime;
+  document.documentElement.dataset.region = stage.region || 1;
+  $('#battlefield .landscape').outerHTML = sceneSVG(stage.region || 1);
+  $('#guide-panel').hidden = true;
+  document.body.classList.remove('learning');
+  $('#keyboard-hint').hidden = true;
+  resetInput();
+  $('#duel-panel > .landscape')?.remove();
+  if (ime) { $('#duel-panel').insertAdjacentHTML('afterbegin', sceneSVG(5)); $('#duel-art').innerHTML = creatureSVG(5, true); nextSpell(); }
+  if (!save.settings.onboarding) {
+    game.onboarding = 0;
+    game.training = true;
+    game.paused = true;
+    readyOverlay('先花約 30 秒，實際練習鎖定、打錯提示、偷看與連擊。', '開始操作教學');
+  } else if (!boss && !stage.reviewOnly && !skipGuide) {
+    beginGuide();
   } else {
-    // 防止按鈕留焦點，Tab 在戰場專作偷看。
-    document.activeElement?.blur();
-    if (boss) spawnEnemy();
+    game.paused = true;
+    readyOverlay('鍵盤準備好後，倒數開始。', '開始戰鬥');
   }
   updateHUD();
   lastTime = performance.now();
@@ -1602,19 +1846,18 @@ function chooseQuestion(excludeInitials = new Set(), previousId = '') {
   return questionsById[game.deck.splice(index, 1)[0]];
 }
 function spawnEnemy() {
-  // 兩排題卡，同排必須相隔 24% 戰場距離，避免同場五怪互相遮字。
-  const availableLanes = (game.maxEnemies > 1 ? [0, 1] : [0]).map(lane => ({
-    lane, residents: game.enemies.filter(enemy => enemy.lane === lane),
-  })).filter(item => !item.residents.some(enemy => enemy.x > 68));
-  if (!availableLanes.length) return false;
-  const lane = availableLanes.sort((a, b) => a.residents.length - b.residents.length)[0].lane;
+  const limit = (window.visualViewport?.height || innerHeight) < 470 ? 1 : game.maxEnemies;
+  if (game.enemies.length >= limit) return false;
+  const lanes = Array.from({length: limit}, (_, i) => i);
+  const lane = lanes.find(i => !game.enemies.some(e => e.lane === i));
+  if (lane === undefined) return false;
   const occupied = new Set(game.enemies.map(enemy => enemy.q.pinyin[0]));
   const q = chooseQuestion(occupied);
   if (!q) return;
   const element = document.createElement('div');
   const enemy = {
-    id: ++game.serial, q, progress: 0, x: game.boss ? 73 : 92,
-    lane: 0, remaining: game.stage.questionsPerMonster || 1,
+    id: ++game.serial, q, progress: 0, x: game.boss ? 72 : 96,
+    lane: 0, variant: (game.serial - 1) % 3, remaining: game.boss || game.training ? 1 : Math.max(game.stage.questionsPerMonster || 1, (game.serial - 1) % 3 === 2 ? 2 : 1),
     clean: true, peeked: false, reveal: 0, element,
   };
   enemy.lane = lane;
@@ -1628,13 +1871,23 @@ function spawnEnemy() {
   return true;
 }
 function positionEnemy(enemy) {
-  const width = $('#battlefield').clientWidth;
-  const cardWidth = enemy.element.offsetWidth || 170;
-  const start = width < 650 ? 48 : 125;
-  const range = width - start - cardWidth * .6;
-  const left = start + enemy.x / 100 * range - cardWidth / 2;
-  const top = game.boss ? 10 : game.maxEnemies > 1 ? [8, 152][enemy.lane] : 12;
-  enemy.element.style.transform = `translate(${left.toFixed(1)}px,${top}px)`;
+  const field = $('#battlefield');
+  const element = enemy.element;
+  const width = field.clientWidth;
+  const height = field.clientHeight;
+  const cardWidth = element.offsetWidth;
+  // Each monster owns a separate vertical track. Card height includes the creature.
+  const count = (window.visualViewport?.height || innerHeight) < 470 && game.enemies.length <= 1 ? 1 : game.maxEnemies;
+  enemy.element.classList.toggle('wide-card', count === 1);
+  const cardSize = count === 1 ? Math.min(width * .78, 220) : (width - 24) / 3;
+  element.style.width = `${cardSize}px`;
+  const actualWidth = element.offsetWidth;
+  const track = (width - 12) / count;
+  const left = count === 1 ? (width - actualWidth) / 2 : 6 + track * enemy.lane + (track - actualWidth) / 2;
+  const travel = Math.max(0, height - element.offsetHeight - 54);
+  const top = 4 + (1 - enemy.x / 100) * travel;
+  element.style.transform = `translate(${left.toFixed(1)}px,${top.toFixed(1)}px)`;
+
 }
 function renderEnemy(enemy) {
   const q = enemy.q;
@@ -1642,7 +1895,7 @@ function renderEnemy(enemy) {
   const answer = [...q.pinyin].map((letter, i) => `<span class="${i < enemy.progress ? 'typed' : reveal ? 'pending' : 'unknown'}">${i < enemy.progress || reveal ? letter : '·'}</span>`).join('');
   enemy.element.classList.toggle('locked', game.locked === enemy.id);
   enemy.element.classList.toggle('reveal', enemy.reveal > 0);
-  enemy.element.innerHTML = `<div class="question-card"><span class="lock-label">已鎖定 / TARGET</span><span class="reading">${escapeHTML(q.kind === 'phonics' ? (q.wholeSyllable ? '請打完整音節' : '請打注音片段') : q.zhuyin)}</span><span class="prompt">${escapeHTML(q.symbol || q.text)}</span>${q.kind === 'phonics' ? `<span class="example">例字：${q.text}</span>${q.notation === 'ü' ? `<span class="example">・${q.exampleNote}</span>` : ''}` : ''}<div class="answer" aria-label="${reveal ? q.pinyin : `已輸入 ${q.pinyin.slice(0, enemy.progress) || '尚無'}`}">${answer}</div>${enemy.remaining > 1 ? `<div class="plates" aria-label="剩餘 ${enemy.remaining} 題護甲">${Array.from({ length: enemy.remaining }, () => '<i></i>').join('')}</div>` : ''}</div>${creatureSVG(game.stage.region || 1, game.boss)}`;
+  enemy.element.innerHTML = `<div class="question-card"><span class="lock-label">已鎖定</span><span class="reading">${escapeHTML(q.kind === 'phonics' ? (q.wholeSyllable ? '請打完整音節' : '請打注音片段') : q.zhuyin)}</span><span class="prompt">${escapeHTML(q.symbol || q.text)}</span>${q.kind === 'phonics' ? `<span class="example">例字：${q.text}</span>${q.notation === 'ü' ? `<span class="example">・${q.exampleNote}</span>` : ''}` : ''}<div class="answer" aria-label="${reveal ? q.pinyin : `已輸入 ${q.pinyin.slice(0, enemy.progress) || '尚無'}`}">${answer}</div>${enemy.remaining > 1 ? `<div class="plates" aria-label="剩餘 ${enemy.remaining} 題護甲">${Array.from({ length: enemy.remaining }, () => '<i></i>').join('')}</div>` : ''}</div>${creatureSVG(game.stage.region || 1, game.boss, enemy.variant || (enemy.lane % 3))}`;
 }
 function message(text, error = false, duration = 3) {
   $('#battle-message').textContent = text;
@@ -1701,6 +1954,7 @@ function unlockTarget() {
   return true;
 }
 function recordMistake(q) {
+  if (game.training) return;
   game.mistakes[q.id] = (game.mistakes[q.id] || 0) + 1;
   const item = save.review[q.id] || { count: 0, mastered: 0 };
   item.count++;
@@ -1840,10 +2094,11 @@ function hurt(amount) {
   if (game.hp <= 0) finishGame(false);
 }
 function checkWaves() {
-  if (game.running && !game.boss && !game.ime && game.spawned >= game.total && !game.enemies.length) finishGame(true);
+  restoreTracks();
+  if (game.running && !game.boss && !game.ime && game.spawned >= game.total && !game.enemies.length && !game.parked.length) finishGame(true);
 }
 function peek() {
-  if (!game?.running || game.paused || game.peeks <= 0 || globallyComposing) return;
+  if (!game?.running || game.paused || game.peeks <= 0) return;
   if (game.ime) {
     if (!game.currentSpell || game.spellAdvance) return;
     game.spellPeeked = true;
@@ -1901,9 +2156,9 @@ function nextSpell() {
   $('#spell-target').textContent = question.text;
   $('#spell-hint').textContent = question.zhuyin;
   $('#spell-input').value = '';
-  $('#spell-input').disabled = false;
-  $('#spell-input').focus();
+  $('#spell-input').readOnly = false;
 }
+
 function castSpell() {
   if (!game?.running || !game.ime || game.paused || game.spellAdvance || globallyComposing || performance.now() - compositionEndedAt < 100) return;
   const value = $('#spell-input').value;
@@ -1958,31 +2213,27 @@ function castSpell() {
     return;
   }
   game.spellAdvance = result.errors ? 2.7 : 1.2;
-  $('#spell-input').disabled = true;
+  $('#spell-input').readOnly = true;
   updateHUD();
 }
 
-function pauseGame(reason = '休息一下，城門替你等候。', showMenu = true) {
+function pauseGame(reason = '怪物與王的蓄力已停止。', showMenu = true) {
   if (!game?.running) return;
   game.paused = true;
+  cancelKeyboardWait();
   if (showMenu) showPauseMenu(reason);
 }
-function showPauseMenu(reason = '遊戲已暫停；怪物與王的蓄力都已停止。') {
-  openModal('pause', `<h2 id="modal-title">讓指尖歇一歇</h2><p>${escapeHTML(reason)}</p><p class="muted">第 1–4 區請先切回英文鍵盤。繼續前，按鍵不會造成攻擊。</p><div class="dialog-actions"><button data-action="map">回地圖</button><button data-action="restart">重來本關</button><button data-action="reference">對照表</button><button class="primary" data-action="resume">繼續 Enter</button></div>`, '[data-action="resume"]');
+function showPauseMenu(reason = '怪物與王的蓄力已停止。') {
+  readyOverlay(reason, '點我繼續', true);
 }
 function resumeGame() {
   if (!game?.running) return;
-  // 組字中不應用選單鍵強行恢復；讓 compositionend 自然結束。
-  if (globallyComposing) return;
   closeModal();
-  game.paused = false;
-  lastTime = performance.now();
-  if (game.ime && !game.spellAdvance) $('#spell-input').focus();
-  else document.activeElement?.blur();
-  message(game.ime ? '繼續輸入咒語。' : '繼續守城。請使用英文鍵盤。');
+  beginKeyboard();
 }
 function finishGame(won) {
   if (!game?.running) return;
+  cancelKeyboardWait();
   game.running = false;
   closeModal();
   const elapsed = Math.max(game.elapsed, 1);
@@ -2014,14 +2265,15 @@ function finishGame(won) {
   }).join('') : '<p class="muted">這一關沒有錯題，讓準確繼續累積。</p>'}</div><div class="dialog-actions"><button data-action="map">回地圖</button><button data-action="restart">再挑戰一次</button>${won && next && !game.stage.reviewOnly ? `<button class="primary" data-action="next" data-id="${next.id}">下一關教學 Enter</button>` : '<button class="primary" data-action="review">看看複習清單</button>'}</div></article>`;
   showScreen('result');
   $('#result-screen .primary')?.focus();
-  if (won) sound('win');
+  if (won) { sound('win'); $('#result-screen').classList.add('celebrate'); setTimeout(() => $('#result-screen').classList.remove('celebrate'), 1600); }
   else sound('hurt');
 }
 
 function tick(time) {
   const dt = lastTime ? Math.min((time - lastTime) / 1000, .06) : 0;
   lastTime = time;
-  if (game?.running && !game.paused) {
+  if (game?.running && !game.paused && !game.guide && !game.training) {
+    restoreTracks();
     game.elapsed += dt;
     if (game.messageTime > 0) {
       game.messageTime -= dt;
@@ -2042,7 +2294,7 @@ function tick(time) {
         }
       }
       for (const enemy of [...game.enemies]) {
-        if (!game.boss) enemy.x -= dt * game.speed;
+        if (!game.boss) enemy.x -= dt * game.speed * (enemy.variant === 1 ? 1.18 : enemy.variant === 2 ? .85 : 1);
         if (enemy.reveal > 0) {
           enemy.reveal -= dt;
           if (enemy.reveal <= 0) renderEnemy(enemy);
@@ -2085,6 +2337,12 @@ function handleAction(action, id) {
     case 'region': selectedRegion = Number(id); renderMap(); break;
     case 'stage': case 'next': teach(stages.find(s => s.id === id)); break;
     case 'start': startGame(); break;
+    case 'skip-guide': startGame(pendingStage, true); break;
+    case 'ready': resumeGame(); break;
+    case 'guide-next': guideNext(); break;
+    case 'settings': showSettings(); break;
+    case 'toggle-builtin': save.settings.builtin = !save.settings.builtin; persist(); showSettings(); break;
+    case 'unlock': resetInput(); unlockTarget(); break;
     case 'close': closeOrResumeMenu(); break;
     case 'map': goMap(); break;
     case 'restart': startGame(game?.stage); break;
@@ -2111,7 +2369,7 @@ function handleAction(action, id) {
 }
 document.addEventListener('click', event => {
   const button = event.target.closest('button[data-action]');
-  if (!button || button.disabled || globallyComposing) return;
+  if (!button || button.disabled) return;
   // 遊戲過程中的地圖功能必須先暫停，避免藏在視窗後繼續扣血。
   if (game?.running && screen === 'play' && ['review', 'shop'].includes(button.dataset.action)) pauseGame('遊戲已暫停。', false);
   handleAction(button.dataset.action, button.dataset.id);
@@ -2124,87 +2382,455 @@ $('#spell-form').addEventListener('submit', event => {
   event.preventDefault();
   castSpell();
 });
-// composition 事件也監聽 document，涵蓋作業系統對非輸入框的組字行為。
-document.addEventListener('compositionstart', () => {
-  globallyComposing = true;
-  if (game?.running && !game.ime) {
-    pauseGame('偵測到中文組字：請先切回英文輸入，再按「繼續」。');
+// The cast input remains mounted through lessons, battles, pauses and IME sessions.
+const castInput = $('#spell-input');
+const inputState = {consumed: 0, raw: '', lastError: '', credits: [], lastHan: '', before: ''};
+let keyboardTimer = 0;
+let countdownTimer = 0;
+let keyboardTicket = 0;
+let keyboardSeen = false;
+let lastCommit = {value: '', at: -Infinity};
+let viewportBaseline = Math.max(innerHeight, document.documentElement.clientHeight);
+let lastViewportHeight = window.visualViewport?.height || innerHeight;
+const useBuiltin = () => save.settings.builtin && !game?.ime;
+function resetInput() {
+  castInput.value = '';
+  inputState.consumed = 0;
+  inputState.raw = '';
+  inputState.lastError = '';
+  inputState.credits = [];
+  inputState.lastHan = '';
+}
+function sceneSVG(region) {
+  const colors = [
+    ['#dff4ff','#bddbb0','#9cc58c','#74aa73'],
+    ['#e7f5ec','#c5ddb2','#9ec895','#78ac80'],
+    ['#edf5e2','#d9dfa7','#b5cb8b','#8fae72'],
+    ['#fff1db','#ead6b5','#cdbb92','#b2b493'],
+    ['#fdf3d8','#ebd9b0','#d5c69b','#b8b185'],
+  ][region - 1];
+  const extras = region === 2 ? '<path d="m15 160 35-95 35 95Zm220-10 36-95 36 95Z" fill="#6d9f77"/>' : region === 3 ? '<path d="M5 255Q100 211 190 246T390 246v35H5Z" fill="#91b5a0"/>' : region === 4 ? '<path d="m30 170 65-115 60 115m50-20 62-110 70 110" fill="#c7b7a0"/>' : region === 5 ? '<path d="M30 160V65h22v95m275 0V65h22v95M18 66l45-29h250l47 29Z" fill="#cfb879"/>' : '<path d="M20 200q15-30 30 0m235-10q15-30 30 0" fill="#94be71"/>';
+  return `<svg class="landscape" viewBox="0 0 390 480" preserveAspectRatio="none" aria-hidden="true"><path fill="${colors[0]}" d="M0 0h390v480H0Z"/><g class="scene-far"><circle cx="318" cy="55" r="28" fill="#fff9df"/><path d="M25 60q16-20 32 0h38q-5-17-22-13-15-23-30-2-16-7-18 15" fill="#fffdf5"/>${extras}</g><path class="scene-mid" d="M0 196Q100 128 200 194T390 180V480H0Z" fill="${colors[1]}"/><path d="M0 280Q140 195 250 265T390 245V480H0Z" fill="${colors[2]}"/><path class="scene-front" d="M0 390Q70 340 130 390T390 355V480H0Z" fill="${colors[3]}"/><path d="M150 480Q220 335 195 220q85 125 80 260" fill="#fff5d2" opacity=".56"/><g fill="#fff4c4"><circle cx="28" cy="325" r="3"/><circle cx="351" cy="365" r="3"/><circle cx="73" cy="421" r="3"/></g></svg>`;
+}
+function showSettings() {
+  if (game?.running) pauseGame('設定期間已暫停。', false);
+  openModal('settings', `${dialogHeader('施法設定')}<div class="teach-rule"><h3>鍵盤方式</h3><p>預設使用手機系統的拼音或英文鍵盤。第 1 區只輸入字母；第 2～4 區也接受選字送出的完整國字或詞語。</p><button data-action="toggle-builtin" aria-pressed="${save.settings.builtin}">使用遊戲內建鍵盤：${save.settings.builtin ? '開' : '關'}</button><p class="muted">內建鍵盤適用第 1～4 區。若系統組字不順，開啟後直接點字母；第五區仍使用系統拼音選字。</p></div><div class="dialog-actions"><button class="primary" data-action="close">完成</button></div>`);
+}
+function readyOverlay(reason, label = '開始', menu = false) {
+  const panel = $('#start-overlay');
+  panel.hidden = false;
+  panel.innerHTML = `<div class="start-card"><p id="start-reason">${escapeHTML(reason)}</p><button class="primary" data-action="ready">${label}</button>${menu ? '<div class="pause-actions"><button data-action="map">回地圖</button><button data-action="restart">重來</button><button data-action="settings">設定</button></div>' : ''}</div>`;
+}
+function cancelKeyboardWait() {
+  clearTimeout(keyboardTimer);
+  clearInterval(countdownTimer);
+  countdownTimer = 0;
+  keyboardTimer = 0;
+  keyboardTicket++;
+}
+function beginKeyboard() {
+  if (!game?.running) return;
+  cancelKeyboardWait();
+  const ticket = keyboardTicket;
+  game.paused = true;
+  keyboardSeen = false;
+  $('#builtin-keyboard').hidden = !useBuiltin();
+  if (useBuiltin()) { keyboardSeen = false; }
+  castInput.readOnly = useBuiltin();
+  castInput.inputMode = useBuiltin() ? 'none' : 'text';
+  // Synchronous focus inside the original click / pointer gesture is required on iOS.
+  if (useBuiltin()) castInput.blur();
+  else castInput.focus({preventScroll: true});
+  readyOverlay('等待鍵盤…外接鍵盤會在 1.5 秒後開始。');
+  $('#start-overlay button').hidden = true;
+  const lowered = window.visualViewport && visualViewport.height < viewportBaseline - 120;
+  if (useBuiltin() || lowered) {
+    keyboardSeen = Boolean(lowered);
+    runCountdown(ticket);
+  } else keyboardTimer = setTimeout(() => runCountdown(ticket), 1500);
+}
+function runCountdown(ticket) {
+  if (ticket !== keyboardTicket || !game?.running) return;
+  clearTimeout(keyboardTimer);
+  keyboardTimer = 0;
+  if (countdownTimer) return;
+  let count = 3;
+  readyOverlay('3');
+  $('#start-overlay button').hidden = true;
+  $('#start-overlay').classList.add('counting');
+  countdownTimer = setInterval(() => {
+    if (ticket !== keyboardTicket || !game?.running) { clearInterval(countdownTimer); countdownTimer = 0; return; }
+    count--;
+    if (count > 0) { $('#start-reason').textContent = count; return; }
+    clearInterval(countdownTimer);
+    countdownTimer = 0;
+    $('#start-overlay').hidden = true;
+    $('#start-overlay').classList.remove('counting');
+    game.paused = false;
+    lastTime = performance.now();
+    if (game.training) renderOnboarding();
+    else if (game.guide) renderGuide();
+    else if (game.boss && !game.enemies.length && !game.ime) spawnEnemy();
+    message(game.ime ? '選出完整繁體中文，再按施放。' : '點怪或打首字母鎖定，連續打完拼音！', false, 5);
+  }, 1000);
+}
+// A small keyboard viewport keeps one active track. Other monsters wait without
+// moving or taking damage, then return with their original progress and HP.
+function restoreTracks() {
+  if (!game?.running || game.ime || !game.parked) return;
+  const small = (window.visualViewport?.height || innerHeight) < 470;
+  const limit = small ? 1 : game.maxEnemies;
+  if (game.enemies.length > limit) {
+    const keep = game.enemies.find(e => e.id === game.locked) || closestEnemy();
+    const rest = game.enemies.filter(e => e !== keep);
+    game.enemies = [keep];
+    keep.lane = 0;
+    for (const e of rest) { e.element.hidden = true; game.parked.push(e); }
   }
-  if (game?.ime) {
-    $('#spell-input').classList.add('composing');
-    $('#composition-state').textContent = '組字中…先完成選字，再按 Enter 施放';
+  while (game.enemies.length < limit && game.parked.length) {
+    const e = game.parked.shift();
+    e.lane = Array.from({length: limit}, (_,i) => i).find(i => !game.enemies.some(v => v.lane === i));
+    e.element.hidden = false;
+    game.enemies.push(e);
   }
-});
-document.addEventListener('compositionupdate', event => {
-  if (game?.ime) $('#composition-state').textContent = `組字中：${event.data || '選字中'}（現在不判錯）`;
-});
-document.addEventListener('compositionend', () => {
-  globallyComposing = false;
-  compositionEndedAt = performance.now();
-  $('#spell-input').classList.remove('composing');
-  $('#composition-state').textContent = '選字完成・確認整句後，再按 Enter 施放';
-});
-document.addEventListener('keydown', event => {
-  if (event.isComposing || event.keyCode === 229 || globallyComposing) {
-    if (game?.running && !game.ime && !game.paused) pauseGame('偵測到組字：請先切回英文輸入，再按「繼續」。');
+}
+function updateViewport() {
+  const vv = window.visualViewport;
+  const h = vv?.height || innerHeight;
+  document.documentElement.classList.toggle('compact-view', h < 570);
+  document.documentElement.classList.toggle('tiny-view', h < 470);
+  const top = vv?.offsetTop || 0;
+  document.documentElement.style.setProperty('--visible-height', `${h}px`);
+  document.documentElement.style.setProperty('--visible-top', `${top}px`);
+  if (screen !== 'play') viewportBaseline = Math.max(innerHeight, h);
+  const lowered = h < viewportBaseline - 120;
+  if (game?.running && !useBuiltin() && game.guide?.step !== 'look') {
+    if (lowered && game.paused && keyboardTimer) { keyboardSeen = true; runCountdown(keyboardTicket); }
+    if (keyboardSeen && !lowered && h > lastViewportHeight + 80) pauseGame('鍵盤已收起，點我繼續並重新開啟鍵盤。');
+  }
+  lastViewportHeight = h;
+  if (screen === 'play') {
+    window.scrollTo(0, 0);
+    restoreTracks();
+    game?.enemies.forEach(positionEnemy);
+  }
+}
+window.visualViewport?.addEventListener('resize', updateViewport);
+window.visualViewport?.addEventListener('scroll', updateViewport);
+window.addEventListener('resize', updateViewport);
+updateViewport();
+function guideItems(stage) {
+  if (stage.region === 3) {
+    const pairs = [ ['知','字','吃','次'], ['南','藍','女','綠'], ['山','上','安','昂'], ['分','風','真','正'], ['心','星','金','京'], ['女','綠','去','學'], ['牛','對','春','水'], ['一','五','魚','月'] ];
+    const pair = pairs[Number(stage.id.split('-')[1]) - 1] || pairs[0];
+    return pair.map(t => stage.pool.map(id => questionsById[id]).find(q => q.text === t) || characters.find(q => q.text === t)).filter(Boolean).slice(0,4);
+  }
+  return stage.pool.slice(0, Math.min(4, stage.pool.length)).map(id => questionsById[id]);
+}
+function beginGuide() {
+  document.body.classList.add('learning');
+  game.guide = {items: guideItems(game.stage), step: 'look', index: 0, progress: '', retry: false};
+  game.paused = true;
+  cancelKeyboardWait();
+  keyboardSeen = false;
+  castInput.blur();
+  $('#battlefield').hidden = true;
+  $('#duel-panel').hidden = true;
+  $('#boss-status').hidden = true;
+  $('#start-overlay').hidden = true;
+  $('#guide-panel').hidden = false;
+  $('#builtin-keyboard').hidden = true;
+  renderGuide();
+}
+function keyDiagram(next) {
+  return ['qwertyuiop','asdfghjkl','zxcvbnm'].map(row => `<div class="key-row">${[...row].map(c => `<i class="${c === next ? 'next-key' : ''}">${c}</i>`).join('')}</div>`).join('');
+}
+function renderGuide() {
+  const g = game.guide;
+  if (!g) return;
+  const q = g.items[g.index];
+  const known = g.step !== 'try' || g.retry;
+  const labels = {look: '看・記住鍵位', follow: '跟・照著打一次', try: '試・自己想想看'};
+  const group = soundGroups.find(x => x.id === game.stage.soundGroup);
+  const hint = group?.commonMistake || (q.kind === 'phonics' ? `${q.exampleNote}。${q.wholeSyllable ? '這題打完整音節。' : `鍵位是 ${q.pinyin}，不要多加例字的其他聲韻。`}` : q.kind === 'sentence' ? '先練整句的拼音連打；戰鬥時用系統拼音選出繁體中文，再施放。' : '不加聲調。n／l 後的 ü 打 v；詞語連續打完。');
+  $('#guide-panel').innerHTML = `<div class="guide-top"><span class="eyebrow">引導練習・沒有怪物、不扣血</span><span>${g.index + 1} / ${g.items.length}</span></div><div class="guide-steps">${['look','follow','try'].map((v,i) => `<span class="${v === g.step ? 'active' : ''}">${i+1} ${labels[v].split('・')[0]}</span>`).join('')}</div><h2>${labels[g.step]}</h2><div class="lesson-card"><small>${q.zhuyin}</small><strong>${q.symbol || q.text}</strong><b class="mono">${known ? q.pinyin : '想想它的拼音'}</b>${q.kind === 'phonics' ? `<small>例字 ${q.text}${known ? ` · ${q.exampleNote || ''}` : ''}</small>` : ''}</div>${game.stage.region === 3 ? `<div class="pair-compare">${g.items.map(v => `<span>${v.text}<b class="mono">${g.step === 'try' && !g.retry ? '？' : v.pinyin}</b></span>`).join('')}</div>` : ''}<p class="lesson-note">${g.retry ? `正解是 ${q.pinyin}。請從頭重打一次，記住再前進。` : g.step === 'try' ? '這次先不看答案。想好後直接輸入；答錯會顯示正解，再重打一次。' : hint}</p>${g.step === 'look' ? `<div class="demo-letters" aria-label="鍵位順序">${[...q.pinyin].map((c,i) => `<b style="animation-delay:${i * .35}s">${c}</b>`).join('')}</div><div class="mini-keys">${keyDiagram(q.pinyin[Math.floor(performance.now()/700)%q.pinyin.length])}</div><button class="primary" data-action="guide-next">${g.index < g.items.length - 1 ? '下一張' : '開始跟著練習'}</button>` : `<p class="guide-progress mono">${g.progress || '等待輸入'}</p>`}`;
+  $('#guide-panel').dataset.step = g.step;
+  const nextButton = $('#guide-panel [data-action="guide-next"]');
+  if (nextButton) {
+    const content = document.createElement('div');
+    content.className = 'guide-scroll';
+    while ($('#guide-panel').firstChild !== nextButton) content.append($('#guide-panel').firstChild);
+    $('#guide-panel').prepend(content);
+  }
+  updateKeyHint();
+}
+function guideNext() {
+  const g = game?.guide;
+  if (!g) return;
+  if (++g.index < g.items.length) renderGuide();
+  else { g.index = 0; g.step = 'follow'; renderGuide(); beginKeyboard(); }
+}
+function updateKeyHint() {
+  const g = game?.guide;
+  const answer = g ? g.items[g.index]?.pinyin : '';
+  const next = answer?.[g.progress.length] || '';
+  const visible = g && g.step !== 'look' && (g.step === 'follow' || g.retry);
+  $('#keyboard-hint').hidden = !visible;
+  if (visible) $('#keyboard-hint').innerHTML = `<span>下一個字母 <b class="mono">${next}</b></span><div class="mini-keys">${keyDiagram(next)}</div>`;
+  document.querySelectorAll('#builtin-keyboard [data-key]').forEach(el => el.classList.toggle('next-key', visible && el.dataset.key === next));
+}
+function guideText(raw, composing = false, fullLength = raw.length) {
+  const g = game.guide;
+  const q = g.items[g.index];
+  if (!q.pinyin.startsWith(raw)) {
+    g.retry = true; g.progress = '';
+    if (composing) inputState.consumed = fullLength; else resetInput();
+    renderGuide();
+    message(`正解：${q.pinyin}。請重打一次，不會扣血。`, true);
     return;
   }
-  if (event.ctrlKey || event.metaKey || event.altKey) return;
-  if (modal.open) {
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      if (modalKind === 'pause') resumeGame();
-      else closeOrResumeMenu();
-    } else if (event.key === 'Enter' && !event.repeat && !['BUTTON', 'SUMMARY', 'SELECT', 'INPUT'].includes(event.target.tagName)) {
-      if (modalKind === 'teach' && isUnlocked(pendingStage)) {
-        event.preventDefault(); startGame();
-      } else if (modalKind === 'pause') {
-        event.preventDefault(); resumeGame();
+  g.progress = raw;
+  if (raw === q.pinyin) {
+    if (composing) inputState.consumed = fullLength; else resetInput();
+    if (++g.index >= g.items.length) {
+      g.index = 0;
+      if (g.step === 'follow') g.step = 'try';
+      else {
+        game.guide = null;
+        document.body.classList.remove('learning');
+        $('#guide-panel').hidden = true;
+        $('#keyboard-hint').hidden = true;
+        $('#battlefield').hidden = game.ime;
+        $('#duel-panel').hidden = !game.ime;
+        $('#boss-status').hidden = !game.boss && !game.ime;
+        game.paused = true;
+        readyOverlay('引導完成！接下來用剛學到的拼音施法。', '開始戰鬥');
+        return;
       }
     }
+    g.progress = ''; g.retry = false;
+  }
+  renderGuide();
+}
+function renderOnboarding() {
+  const step = game.onboarding;
+  const prompts = ['點一下怪物題卡，練習直接鎖定。', '輸入 x，看看打錯時的正解提示。', '點「偷看」，或按 Tab。', '照正解輸入 b，擊倒並累積連擊。'];
+  if (!game.enemies.length) {
+    spawnEnemy();
+    const e = game.enemies[0];
+    e.q = phonics.find(q => q.pinyin === 'b'); e.progress = 0;
+    renderEnemy(e); positionEnemy(e);
+  }
+  $('#keyboard-hint').hidden = false;
+  $('#keyboard-hint').innerHTML = `<strong>操作 ${step + 1} / 4</strong><span>${prompts[step]}</span>`;
+}
+function finishOnboarding() {
+  save.settings.onboarding = true;
+  persist();
+  game.enemies.forEach(e => e.element.remove());
+  game.enemies = []; game.locked = null; game.spawned = 0;
+  game.correct = 0; game.wrong = 0; game.combo = 0; game.longest = 0; game.kills = 0; game.letters = 0; game.score = 0;
+  game.mistakes = {}; game.peeks = CONFIG.basePeeks + save.upgrades.peek;
+  game.training = false;
+  resetInput();
+  $('#keyboard-hint').hidden = true;
+  if (!game.boss && !game.stage.reviewOnly) beginGuide();
+  else { game.paused = true; readyOverlay('操作教學完成，準備開始！', '開始戰鬥'); }
+}
+function normalizeLetters(value) {
+  return value.normalize('NFC').toLowerCase().replace(/ü/g, 'v').replace(/[\s'’]/gu, '');
+}
+function zhuyinWarning() {
+  pauseGame('目前是注音鍵盤，請切換到拼音或英文鍵盤', false);
+  readyOverlay('目前是注音鍵盤，請切換到拼音或英文鍵盤', '我切好了');
+  $('#start-reason').insertAdjacentHTML('afterend', '<div class="keyboard-help"><p><b>iOS：</b>設定 → 一般 → 鍵盤 → 鍵盤 → 新增鍵盤 → 中文（繁體）→ 拼音。回到遊戲長按地球鍵，切換到繁體拼音或英文。</p><p><b>Android：</b>以 Gboard 為例：設定 → 系統 → 鍵盤 → 螢幕鍵盤 → Gboard → 語言 → 新增中文（繁體）拼音；長按空白鍵或地球鍵切換。不同廠牌名稱可能不同，選字後確認為繁體。</p><p>若系統鍵盤配合不順，可回地圖 → 設定 → 開啟遊戲內建鍵盤。</p></div>');
+  resetInput();
+}
+function processText(value, composing = globallyComposing, fromBuiltin = false) {
+  if (!game?.running || game.paused || (useBuiltin() && !fromBuiltin)) return;
+  if (/[ㄅ-ㄩˊˇˋ˙]/u.test(value)) { zhuyinWarning(); return; }
+  if (game.ime) return;
+  if (game.training) {
+    const fullRaw = normalizeLetters(value);
+    if (fullRaw.length < inputState.raw.length) inputState.consumed = Math.min(inputState.consumed, fullRaw.length);
+    inputState.raw = fullRaw;
+    const raw = fullRaw.slice(inputState.consumed);
+    if (game.onboarding === 1 && raw === 'x') {
+      wrongKey(game.enemies[0]); game.onboarding = 2;
+      if (composing) inputState.consumed = fullRaw.length; else resetInput();
+      renderOnboarding();
+    }
+    else if (game.onboarding === 3 && raw === 'b') {
+      const e = game.enemies[0]; e.clean = true; e.peeked = false; completeQuestion(e);
+      game.onboarding = 4;
+      $('#keyboard-hint').innerHTML = '<strong>施法成功・連擊 +1</strong>';
+      setTimeout(() => { if (game?.training) finishOnboarding(); }, 450);
+    }
+    return;
+  }
+  const normalized = normalizeLetters(value);
+  if (game.guide) {
+    if (normalized.length < inputState.raw.length) inputState.consumed = Math.min(inputState.consumed, normalized.length);
+    inputState.raw = normalized;
+    if (game.guide.step !== 'look' && /^[a-z]*$/u.test(normalized)) guideText(normalized.slice(inputState.consumed), composing, normalized.length);
+    return;
+  }
+  if (!game.enemies.length) {
+    // Letters between waves must not become a stale prefix of the next target.
+    if (composing) { inputState.raw = normalized; inputState.consumed = normalized.length; }
+    else resetInput();
+    return;
+  }
+  const han = value.match(/\p{Script=Han}+/gu)?.join('') || '';
+  if (han && !composing && game.stage.region !== 1) {
+    if (han === inputState.lastHan) return;
+    inputState.lastHan = han;
+    let remaining = han;
+    // An IME may commit Chinese for a syllable already defeated through letters.
+    for (const text of inputState.credits) if (remaining.startsWith(text)) remaining = remaining.slice(text.length);
+    while (remaining) {
+      const candidates = [...game.enemies].sort((a,b) => (a.id === game.locked ? -1 : b.id === game.locked ? 1 : a.x - b.x));
+      const e = candidates.find(e => remaining.includes(e.q.text));
+      if (!e) break;
+      remaining = remaining.replace(e.q.text, '');
+      game.correct += e.q.pinyin.length - e.progress;
+      completeQuestion(e);
+    }
+    if (remaining) wrongKey(game.enemies.find(e => e.id === game.locked) || closestEnemy());
+    // Committed text is cleared outside composition; following duplicate input sees empty value.
+    resetInput();
+    updateHUD();
+    return;
+  }
+  if (han) return;
+  const raw = normalized;
+  if (!/^[a-z]*$/u.test(raw)) return;
+  if (raw.length < inputState.raw.length) {
+    inputState.consumed = Math.min(inputState.consumed, raw.length);
+    inputState.lastError = '';
+  }
+  inputState.raw = raw;
+  const pending = raw.slice(inputState.consumed);
+  if (!pending) {
+    const e = game.enemies.find(e => e.id === game.locked);
+    if (e) { e.progress = 0; renderEnemy(e); }
+    return;
+  }
+  const candidates = game.enemies.filter(e => e.q.pinyin.startsWith(pending));
+  let enemy = candidates.find(e => e.id === game.locked) || candidates.sort((a,b) => a.x - b.x)[0];
+  if (!enemy) {
+    if (inputState.lastError !== raw && game.enemies.length) {
+      wrongKey(game.enemies.find(e => e.id === game.locked) || closestEnemy());
+      inputState.lastError = raw;
+    }
+    return;
+  }
+  const previous = game.enemies.find(e => e.id === game.locked);
+  if (previous && previous !== enemy) { previous.progress = 0; renderEnemy(previous); }
+  game.locked = enemy.id;
+  const added = Math.max(0, pending.length - enemy.progress);
+  game.correct += added;
+  enemy.progress = pending.length;
+  if (added) { sound('hit'); animate(enemy.element, 'hit'); enemy.x = Math.min(98, enemy.x + .5); }
+  renderEnemy(enemy); positionEnemy(enemy);
+  if (pending === enemy.q.pinyin) {
+    inputState.consumed = raw.length;
+    inputState.credits.push(enemy.q.text);
+    completeQuestion(enemy);
+    if (!composing) resetInput();
+  }
+  updateHUD();
+}
+castInput.addEventListener('beforeinput', event => { inputState.before = castInput.value; });
+castInput.addEventListener('input', event => {
+  if (!globallyComposing && castInput.value === lastCommit.value && performance.now() - lastCommit.at < 80 && !game?.ime) { castInput.value = ''; return; }
+  // During IME composition the element may lag compositionupdate.data. Never clear it here.
+  processText(castInput.value, globallyComposing || event.isComposing);
+});
+castInput.addEventListener('compositionstart', () => { globallyComposing = true; castInput.classList.add('composing'); });
+castInput.addEventListener('compositionupdate', event => { processText(event.data || castInput.value, true); });
+castInput.addEventListener('compositionend', event => {
+  globallyComposing = false;
+  compositionEndedAt = performance.now();
+  castInput.classList.remove('composing');
+  const finalValue = event.data || castInput.value;
+  processText(finalValue, false);
+  if (game?.guide?.step === 'look') resetInput();
+  if (!game?.ime && inputState.consumed > 0 && normalizeLetters(finalValue).length <= inputState.consumed) resetInput();
+  if (/\p{Script=Han}/u.test(finalValue)) lastCommit = {value: finalValue, at: performance.now()};
+});
+castInput.addEventListener('blur', () => {
+  if (screen === 'play' && game?.running && (!game.paused || countdownTimer || keyboardTimer) && !useBuiltin() && !(game.guide?.step === 'look')) pauseGame('施法列失去焦點，怪物與王已暫停。');
+});
+document.addEventListener('pointerdown', event => {
+  if (useBuiltin() && event.target === castInput) event.preventDefault();
+  const enemyNode = event.target.closest('.enemy');
+  const action = event.target.closest('[data-action]')?.dataset.action;
+  if (enemyNode && game?.running && !game.paused) {
+    event.preventDefault();
+    const e = game.enemies.find(e => e.id === Number(enemyNode.dataset.enemyId));
+    if (!e) return;
+    if (game.locked === e.id) { if (!useBuiltin()) castInput.focus({preventScroll: true}); return; }
+    if (globallyComposing) { inputState.consumed = inputState.raw.length; inputState.credits = []; } else resetInput();
+    unlockTarget(); game.locked = e.id; renderEnemy(e);
+    if (!useBuiltin()) castInput.focus({preventScroll: true});
+    if (game.training && game.onboarding === 0) { game.onboarding = 1; renderOnboarding(); }
+  }
+  if (['peek','unlock','ready','guide-next'].includes(action) || event.target.closest('#cast-button')) event.preventDefault();
+});
+const originalPeek = peek;
+peek = function () {
+  originalPeek();
+  if (game?.training && game.onboarding === 2) { game.onboarding = 3; renderOnboarding(); }
+};
+function builtinLetter(key) {
+  if (!game?.running || game.paused || game.ime) return;
+  if (key === 'peek') { peek(); return; }
+  if (key === 'unlock') { resetInput(); unlockTarget(); return; }
+  if (key === 'delete') { castInput.value = castInput.value.slice(0,-1); }
+  else castInput.value += key;
+  // The same prefix engine is used by touch and system input.
+  processText(castInput.value, false, true);
+}
+$('#builtin-keyboard').innerHTML = ['qwertyuiop','asdfghjkl','zxcvbnm'].map(row => `<div class="key-row" style="--key-count:${row.length}">${[...row].map(c => `<button type="button" data-key="${c}" aria-label="字母 ${c}">${c}</button>`).join('')}</div>`).join('') + '<div class="key-row key-tools"><button data-key="peek">偷看</button><button data-key="delete">刪除</button><button data-key="unlock">解除鎖定</button></div>';
+$('#builtin-keyboard').addEventListener('pointerdown', event => {
+  event.preventDefault();
+  const buttons = [...event.currentTarget.querySelectorAll('[data-key]')];
+  const nearest = buttons.sort((a,b) => {
+    const distance = el => { const r = el.getBoundingClientRect(); return Math.hypot(event.clientX - r.x - r.width/2, event.clientY - r.y - r.height/2); };
+    return distance(a) - distance(b);
+  })[0];
+  if (!nearest) return;
+  animate(nearest, 'pressed');
+  builtinLetter(nearest.dataset.key);
+});
+document.addEventListener('keydown', event => {
+  if (event.isComposing || event.keyCode === 229 || globallyComposing || event.ctrlKey || event.metaKey || event.altKey) return;
+  if (modal.open) {
+    if (event.key === 'Escape') { event.preventDefault(); closeOrResumeMenu(); }
     return;
   }
   if (screen !== 'play' || !game?.running || game.paused) return;
-  if (event.repeat) {
-    if (['Escape', 'Tab', 'Enter', 'Backspace'].includes(event.key) || /^[a-z]$/i.test(event.key)) event.preventDefault();
-    return;
-  }
-  if (game.ime) {
-    if (performance.now() - compositionEndedAt < 100) {
-      if (event.key === 'Enter') event.preventDefault();
-      return;
-    }
-    if (event.key === 'Escape') {
-      event.preventDefault(); pauseGame();
-    } else if (event.key === 'Enter' && event.target === $('#spell-input')) {
-      event.preventDefault(); castSpell();
-    }
-    // 中文輸入框保留 Tab 導覽；偷看用可聚焦的按鈕。
-    return;
-  }
-  if (event.key === 'Escape') {
+  if (event.key === 'Escape') { event.preventDefault(); if (!unlockTarget()) pauseGame(); else resetInput(); }
+  else if (event.key === 'Tab') { event.preventDefault(); peek(); }
+  else if (event.key === 'Enter' && game.ime) {
     event.preventDefault();
-    if (!unlockTarget()) pauseGame();
-  } else if (event.key === 'Backspace') {
-    event.preventDefault(); unlockTarget();
-  } else if (event.key === 'Tab') {
-    event.preventDefault(); peek();
-  } else if (/^[a-z]$/i.test(event.key) && !['SELECT', 'INPUT', 'TEXTAREA'].includes(event.target.tagName)) {
-    event.preventDefault(); attack(event.key.toLowerCase());
+    if (performance.now() - compositionEndedAt >= 100) castSpell();
+  } else if (event.target !== castInput && /^[a-z]$/iu.test(event.key)) {
+    event.preventDefault();
+    if (useBuiltin()) builtinLetter(event.key.toLowerCase());
+    else { castInput.value += event.key.toLowerCase(); processText(castInput.value); }
+  } else if (event.key === 'Backspace' && event.target !== castInput) {
+    event.preventDefault();
+    if (useBuiltin()) builtinLetter('delete');
+    else { castInput.value = castInput.value.slice(0,-1); processText(castInput.value); }
   }
 });
-modal.addEventListener('cancel', event => {
-  event.preventDefault();
-  if (globallyComposing) return;
-  if (modalKind === 'pause') resumeGame();
-  else closeOrResumeMenu();
-});
-window.addEventListener('blur', () => {
-  if (game?.running && !game.paused) pauseGame('視窗已失焦，已自動暫停。');
-});
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden && game?.running && !game.paused) pauseGame('分頁暫時離開，已自動暫停。');
-});
+modal.addEventListener('cancel', event => { event.preventDefault(); closeOrResumeMenu(); });
+window.addEventListener('blur', () => { if (game?.running && (!game.paused || countdownTimer || keyboardTimer)) pauseGame('視窗已失焦，已自動暫停。'); });
+document.addEventListener('visibilitychange', () => { if (document.hidden && game?.running && (!game.paused || countdownTimer || keyboardTimer)) pauseGame('分頁暫時離開，已自動暫停。'); });
+
+document.addEventListener('touchmove', event => { if (screen === 'play' && event.touches.length > 1) event.preventDefault(); }, {passive: false});
 window.addEventListener('pagehide', persist);
 
 refreshHeader();
