@@ -283,6 +283,31 @@ const impossibleErrors=[];
 validateStage(impossible,impossibleErrors);
 check(impossibleErrors.some(e=>e.includes('首字母互異')),'未抓到不可能的同場數');
 
+// Third-version safeguards: unchanged bank and real consumed-prefix behavior.
+const thirdHTML = readFileSync(new URL('index.html', import.meta.url), 'utf8');
+const secondHTML = readFileSync(new URL('v2.html', import.meta.url), 'utf8');
+const bankBlock = text => text.match(/\/\/ BEGIN QUESTION BANK\n([\s\S]*?)\n\/\/ END QUESTION BANK/u)[1];
+equal(bankBlock(thirdHTML), bankBlock(secondHTML), '第三版與 v2.html 題庫逐位元相同');
+const prefixFunction = thirdHTML.slice(thirdHTML.indexOf('function pendingLetters('), thirdHTML.indexOf('function configureInputs('));
+const state = {raw: 'b', consumed: 1};
+const pendingLettersTest = new Function('inputState', 'normalizeLetters', prefixFunction + '; return pendingLetters;')(state, text => text.toLowerCase().replace(/[\s’']/gu, '').replace(/ü/g, 'v'));
+equal(pendingLettersTest('bp').slice(state.consumed), 'p', '換焦失效、殘留 b 的 bp 仍接受下一個 p');
+state.raw = 'bp'; state.consumed = 2;
+equal(pendingLettersTest("bp ' m").slice(state.consumed), 'm', '組字持續累積含空格與撇號仍消耗前綴');
+state.raw = 'b'; state.consumed = 1;
+equal(pendingLettersTest('p').slice(state.consumed), 'p', '換焦成功後新字母 p 不被舊 consumed 吞掉');
+state.raw = 'b'; state.consumed = 1;
+equal(pendingLettersTest('b').slice(state.consumed), 'b', '下一隻同答案 b 仍可重新擊倒');
+state.raw = 'ni'; state.consumed = 0;
+equal(pendingLettersTest('n').slice(state.consumed), 'n', '刪除回退保留新的有效前綴');
+state.raw = 'b'; state.consumed = 1;
+equal(pendingLettersTest(''), '', '組字刪光後 consumed 歸零');
+equal(state.consumed, 0, '刪光不殘留 consumed');
+state.raw = 'ni'; state.consumed = 2;
+equal(pendingLettersTest('nihao', ['nihao']).slice(state.consumed), 'nihao', '乾淨的新答案與前題共享前綴仍完整接受');
+state.raw = 'ni'; state.consumed = 2;
+equal(pendingLettersTest('ninihao', ['nihao']).slice(state.consumed), 'nihao', '共享前綴的原生殘留仍消耗舊 ni');
+
 console.log('拼鬥魔法師・單檔內嵌題庫自我檢查');
 console.log(`第 1 區：${phonics.length} 題（聲母 ${phonics.filter(q=>q.mode==='initial').length}、韻母 ${phonics.filter(q=>q.mode==='final').length}；含 ㄝ／ㄦ 補充）`);
 console.log(`第 2 區：${characters.length} 個不重複單字`);

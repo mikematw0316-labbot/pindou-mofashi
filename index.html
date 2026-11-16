@@ -171,8 +171,8 @@
     .duel-top .creature { width: 125px; height: 135px; }
     .spell-target { font-size: clamp(24px,3vw,36px); line-height: 1.7; font-weight: 700; letter-spacing: .08em; margin-bottom: 8px; }
     .spell-hint { font-size: 12px; line-height: 1.7; color: var(--muted); overflow-wrap: anywhere; }
-    #spell-input { width: 100%; resize: vertical; min-height: 86px; max-height: 180px; padding: 14px; border: 2px solid var(--line); border-radius: 10px; background: var(--paper); color: var(--ink); font-size: 24px; margin: 16px 0 8px; }
-    #spell-input.composing { border-color: var(--gold); }
+    .spell-input { width: 100%; resize: vertical; min-height: 86px; max-height: 180px; padding: 14px; border: 2px solid var(--line); border-radius: 10px; background: var(--paper); color: var(--ink); font-size: 24px; margin: 16px 0 8px; }
+    .spell-input.composing { border-color: var(--gold); }
     .spell-feedback { min-height: 45px; font-size: 20px; line-height: 1.9; overflow-wrap: anywhere; }
     .char-good { color: var(--accent); }
     .char-bad { color: var(--danger); background: var(--danger-soft); border-radius: 3px; padding: 2px 4px; margin: 2px; text-decoration: underline; }
@@ -393,8 +393,8 @@
     #guard-label { font-size:10px; }
     .cast-bar { display:flex; flex-shrink:0; gap:8px; align-items:center; border:1px solid var(--line); border-radius:15px; background:var(--panel); padding:3px 9px; min-height:48px; }
     .cast-bar label { font-size:11px; white-space:nowrap; color:var(--muted); }
-    #spell-input { min-width:0; width:100%; min-height:40px; max-height:none; height:40px; margin:0; padding:6px; border:0; background:transparent; font:18px ui-monospace,monospace; color:var(--ink); }
-    #spell-input:focus { outline:0; }
+    .spell-input { min-width:0; width:100%; min-height:40px; max-height:none; height:40px; margin:0; padding:6px; border:0; background:transparent; font:18px ui-monospace,monospace; color:var(--ink); }
+    .spell-input:focus { outline:0; }
     .cast-bar:focus-within { border-color:var(--accent); box-shadow:0 0 0 2px #326b521c; }
     #cast-button { flex:0 0 auto; white-space:nowrap; min-width:64px; padding:5px 10px; }
     #builtin-keyboard { flex-shrink:0; touch-action:none; user-select:none; padding:3px 0; }
@@ -494,9 +494,49 @@
     button,.question-card,.guide-steps,.key-row { user-select:none; -webkit-user-select:none; }
     @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none !important; transition:none !important; scroll-behavior:auto !important; } }
 
+
+    .spell-inputs { position:relative; flex:1; min-width:0; height:40px; }
+    .spell-inputs .spell-input { position:absolute; inset:0; opacity:0; pointer-events:none; }
+    .spell-inputs .active-input { opacity:1; pointer-events:auto; }
+    #action-prompt { flex-shrink:0; margin:0; padding:7px 10px; border-radius:12px; background:var(--soft); color:var(--ink); font-size:14px; font-weight:700; line-height:1.4; }
+    #tutorial-info { flex:1; min-height:0; overflow:auto; padding:12px; background:var(--panel); border:1px solid var(--line); border-radius:16px; font-size:14px; line-height:1.5; }
+    #tutorial-info h3 { margin:0 0 8px; }
+    #tutorial-info p { margin:0 0 10px; }
+    #tutorial-info button { width:100%; }
+    .play-heading > div { flex:1; min-width:0; }
+    #keyboard-mode { display:block; width:100%; min-height:44px; margin:8px 0; font-size:16px; }
+    .debug-switch { display:flex; gap:10px; align-items:center; min-height:44px; }
+    #input-debug { position:fixed; z-index:50; top:var(--visible-top,0px); left:50%; transform:translateX(-50%); width:min(100%,560px); height:94px; padding:3px 6px; background:#fffdf2ed; color:#263e35; font:7px/8px ui-monospace,monospace; overflow:hidden; pointer-events:none; border-bottom:1px solid #8aa68e; }
+    #debug-context { white-space:pre; overflow:hidden; }
+    #debug-events { white-space:pre; height:64px; overflow-x:auto; overflow-y:hidden; pointer-events:auto; scrollbar-width:none; touch-action:pan-x; }
+    .debug-enabled { padding-top:94px; }
+    .debug-enabled.playing main { padding-top:94px; }
+    .hud { grid-template-columns:1.2fr 1fr 1fr; min-height:34px; }
+    .hud .stat { display:flex; gap:5px; align-items:center; justify-content:center; min-width:0; padding:4px 7px; }
+    .hud .stat:nth-child(2),.hud .stat:nth-child(5) { display:none; }
+    .hud .stat small { margin:0; white-space:nowrap; }
+    .hud .stat strong { font-size:14px; white-space:nowrap; }
+    .hud .hp-text { margin:0; white-space:nowrap; }
+    .hud .meter { min-width:22px; }
+    .tiny-view .wide-card .creature,.wide-card .creature { position:static; display:block; margin:2px auto 0; width:40px; height:40px; }
+    .tiny-view .gate,.tiny-view .mage { height:30px; width:35px; }
+    .tiny-view #play-screen { gap:4px; }
+    .tiny-view #action-prompt { padding:4px 8px; font-size:13px; }
+    .tiny-view .battlefield { min-height:140px; }
+    .battlefield.answer-nudge .answer { font-size:25px; animation:answer-nudge 1s ease-in-out infinite; }
+    @keyframes answer-nudge { 50% { transform:scale(1.15); color:var(--accent); } }
+    .debug-enabled.playing { padding-top:0; }
+    .tiny-view .debug-enabled #play-screen { gap:2px; padding-top:4px; }
+    .tiny-view .debug-enabled .hud { min-height:24px; }
+    .tiny-view .debug-enabled .hud .stat { padding:2px 5px; }
+    .tiny-view .debug-enabled .battlefield { min-height:154px; }
+    .tiny-view .debug-enabled #action-prompt { font-size:12px; padding:3px 7px; }
+    #skip-onboarding { position:relative; z-index:31; }
+    .builtin-mode .play-controls,.builtin-mode .battle-message { display:none; }
   </style>
 </head>
 <body>
+  <aside id="input-debug" hidden aria-label="最近八筆輸入事件"><div id="debug-context"></div><div id="debug-events"></div></aside>
   <header>
     <div class="brand">
       <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true"><path d="M6 42V17h8V8h7v9h6V8h7v9h8v25H30V29a6 6 0 0 0-12 0v13Z" fill="currentColor"/><path d="m24 2 3 5-3 5-3-5Z" fill="currentColor"/></svg>
@@ -527,17 +567,19 @@
       </div>
     </section>
     <section id="play-screen" aria-label="遊戲戰場" hidden>
-      <div class="play-heading"><div><p id="play-eyebrow" class="eyebrow">聲韻草原</p><h2 id="play-title"></h2></div><button data-action="pause">暫停 <kbd>Esc</kbd></button></div>
+      <div class="play-heading"><div><p id="play-eyebrow" class="eyebrow">聲韻草原</p><h2 id="play-title"></h2></div><button data-action="skip-onboarding" id="skip-onboarding" hidden>跳過</button><button data-action="pause">暫停 <kbd>Esc</kbd></button></div>
       <div class="hud">
-        <div class="stat"><div class="hp-text"><span>城門耐久</span><b id="hp-text"></b></div><div class="meter" role="progressbar" aria-label="城門血量" id="hp-meter"><i id="hp-fill"></i></div></div>
+        <div class="stat"><div class="hp-text"><span>血量 </span><b id="hp-text"></b></div><div class="meter" role="progressbar" aria-label="城門血量" id="hp-meter"><i id="hp-fill"></i></div></div>
         <div class="stat"><small>得分</small><strong id="score-value">0</strong></div>
-        <div class="stat"><small>連擊 / 倍率</small><strong id="combo-value">0 <em>×1.0</em></strong></div>
+        <div class="stat"><small>連擊</small><strong id="combo-value">0 <em>×1.0</em></strong></div>
         <div class="stat"><small id="progress-label">擊倒 / 波次</small><strong id="progress-value">0 / 12</strong></div>
         <div class="stat"><small id="speed-label">字母 / 分鐘</small><strong id="speed-value">0</strong></div>
       </div>
       <div id="boss-status" class="boss-status" hidden><div><small id="boss-name">守關者・三段護甲</small><div id="boss-bars" class="boss-bar"></div></div><div class="charge"><small id="charge-label">王正在蓄力</small><div class="meter"><i id="charge-fill"></i></div></div></div>
       <section id="guide-panel" hidden aria-label="引導練習"></section>
       <div id="keyboard-hint" hidden></div>
+      <p id="action-prompt" role="status"></p>
+      <div id="tutorial-info" hidden></div>
       <div id="start-overlay" hidden><p id="start-reason"></p><button class="primary" data-action="ready">開始</button></div>
       <div id="battlefield" class="battlefield">
         <svg class="landscape" viewBox="0 0 1200 350" preserveAspectRatio="none" aria-hidden="true"><path d="M0 220 120 140 240 210 420 90 600 210 770 125 950 210 1100 100 1200 180V350H0Z" fill="currentColor"/><path d="M0 270Q300 210 600 275T1200 240" fill="none" stroke="currentColor" stroke-width="3"/></svg>
@@ -552,9 +594,12 @@
 
         <div id="spell-feedback" class="spell-feedback" aria-live="polite"></div>
       </div>
-      <form id="spell-form" class="cast-bar">
+      <form id="spell-form" class="cast-bar" novalidate>
         <label for="spell-input" id="input-label">施法列</label>
-        <input id="spell-input" type="text" aria-label="施法列" placeholder="在這裡輸入拼音…" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" enterkeyhint="done">
+        <div class="spell-inputs">
+          <input id="spell-input" class="spell-input active-input" data-slot="A" data-1p-ignore="true" data-lpignore="true" type="text" aria-label="施法列" placeholder="在這裡輸入拼音…" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" enterkeyhint="done">
+          <input id="spell-input-b" class="spell-input" data-slot="B" tabindex="-1" aria-hidden="true" data-1p-ignore="true" data-lpignore="true" type="text" aria-label="施法列" placeholder="在這裡輸入拼音…" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" enterkeyhint="done">
+        </div>
         <button id="cast-button" type="submit" class="primary" hidden>施放</button>
         <span id="composition-state" role="status" hidden></span>
       </form>
@@ -1495,7 +1540,7 @@ function freshSave() {
   return {
     version: CONFIG.version, coins: 0, records: {}, review: {},
     upgrades: { gate: 0, peek: 0, guard: 0 },
-    settings: { sound: true, theme: 'light', builtin: false, onboarding: false },
+    settings: { sound: true, theme: 'light', builtin: false, keyboardMode: 'pinyin', debug: false, onboarding: false },
   };
 }
 let storageAvailable = true;
@@ -1509,7 +1554,9 @@ function loadSave() {
       clean.upgrades[key] = clamp(Math.floor(Number(raw.upgrades?.[key]) || 0), 0, key === 'guard' ? 1 : 3);
     }
     clean.settings.sound = raw.settings?.sound !== false;
-    clean.settings.builtin = raw.settings?.builtin === true;
+    clean.settings.keyboardMode = ['pinyin', 'english', 'builtin'].includes(raw.settings?.keyboardMode) ? raw.settings.keyboardMode : raw.settings?.builtin === true ? 'builtin' : 'pinyin';
+    clean.settings.builtin = clean.settings.keyboardMode === 'builtin';
+    clean.settings.debug = raw.settings?.debug === true;
     clean.settings.onboarding = raw.settings?.onboarding === true;
     if (['light', 'dark'].includes(raw.settings?.theme)) clean.settings.theme = raw.settings.theme;
     for (const [id, record] of Object.entries(raw.records || {})) {
@@ -1613,7 +1660,7 @@ function showScreen(name) {
   screen = name;
   if (name !== 'play') document.body.classList.remove('learning');
   document.body.classList.toggle('playing', name === 'play');
-  if (name !== 'play') { cancelKeyboardWait(); $('#start-overlay').hidden = true; $('#spell-input').blur(); }
+  if (name !== 'play') { cancelKeyboardWait(); $('#start-overlay').hidden = true; castInput.blur(); }
   window.scrollTo(0, 0);
   for (const value of ['map', 'play', 'result']) $(`#${value}-screen`).hidden = value !== name;
 }
@@ -1790,13 +1837,13 @@ function startGame(stage = pendingStage, skipGuide = false) {
   $('#duel-panel').hidden = !ime;
   $('#boss-status').hidden = !boss && !ime;
   $('#boss-name').textContent = ime ? `${boss ? '墨冠守望者' : '神殿試煉者'}・三段咒印` : `${artNames[(stage.region || 1) - 1]}之王・三段護甲`;
-  $('#progress-label').textContent = ime || boss ? '剩餘護甲' : '擊倒 / 波次';
+  $('#progress-label').textContent = ime || boss ? '護甲' : '進度';
   $('#speed-label').textContent = ime ? '中文字 / 分鐘' : '字母 / 分鐘';
   $('#control-help').textContent = ime ? 'Enter 施放　·　Esc 暫停　·　組字期間不觸發快捷鍵' : '英文字母 攻擊　·　Backspace 解除鎖定　·　Esc 解除／暫停';
   $('#spell-feedback').replaceChildren();
-  $('#spell-input').value = '';
-  $('#spell-input').classList.remove('composing');
-  $('#spell-input').readOnly = false;
+  castInput.value = '';
+  castInput.classList.remove('composing');
+  castInput.readOnly = false;
   $('#composition-state').textContent = '等待輸入・標點與全半形不影響判定';
   showScreen('play');
   message(ime ? '請切換系統拼音輸入法，輸入繁體中文。' : '請切英文鍵盤，打出怪物的拼音！', false, 6);
@@ -1804,16 +1851,22 @@ function startGame(stage = pendingStage, skipGuide = false) {
   document.documentElement.dataset.region = stage.region || 1;
   $('#battlefield .landscape').outerHTML = sceneSVG(stage.region || 1);
   $('#guide-panel').hidden = true;
+  $('#tutorial-info').hidden = true;
+  $('#skip-onboarding').hidden = true;
   document.body.classList.remove('learning');
   $('#keyboard-hint').hidden = true;
   resetInput();
   $('#duel-panel > .landscape')?.remove();
+  $('#battlefield').before($('#action-prompt'));
+  configureInputs();
+  setInstruction(ime ? '選出完整繁體中文，再按施放。' : '點怪或打首字母鎖定，再打完拼音。');
   if (ime) { $('#duel-panel').insertAdjacentHTML('afterbegin', sceneSVG(5)); $('#duel-art').innerHTML = creatureSVG(5, true); nextSpell(); }
   if (!save.settings.onboarding) {
     game.onboarding = 0;
     game.training = true;
+    $('#skip-onboarding').hidden = false;
     game.paused = true;
-    readyOverlay('先花約 30 秒，實際練習鎖定、打錯提示、偷看與連擊。', '開始操作教學');
+    readyOverlay('先花約 30 秒，打出正確拼音，練習擊倒、連擊與鎖定。', '開始操作教學');
   } else if (!boss && !stage.reviewOnly && !skipGuide) {
     beginGuide();
   } else {
@@ -1845,14 +1898,14 @@ function chooseQuestion(excludeInitials = new Set(), previousId = '') {
   }
   return questionsById[game.deck.splice(index, 1)[0]];
 }
-function spawnEnemy() {
-  const limit = (window.visualViewport?.height || innerHeight) < 470 ? 1 : game.maxEnemies;
+function spawnEnemy(forcedQuestion = null) {
+  const limit = game.training ? 2 : (window.visualViewport?.height || innerHeight) < 470 ? 1 : game.maxEnemies;
   if (game.enemies.length >= limit) return false;
   const lanes = Array.from({length: limit}, (_, i) => i);
   const lane = lanes.find(i => !game.enemies.some(e => e.lane === i));
   if (lane === undefined) return false;
   const occupied = new Set(game.enemies.map(enemy => enemy.q.pinyin[0]));
-  const q = chooseQuestion(occupied);
+  const q = forcedQuestion || chooseQuestion(occupied);
   if (!q) return;
   const element = document.createElement('div');
   const enemy = {
@@ -1875,11 +1928,10 @@ function positionEnemy(enemy) {
   const element = enemy.element;
   const width = field.clientWidth;
   const height = field.clientHeight;
-  const cardWidth = element.offsetWidth;
   // Each monster owns a separate vertical track. Card height includes the creature.
-  const count = (window.visualViewport?.height || innerHeight) < 470 && game.enemies.length <= 1 ? 1 : game.maxEnemies;
+  const count = game.training ? (game.onboarding === 2 ? 2 : 1) : (window.visualViewport?.height || innerHeight) < 470 && game.enemies.length <= 1 ? 1 : game.maxEnemies;
   enemy.element.classList.toggle('wide-card', count === 1);
-  const cardSize = count === 1 ? Math.min(width * .78, 220) : (width - 24) / 3;
+  const cardSize = count === 1 ? Math.min(width * .78, 220) : (width - 24) / count;
   element.style.width = `${cardSize}px`;
   const actualWidth = element.offsetWidth;
   const track = (width - 12) / count;
@@ -1891,7 +1943,7 @@ function positionEnemy(enemy) {
 }
 function renderEnemy(enemy) {
   const q = enemy.q;
-  const reveal = enemy.reveal > 0 || enemy.peeked || game.stage.showPinyin;
+  const reveal = game.training || enemy.reveal > 0 || enemy.peeked || game.stage.showPinyin;
   const answer = [...q.pinyin].map((letter, i) => `<span class="${i < enemy.progress ? 'typed' : reveal ? 'pending' : 'unknown'}">${i < enemy.progress || reveal ? letter : '·'}</span>`).join('');
   enemy.element.classList.toggle('locked', game.locked === enemy.id);
   enemy.element.classList.toggle('reveal', enemy.reveal > 0);
@@ -1986,13 +2038,17 @@ function wrongKey(enemy) {
     recordMistake(enemy.q);
     renderEnemy(enemy);
     animate(enemy.element, 'hurt');
-    message(`正解：${enemy.q.pinyin}　${protectedCombo ? '護符守住連擊！' : '看清後繼續輸入，已打對的部分會保留。'}`, true);
+    enemy.progress = 0;
+    renderEnemy(enemy);
+    message(`正解：${enemy.q.pinyin}，請從頭重打。${protectedCombo ? '護符守住連擊！' : ''}`, true);
+    setInstruction(`正解是 ${enemy.q.pinyin}，請從頭重打。`);
   }
-  if (game.boss) {
+  if (game.boss && !game.training) {
     game.bossHP = Math.min(game.bossMax, game.bossHP + .5);
     game.charge = Math.min(.99, game.charge + .08);
   }
   sound('wrong');
+  consumeInput(inputState.raw);
   updateHUD();
 }
 function attack(letter) {
@@ -2039,7 +2095,7 @@ function completeQuestion(enemy) {
   const clean = enemy.clean && !enemy.peeked;
   game.letters += enemy.q.pinyin.length;
   recordMastery(enemy.q, clean);
-  if (game.boss) {
+  if (game.boss && !game.training) {
     game.bossHP = Math.max(0, game.bossHP - 1);
     game.kills++;
     if (clean) addCombo();
@@ -2155,13 +2211,13 @@ function nextSpell() {
   game.spellAdvance = 0;
   $('#spell-target').textContent = question.text;
   $('#spell-hint').textContent = question.zhuyin;
-  $('#spell-input').value = '';
-  $('#spell-input').readOnly = false;
+  castInput.value = '';
+  castInput.readOnly = false;
 }
 
 function castSpell() {
   if (!game?.running || !game.ime || game.paused || game.spellAdvance || globallyComposing || performance.now() - compositionEndedAt < 100) return;
-  const value = $('#spell-input').value;
+  const value = castInput.value;
   if (!normalizeSpell(value)) {
     message('先輸入咒語，再按 Enter 施放。', true);
     return;
@@ -2191,7 +2247,10 @@ function castSpell() {
     sound('wrong');
   }
   if (result.ratio < .8) {
-    $('#spell-feedback').insertAdjacentHTML('beforeend', '<small class="muted" style="display:block;font-size:12px">未達 80%，這次未造成傷害；可修正原句後再施放。</small>');
+    $('#spell-feedback').insertAdjacentHTML('beforeend', '<small class="muted" style="display:block;font-size:12px">未達 80%，這次未造成傷害；請對照題句重新輸入。</small>');
+    resetInput();
+    rotateInput();
+    setInstruction('對照題句，重新選出完整繁體中文後施放。');
     updateHUD();
     return;
   }
@@ -2208,12 +2267,14 @@ function castSpell() {
   animate($('#duel-art'), 'hit');
   sound('defeat');
   $('#spell-feedback').insertAdjacentHTML('beforeend', `<small class="muted" style="display:block;font-size:12px">咒語命中，護甲 -${damage}；${result.errors ? '可對照紅字記住正確用字。' : '全句正確！'}</small>`);
+  resetInput();
+  rotateInput();
   if (game.bossHP <= 0) {
     finishGame(true);
     return;
   }
   game.spellAdvance = result.errors ? 2.7 : 1.2;
-  $('#spell-input').readOnly = true;
+  castInput.readOnly = true;
   updateHUD();
 }
 
@@ -2272,6 +2333,11 @@ function finishGame(won) {
 function tick(time) {
   const dt = lastTime ? Math.min((time - lastTime) / 1000, .06) : 0;
   lastTime = time;
+  if (game?.running && !game.paused && game.training && game.onboarding < 3) {
+    game.idleSeconds = (game.idleSeconds || 0) + dt;
+    $('#battlefield').classList.toggle('answer-nudge', game.idleSeconds >= 8);
+    if (game.idleSeconds >= 20 && !$('#late-skip')) $('#action-prompt').insertAdjacentHTML('beforeend', ' <button id="late-skip" data-action="skip-onboarding">跳過教學</button>');
+  }
   if (game?.running && !game.paused && !game.guide && !game.training) {
     restoreTracks();
     game.elapsed += dt;
@@ -2341,7 +2407,7 @@ function handleAction(action, id) {
     case 'ready': resumeGame(); break;
     case 'guide-next': guideNext(); break;
     case 'settings': showSettings(); break;
-    case 'toggle-builtin': save.settings.builtin = !save.settings.builtin; persist(); showSettings(); break;
+    case 'skip-onboarding': case 'onboarding-done': finishOnboarding(); break;
     case 'unlock': resetInput(); unlockTarget(); break;
     case 'close': closeOrResumeMenu(); break;
     case 'map': goMap(); break;
@@ -2382,8 +2448,12 @@ $('#spell-form').addEventListener('submit', event => {
   event.preventDefault();
   castSpell();
 });
-// The cast input remains mounted through lessons, battles, pauses and IME sessions.
-const castInput = $('#spell-input');
+// Both cast inputs remain mounted through lessons, battles, pauses and IME sessions.
+const castInputs = [...document.querySelectorAll('.spell-input')];
+let castInput = castInputs[0];
+let swappingInput = false;
+let inputEpoch = 0;
+const debugEvents = [];
 const inputState = {consumed: 0, raw: '', lastError: '', credits: [], lastHan: '', before: ''};
 let keyboardTimer = 0;
 let countdownTimer = 0;
@@ -2392,7 +2462,7 @@ let keyboardSeen = false;
 let lastCommit = {value: '', at: -Infinity};
 let viewportBaseline = Math.max(innerHeight, document.documentElement.clientHeight);
 let lastViewportHeight = window.visualViewport?.height || innerHeight;
-const useBuiltin = () => save.settings.builtin && !game?.ime;
+const useBuiltin = () => save.settings.keyboardMode === 'builtin' && !game?.ime;
 function resetInput() {
   castInput.value = '';
   inputState.consumed = 0;
@@ -2400,6 +2470,89 @@ function resetInput() {
   inputState.lastError = '';
   inputState.credits = [];
   inputState.lastHan = '';
+  castInputs.forEach(input => { input.value = ''; });
+}
+// Retain the consumed prefix as a fallback for IMEs that carry their buffer
+// across focus. A clean next value starts a fresh buffer automatically.
+function pendingLetters(value, answers = []) {
+  const raw = normalizeLetters(value);
+  const prefix = inputState.raw.slice(0, inputState.consumed);
+  // A clean correct answer may itself begin with the previous answer (ni → nihao).
+  // Prefer a live full prefix before trying the carried-buffer suffix.
+  if (inputState.consumed && (answers.some(answer => answer.startsWith(raw)) || !(raw.length > prefix.length && raw.startsWith(prefix)))) {
+    inputState.consumed = 0;
+    inputState.raw = '';
+  }
+  return raw;
+}
+function configureInputs() {
+  document.body.classList.toggle('builtin-mode', useBuiltin());
+  const english = save.settings.keyboardMode === 'english' && !game?.ime;
+  for (const input of castInputs) {
+    input.type = english ? 'email' : 'text';
+    input.inputMode = useBuiltin() ? 'none' : english ? 'email' : 'text';
+    input.readOnly = useBuiltin();
+    input.autocomplete = 'off';
+  }
+}
+function rotateInput() {
+  const previous = castInput;
+  const next = castInputs.find(input => input !== previous);
+  const hadFocus = document.activeElement === previous;
+  swappingInput = true;
+  inputEpoch++;
+  // Change the event owner before focus: synchronous compositionend / blur
+  // emitted by the retired editor must never answer the next question.
+  castInput = next;
+  previous.value = '';
+  next.value = '';
+  globallyComposing = false;
+  previous.classList.remove('composing', 'active-input');
+  next.classList.add('active-input');
+  previous.tabIndex = -1;
+  previous.setAttribute('aria-hidden', 'true');
+  next.tabIndex = 0;
+  next.removeAttribute('aria-hidden');
+  $('#input-label').htmlFor = next.id;
+  configureInputs();
+  if (hadFocus && !useBuiltin()) next.focus({preventScroll: true});
+  swappingInput = false;
+  renderDebug();
+}
+function consumeInput(raw, credit = '') {
+  inputState.raw = raw;
+  inputState.consumed = raw.length;
+  inputState.lastError = '';
+  if (credit) inputState.credits.push(credit);
+  rotateInput();
+}
+function renderDebug() {
+  const panel = $('#input-debug');
+  panel.hidden = !save.settings.debug;
+  document.body.classList.toggle('debug-enabled', save.settings.debug);
+  if (!save.settings.debug) return;
+  const ua = /iPhone|iPad|Android/.exec(navigator.userAgent)?.[0] || navigator.platform;
+  const browser = /(?:CriOS|Chrome|Version|Firefox)\/[\d.]+/.exec(navigator.userAgent)?.[0] || 'WebView';
+  $('#debug-context').textContent = `vv/window ${Math.round(window.visualViewport?.height || innerHeight)}/${innerHeight} active=${document.activeElement?.dataset.slot || document.activeElement?.tagName}\nUA ${ua} ${browser} · D=data C=isComposing V=value R=raw N=consumed T=target`;
+  $('#debug-events').textContent = debugEvents.join('\n');
+}
+function logInput(event, input) {
+  if (!save.settings.debug) return;
+  const e = game?.enemies.find(e => e.id === game.locked);
+  const value = text => JSON.stringify(String(text));
+  const type = event.type.replace('composition','comp.').replace('beforeinput','before');
+  debugEvents.push(`${type} ${input.dataset.slot} D${value(event.data ?? '')} C${Number(!!event.isComposing || event.type === 'compositionupdate')} V${value(input.value)} R${value(normalizeLetters(event.type === 'compositionupdate' ? event.data || input.value : input.value))} N${inputState.consumed} T${e ? e.id + ':' + e.q.pinyin : '—'}`);
+  if (debugEvents.length > 8) debugEvents.shift();
+  renderDebug();
+}
+function setInstruction(text) {
+  $('#action-prompt').textContent = text;
+}
+function tutorialProgress() {
+  if (!game?.training) return;
+  game.idleSeconds = 0;
+  $('#late-skip')?.remove();
+  $('#battlefield').classList.remove('answer-nudge');
 }
 function sceneSVG(region) {
   const colors = [
@@ -2414,8 +2567,24 @@ function sceneSVG(region) {
 }
 function showSettings() {
   if (game?.running) pauseGame('設定期間已暫停。', false);
-  openModal('settings', `${dialogHeader('施法設定')}<div class="teach-rule"><h3>鍵盤方式</h3><p>預設使用手機系統的拼音或英文鍵盤。第 1 區只輸入字母；第 2～4 區也接受選字送出的完整國字或詞語。</p><button data-action="toggle-builtin" aria-pressed="${save.settings.builtin}">使用遊戲內建鍵盤：${save.settings.builtin ? '開' : '關'}</button><p class="muted">內建鍵盤適用第 1～4 區。若系統組字不順，開啟後直接點字母；第五區仍使用系統拼音選字。</p></div><div class="dialog-actions"><button class="primary" data-action="close">完成</button></div>`);
+  openModal('settings', `${dialogHeader('施法設定')}<div class="teach-rule"><h3>鍵盤模式</h3><p>第 1 區打字母；第 2～4 區可用拼音選字。第五區一律使用一般文字輸入框。</p><label for="keyboard-mode">選擇鍵盤</label><select id="keyboard-mode">${[['pinyin','手機拼音鍵盤（預設）'],['english','英文鍵盤'],['builtin','遊戲內建鍵盤']].map(([v,t]) => `<option value="${v}" ${save.settings.keyboardMode === v ? 'selected' : ''}>${t}</option>`).join('')}</select><p class="muted">手機拼音鍵盤會在命中或重試時換焦，清除組字。英文鍵盤只接受字母；內建鍵盤適用第 1～4 區。</p><label class="debug-switch"><input id="debug-toggle" type="checkbox" ${save.settings.debug ? 'checked' : ''}>偵錯資訊（最近 8 筆輸入事件）</label></div><div class="dialog-actions"><button class="primary" data-action="close">完成</button></div>`);
 }
+document.addEventListener('change', event => {
+  if (event.target.id === 'keyboard-mode') {
+    save.settings.keyboardMode = event.target.value;
+    save.settings.builtin = save.settings.keyboardMode === 'builtin';
+    save.settings.builtin = event.target.value === 'builtin';
+    resetInput();
+    configureInputs();
+    persist();
+  }
+  if (event.target.id === 'debug-toggle') {
+    save.settings.debug = event.target.checked;
+    persist();
+    renderDebug();
+    game?.enemies.forEach(positionEnemy);
+  }
+});
 function readyOverlay(reason, label = '開始', menu = false) {
   const panel = $('#start-overlay');
   panel.hidden = false;
@@ -2436,8 +2605,7 @@ function beginKeyboard() {
   keyboardSeen = false;
   $('#builtin-keyboard').hidden = !useBuiltin();
   if (useBuiltin()) { keyboardSeen = false; }
-  castInput.readOnly = useBuiltin();
-  castInput.inputMode = useBuiltin() ? 'none' : 'text';
+  configureInputs();
   // Synchronous focus inside the original click / pointer gesture is required on iOS.
   if (useBuiltin()) castInput.blur();
   else castInput.focus({preventScroll: true});
@@ -2471,13 +2639,14 @@ function runCountdown(ticket) {
     if (game.training) renderOnboarding();
     else if (game.guide) renderGuide();
     else if (game.boss && !game.enemies.length && !game.ime) spawnEnemy();
+    if (!game.training && !game.guide) setInstruction(game.ime ? '選出完整繁體中文，再按施放。' : '點怪或打首字母鎖定，再打完拼音。');
     message(game.ime ? '選出完整繁體中文，再按施放。' : '點怪或打首字母鎖定，連續打完拼音！', false, 5);
   }, 1000);
 }
 // A small keyboard viewport keeps one active track. Other monsters wait without
 // moving or taking damage, then return with their original progress and HP.
 function restoreTracks() {
-  if (!game?.running || game.ime || !game.parked) return;
+  if (!game?.running || game.training || game.ime || !game.parked) return;
   const small = (window.visualViewport?.height || innerHeight) < 470;
   const limit = small ? 1 : game.maxEnemies;
   if (game.enemies.length > limit) {
@@ -2508,6 +2677,7 @@ function updateViewport() {
     if (lowered && game.paused && keyboardTimer) { keyboardSeen = true; runCountdown(keyboardTicket); }
     if (keyboardSeen && !lowered && h > lastViewportHeight + 80) pauseGame('鍵盤已收起，點我繼續並重新開啟鍵盤。');
   }
+  renderDebug();
   lastViewportHeight = h;
   if (screen === 'play') {
     window.scrollTo(0, 0);
@@ -2562,6 +2732,9 @@ function renderGuide() {
     while ($('#guide-panel').firstChild !== nextButton) content.append($('#guide-panel').firstChild);
     $('#guide-panel').prepend(content);
   }
+  $('#spell-form').before($('#action-prompt'));
+  setInstruction(g.step === 'look' ? '看這張卡，按「下一張」；也可以直接打出拼音。' : g.retry ? `正解是 ${q.pinyin}，請從頭重打。` : g.step === 'follow' ? `照著打出 ${q.pinyin}。` : '想想題目的拼音，直接輸入。');
+  configureInputs();
   updateKeyHint();
 }
 function guideNext() {
@@ -2579,19 +2752,23 @@ function updateKeyHint() {
   if (visible) $('#keyboard-hint').innerHTML = `<span>下一個字母 <b class="mono">${next}</b></span><div class="mini-keys">${keyDiagram(next)}</div>`;
   document.querySelectorAll('#builtin-keyboard [data-key]').forEach(el => el.classList.toggle('next-key', visible && el.dataset.key === next));
 }
-function guideText(raw, composing = false, fullLength = raw.length) {
+function guideText(raw) {
   const g = game.guide;
   const q = g.items[g.index];
+  if (g.step === 'look') {
+    if (raw === q.pinyin) { consumeInput(inputState.raw); guideNext(); }
+    return;
+  }
   if (!q.pinyin.startsWith(raw)) {
     g.retry = true; g.progress = '';
-    if (composing) inputState.consumed = fullLength; else resetInput();
+    consumeInput(inputState.raw);
     renderGuide();
     message(`正解：${q.pinyin}。請重打一次，不會扣血。`, true);
     return;
   }
   g.progress = raw;
   if (raw === q.pinyin) {
-    if (composing) inputState.consumed = fullLength; else resetInput();
+    consumeInput(inputState.raw);
     if (++g.index >= g.items.length) {
       g.index = 0;
       if (g.step === 'follow') g.step = 'try';
@@ -2604,6 +2781,8 @@ function guideText(raw, composing = false, fullLength = raw.length) {
         $('#duel-panel').hidden = !game.ime;
         $('#boss-status').hidden = !game.boss && !game.ime;
         game.paused = true;
+        $('#battlefield').before($('#action-prompt'));
+        setInstruction('按「開始戰鬥」，用剛學到的拼音施法。');
         readyOverlay('引導完成！接下來用剛學到的拼音施法。', '開始戰鬥');
         return;
       }
@@ -2614,26 +2793,50 @@ function guideText(raw, composing = false, fullLength = raw.length) {
 }
 function renderOnboarding() {
   const step = game.onboarding;
-  const prompts = ['點一下怪物題卡，練習直接鎖定。', '輸入 x，看看打錯時的正解提示。', '點「偷看」，或按 Tab。', '照正解輸入 b，擊倒並累積連擊。'];
-  if (!game.enemies.length) {
-    spawnEnemy();
-    const e = game.enemies[0];
-    e.q = phonics.find(q => q.pinyin === 'b'); e.progress = 0;
-    renderEnemy(e); positionEnemy(e);
+  $('#battlefield').before($('#action-prompt'));
+  $('#skip-onboarding').hidden = false;
+  $('#keyboard-hint').hidden = true;
+  $('#battlefield').hidden = step === 3;
+  $('#duel-panel').hidden = true;
+  $('#tutorial-info').hidden = step !== 3;
+  const prompts = ['打出 b，擊倒這隻怪', '再一隻：打出 p', '兩隻一起來：先打哪個字母就鎖定哪一隻，也可以點怪。', '看完說明，按「我知道了」完成教學。'];
+  setInstruction(`操作 ${step + 1} / 4：${prompts[step]}`);
+  if (step === 3) {
+    $('#tutorial-info').innerHTML = '<h3>施法小提醒</h3><p>打錯：怪物往前衝、亮出正解、連擊歸零；看清楚後從頭重打。</p><p>「偷看」可以顯示答案，這次不累積連擊。</p><p>按右上角「暫停」可休息，再點「點我繼續」。</p><button class="primary" data-action="onboarding-done">我知道了</button>';
+    castInput.blur();
+    return;
   }
-  $('#keyboard-hint').hidden = false;
-  $('#keyboard-hint').innerHTML = `<strong>操作 ${step + 1} / 4</strong><span>${prompts[step]}</span>`;
+  if (!game.enemies.length) {
+    const answers = step === 0 ? ['b'] : step === 1 ? ['p'] : ['b', 'p'];
+    for (const [lane, answer] of answers.entries()) {
+      spawnEnemy();
+      const e = game.enemies.at(-1);
+      e.q = phonics.find(q => q.pinyin === answer);
+      e.progress = 0; e.lane = lane; e.x = 90; e.remaining = 1;
+      renderEnemy(e);
+    }
+  }
+  game.enemies.forEach(positionEnemy);
+  updateHUD();
 }
 function finishOnboarding() {
+  if (!game?.training) return;
   save.settings.onboarding = true;
   persist();
-  game.enemies.forEach(e => e.element.remove());
-  game.enemies = []; game.locked = null; game.spawned = 0;
+  $('#enemy-layer').replaceChildren();
+  game.enemies = []; game.parked = []; game.locked = null; game.spawned = 0;
   game.correct = 0; game.wrong = 0; game.combo = 0; game.longest = 0; game.kills = 0; game.letters = 0; game.score = 0;
   game.mistakes = {}; game.peeks = CONFIG.basePeeks + save.upgrades.peek;
   game.training = false;
+  game.bossHP = game.bossMax; game.charge = 0;
+  consumeInput(inputState.raw);
   resetInput();
+  $('#skip-onboarding').hidden = true;
+  $('#tutorial-info').hidden = true;
+  $('#late-skip')?.remove();
+  $('#battlefield').classList.remove('answer-nudge');
   $('#keyboard-hint').hidden = true;
+  configureInputs();
   if (!game.boss && !game.stage.reviewOnly) beginGuide();
   else { game.paused = true; readyOverlay('操作教學完成，準備開始！', '開始戰鬥'); }
 }
@@ -2646,33 +2849,25 @@ function zhuyinWarning() {
   $('#start-reason').insertAdjacentHTML('afterend', '<div class="keyboard-help"><p><b>iOS：</b>設定 → 一般 → 鍵盤 → 鍵盤 → 新增鍵盤 → 中文（繁體）→ 拼音。回到遊戲長按地球鍵，切換到繁體拼音或英文。</p><p><b>Android：</b>以 Gboard 為例：設定 → 系統 → 鍵盤 → 螢幕鍵盤 → Gboard → 語言 → 新增中文（繁體）拼音；長按空白鍵或地球鍵切換。不同廠牌名稱可能不同，選字後確認為繁體。</p><p>若系統鍵盤配合不順，可回地圖 → 設定 → 開啟遊戲內建鍵盤。</p></div>');
   resetInput();
 }
-function processText(value, composing = globallyComposing, fromBuiltin = false) {
-  if (!game?.running || game.paused || (useBuiltin() && !fromBuiltin)) return;
+function processText(value, composing = globallyComposing, fromBuiltin = false, isDelete = false) {
+  if (!game?.running || (game.paused && game.guide?.step !== 'look') || (useBuiltin() && !fromBuiltin)) return;
+  if (game.training && game.onboarding === 3) return;
   if (/[ㄅ-ㄩˊˇˋ˙]/u.test(value)) { zhuyinWarning(); return; }
-  if (game.ime) return;
-  if (game.training) {
-    const fullRaw = normalizeLetters(value);
-    if (fullRaw.length < inputState.raw.length) inputState.consumed = Math.min(inputState.consumed, fullRaw.length);
-    inputState.raw = fullRaw;
-    const raw = fullRaw.slice(inputState.consumed);
-    if (game.onboarding === 1 && raw === 'x') {
-      wrongKey(game.enemies[0]); game.onboarding = 2;
-      if (composing) inputState.consumed = fullRaw.length; else resetInput();
-      renderOnboarding();
-    }
-    else if (game.onboarding === 3 && raw === 'b') {
-      const e = game.enemies[0]; e.clean = true; e.peeked = false; completeQuestion(e);
-      game.onboarding = 4;
-      $('#keyboard-hint').innerHTML = '<strong>施法成功・連擊 +1</strong>';
-      setTimeout(() => { if (game?.training) finishOnboarding(); }, 450);
-    }
-    return;
-  }
-  const normalized = normalizeLetters(value);
+  if (game.ime && !game.training && !game.guide) return;
+  const deleting = isDelete || (normalizeLetters(value).length < inputState.raw.length && inputState.consumed === 0);
+  const answers = game.guide ? [game.guide.items[game.guide.index].pinyin] : game.enemies.map(e => e.q.pinyin);
+  const normalized = pendingLetters(value, answers);
   if (game.guide) {
+    const q = game.guide.items[game.guide.index];
+    if (!composing && game.stage.region !== 1 && value === q.text && (save.settings.keyboardMode !== 'english' || game.ime)) {
+      inputState.raw = q.pinyin;
+      inputState.consumed = 0;
+      guideText(q.pinyin);
+      return;
+    }
     if (normalized.length < inputState.raw.length) inputState.consumed = Math.min(inputState.consumed, normalized.length);
     inputState.raw = normalized;
-    if (game.guide.step !== 'look' && /^[a-z]*$/u.test(normalized)) guideText(normalized.slice(inputState.consumed), composing, normalized.length);
+    if (/^[a-z]*$/u.test(normalized)) guideText(normalized.slice(inputState.consumed));
     return;
   }
   if (!game.enemies.length) {
@@ -2682,10 +2877,11 @@ function processText(value, composing = globallyComposing, fromBuiltin = false) 
     return;
   }
   const han = value.match(/\p{Script=Han}+/gu)?.join('') || '';
-  if (han && !composing && game.stage.region !== 1) {
+  if (han && !composing && game.stage.region !== 1 && save.settings.keyboardMode !== 'english') {
     if (han === inputState.lastHan) return;
     inputState.lastHan = han;
     let remaining = han;
+    const epoch = inputEpoch;
     // An IME may commit Chinese for a syllable already defeated through letters.
     for (const text of inputState.credits) if (remaining.startsWith(text)) remaining = remaining.slice(text.length);
     while (remaining) {
@@ -2695,8 +2891,10 @@ function processText(value, composing = globallyComposing, fromBuiltin = false) 
       remaining = remaining.replace(e.q.text, '');
       game.correct += e.q.pinyin.length - e.progress;
       completeQuestion(e);
+      rotateInput();
     }
     if (remaining) wrongKey(game.enemies.find(e => e.id === game.locked) || closestEnemy());
+    else if (epoch === inputEpoch) rotateInput();
     // Committed text is cleared outside composition; following duplicate input sees empty value.
     resetInput();
     updateHUD();
@@ -2719,12 +2917,18 @@ function processText(value, composing = globallyComposing, fromBuiltin = false) 
   const candidates = game.enemies.filter(e => e.q.pinyin.startsWith(pending));
   let enemy = candidates.find(e => e.id === game.locked) || candidates.sort((a,b) => a.x - b.x)[0];
   if (!enemy) {
+    if (deleting) {
+      const locked = game.enemies.find(e => e.id === game.locked);
+      if (locked) { locked.progress = 0; renderEnemy(locked); }
+      return;
+    }
     if (inputState.lastError !== raw && game.enemies.length) {
       wrongKey(game.enemies.find(e => e.id === game.locked) || closestEnemy());
-      inputState.lastError = raw;
+      inputState.lastError = '';
     }
     return;
   }
+  if (game.training && pending.length > enemy.progress) tutorialProgress();
   const previous = game.enemies.find(e => e.id === game.locked);
   if (previous && previous !== enemy) { previous.progress = 0; renderEnemy(previous); }
   game.locked = enemy.id;
@@ -2734,34 +2938,62 @@ function processText(value, composing = globallyComposing, fromBuiltin = false) 
   if (added) { sound('hit'); animate(enemy.element, 'hit'); enemy.x = Math.min(98, enemy.x + .5); }
   renderEnemy(enemy); positionEnemy(enemy);
   if (pending === enemy.q.pinyin) {
-    inputState.consumed = raw.length;
-    inputState.credits.push(enemy.q.text);
+    const credit = enemy.q.text;
     completeQuestion(enemy);
-    if (!composing) resetInput();
+    consumeInput(raw, credit);
+    if (game.training) {
+      tutorialProgress();
+      if (!game.enemies.length) game.onboarding++;
+      renderOnboarding();
+    } else setInstruction('點怪或打首字母鎖定，再打完拼音。');
   }
   updateHUD();
 }
-castInput.addEventListener('beforeinput', event => { inputState.before = castInput.value; });
-castInput.addEventListener('input', event => {
-  if (!globallyComposing && castInput.value === lastCommit.value && performance.now() - lastCommit.at < 80 && !game?.ime) { castInput.value = ''; return; }
-  // During IME composition the element may lag compositionupdate.data. Never clear it here.
-  processText(castInput.value, globallyComposing || event.isComposing);
-});
-castInput.addEventListener('compositionstart', () => { globallyComposing = true; castInput.classList.add('composing'); });
-castInput.addEventListener('compositionupdate', event => { processText(event.data || castInput.value, true); });
-castInput.addEventListener('compositionend', event => {
-  globallyComposing = false;
-  compositionEndedAt = performance.now();
-  castInput.classList.remove('composing');
-  const finalValue = event.data || castInput.value;
-  processText(finalValue, false);
-  if (game?.guide?.step === 'look') resetInput();
-  if (!game?.ime && inputState.consumed > 0 && normalizeLetters(finalValue).length <= inputState.consumed) resetInput();
-  if (/\p{Script=Han}/u.test(finalValue)) lastCommit = {value: finalValue, at: performance.now()};
-});
-castInput.addEventListener('blur', () => {
-  if (screen === 'play' && game?.running && (!game.paused || countdownTimer || keyboardTimer) && !useBuiltin() && !(game.guide?.step === 'look')) pauseGame('施法列失去焦點，怪物與王已暫停。');
-});
+for (const input of castInputs) {
+  input.addEventListener('beforeinput', event => {
+    logInput(event, input);
+    if (input === castInput && !swappingInput) inputState.before = input.value;
+  });
+  input.addEventListener('input', event => {
+    logInput(event, input);
+    if (input !== castInput || swappingInput) { input.value = ''; return; }
+    if (!globallyComposing && input.value === lastCommit.value && performance.now() - lastCommit.at < 80 && !game?.ime) { input.value = ''; return; }
+    processText(input.value, save.settings.keyboardMode === 'english' && !game?.ime ? false : globallyComposing || event.isComposing, false, event.inputType.startsWith('delete'));
+  });
+  input.addEventListener('compositionstart', event => {
+    logInput(event, input);
+    if (input !== castInput || swappingInput || (save.settings.keyboardMode === 'english' && !game?.ime)) return;
+    globallyComposing = true;
+    input.classList.add('composing');
+  });
+  input.addEventListener('compositionupdate', event => {
+    logInput(event, input);
+    if (input !== castInput || swappingInput || (save.settings.keyboardMode === 'english' && !game?.ime)) return;
+    processText(event.data || input.value, true);
+  });
+  input.addEventListener('compositionend', event => {
+    logInput(event, input);
+    if (input !== castInput || swappingInput) { input.value = ''; return; }
+    globallyComposing = false;
+    compositionEndedAt = performance.now();
+    input.classList.remove('composing');
+    const finalValue = event.data || input.value;
+    // Some WebViews deliver the final Latin commit to the newly focused editor.
+    // The letters were already accepted by compositionupdate; do not hit twice.
+    if (!game?.ime && inputState.consumed > 0 && inputState.consumed === inputState.raw.length && normalizeLetters(finalValue) === inputState.raw) {
+      resetInput();
+      return;
+    }
+    const epoch = inputEpoch;
+    processText(finalValue, false);
+    if (epoch === inputEpoch && !game?.ime && inputState.consumed > 0 && normalizeLetters(finalValue).length <= inputState.consumed) resetInput();
+    if (/\p{Script=Han}/u.test(finalValue)) lastCommit = {value: finalValue, at: performance.now()};
+  });
+  input.addEventListener('blur', () => {
+    if (swappingInput || castInputs.includes(document.activeElement) || game?.training && game.onboarding === 3) return;
+    if (screen === 'play' && game?.running && (!game.paused || countdownTimer || keyboardTimer) && !useBuiltin() && game.guide?.step !== 'look') pauseGame('施法列失去焦點，怪物與王已暫停。');
+  });
+}
 document.addEventListener('pointerdown', event => {
   if (useBuiltin() && event.target === castInput) event.preventDefault();
   const enemyNode = event.target.closest('.enemy');
@@ -2774,25 +3006,33 @@ document.addEventListener('pointerdown', event => {
     if (globallyComposing) { inputState.consumed = inputState.raw.length; inputState.credits = []; } else resetInput();
     unlockTarget(); game.locked = e.id; renderEnemy(e);
     if (!useBuiltin()) castInput.focus({preventScroll: true});
-    if (game.training && game.onboarding === 0) { game.onboarding = 1; renderOnboarding(); }
+
   }
   if (['peek','unlock','ready','guide-next'].includes(action) || event.target.closest('#cast-button')) event.preventDefault();
 });
-const originalPeek = peek;
-peek = function () {
-  originalPeek();
-  if (game?.training && game.onboarding === 2) { game.onboarding = 3; renderOnboarding(); }
-};
 function builtinLetter(key) {
-  if (!game?.running || game.paused || game.ime) return;
+  if (!game?.running || (game.paused && game.guide?.step !== 'look') || (game.ime && !game.training && !game.guide)) return;
   if (key === 'peek') { peek(); return; }
   if (key === 'unlock') { resetInput(); unlockTarget(); return; }
   if (key === 'delete') { castInput.value = castInput.value.slice(0,-1); }
   else castInput.value += key;
   // The same prefix engine is used by touch and system input.
-  processText(castInput.value, false, true);
+  processText(castInput.value, false, true, key === 'delete');
 }
 $('#builtin-keyboard').innerHTML = ['qwertyuiop','asdfghjkl','zxcvbnm'].map(row => `<div class="key-row" style="--key-count:${row.length}">${[...row].map(c => `<button type="button" data-key="${c}" aria-label="字母 ${c}">${c}</button>`).join('')}</div>`).join('') + '<div class="key-row key-tools"><button data-key="peek">偷看</button><button data-key="delete">刪除</button><button data-key="unlock">解除鎖定</button></div>';
+// A key can finish the stage during pointerdown. Its following click must
+// not land on a newly revealed result button (for example, 再挑戰一次).
+// A fresh pointerdown starts a new gesture, so deliberate result taps work.
+let keyboardClickPending = false;
+document.addEventListener('pointerdown', event => {
+  keyboardClickPending = Boolean(event.target.closest('#builtin-keyboard'));
+}, true);
+document.addEventListener('click', event => {
+  if (!keyboardClickPending) return;
+  keyboardClickPending = false;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+}, true);
 $('#builtin-keyboard').addEventListener('pointerdown', event => {
   event.preventDefault();
   const buttons = [...event.currentTarget.querySelectorAll('[data-key]')];
@@ -2810,7 +3050,7 @@ document.addEventListener('keydown', event => {
     if (event.key === 'Escape') { event.preventDefault(); closeOrResumeMenu(); }
     return;
   }
-  if (screen !== 'play' || !game?.running || game.paused) return;
+  if (screen !== 'play' || !game?.running || (game.paused && game.guide?.step !== 'look')) return;
   if (event.key === 'Escape') { event.preventDefault(); if (!unlockTarget()) pauseGame(); else resetInput(); }
   else if (event.key === 'Tab') { event.preventDefault(); peek(); }
   else if (event.key === 'Enter' && game.ime) {
@@ -2823,7 +3063,7 @@ document.addEventListener('keydown', event => {
   } else if (event.key === 'Backspace' && event.target !== castInput) {
     event.preventDefault();
     if (useBuiltin()) builtinLetter('delete');
-    else { castInput.value = castInput.value.slice(0,-1); processText(castInput.value); }
+    else { castInput.value = castInput.value.slice(0,-1); processText(castInput.value, false, false, true); }
   }
 });
 modal.addEventListener('cancel', event => { event.preventDefault(); closeOrResumeMenu(); });
@@ -2834,6 +3074,7 @@ document.addEventListener('touchmove', event => { if (screen === 'play' && event
 window.addEventListener('pagehide', persist);
 
 refreshHeader();
+renderDebug();
 renderMap();
 persist();
 requestAnimationFrame(tick);
