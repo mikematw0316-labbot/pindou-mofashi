@@ -2345,7 +2345,7 @@ function teach(stage) {
     : region === 1 ? '依題卡標示輸入：ㄅ（八）只打 b，ㄓ（知）只打 zh；元、雲、翁則打 yuan、yun、weng。'
       : '不要加聲調、空格或把 ü 打成 u；女為 nv，去為 qu。打錯會立刻亮出正解 1.5 秒。');
   const systemHelp = ime ? `<details open><summary>新增與切換繁體拼音輸入法</summary><div class="hint-box"><b>macOS：</b>系統設定 → 鍵盤 → 文字輸入 → 編輯 → ＋ → 繁體中文 → 拼音。用地球鍵／Control＋空白鍵切換；選擇繁體拼音，鍵入拼音後用空白或數字選字。不同系統版本的名稱可能略有差異。<br><b>Windows：</b>設定 → 時間與語言 → 語言與地區 → 中文（繁體，台灣）→ 語言選項 → Microsoft 注音 → 鍵盤選項 → 按鍵指派／鍵盤配置，選漢語拼音。用 Win＋空白鍵切換、Shift 切中英。也可在已有的 Microsoft 拼音設定啟用繁體輸出；請確認輸入框產生的是繁體字。<br><b>連打：</b>先練「我們」women，再連成詞句；候選不對時重新選字。本頁無法替你安裝或判斷輸入法種類。</div></details>` : '';
-  openModal('teach', `${dialogHeader(`${stage.region ? `第 ${stage.region} 區・` : ''}${escapeHTML(stage.title)}`)}<p class="eyebrow">怪物圖鑑 / ${artNames[region - 1]}${stage.kind.includes('boss') ? '・王有三段血條' : ''}</p><div class="teach-rule">${rules}</div><div class="example-grid">${examples.filter(Boolean).map(exampleHTML).join('')}</div><p class="hint-box"><b>常見錯誤：</b>${common}<br>${ime ? '王的蓄力不會在組字時停止；按暫停可安全休息。' : '每個正確字母會擊退怪物；Tab 消耗偷看且不累積本次連擊。Backspace／Esc 解除鎖定；未鎖定時 Esc 暫停。'}</p>${systemHelp}${region === 1 ? `<details><summary>完整注音 ↔ 拼音對照表</summary>${referenceHTML()}</details>` : ''}<p class="muted" style="font-size:12px">${stage.kind.includes('boss') ? '王題目優先選本區易錯題與你的錯題；打錯會回復少量護甲並加速蓄力。' : `本關同場最多 ${Math.min(3, stage.maxSimultaneous)} 隻；通過後解鎖下一關。`} ${!unlocked ? '目前尚未解鎖，請先通過前一關。' : ''}</p><div class="dialog-actions"><button data-action="close">返回地圖</button>${(save.records[stage.id]?.stars === 3 && !stage.kind.includes('boss')) ? '<button data-action="skip-guide">跳過教學</button>' : ''}<button class="primary" data-action="start" ${unlocked ? '' : 'disabled'}>${stage.kind.includes('boss') || stage.reviewOnly ? '準備挑戰' : '開始引導練習'}</button></div>`, unlocked ? '[data-action="start"]' : '[data-action="close"]');
+  openModal('teach', `${dialogHeader(`${stage.region ? `第 ${stage.region} 區・` : ''}${escapeHTML(stage.title)}`)}<p class="eyebrow">怪物圖鑑 / ${artNames[region - 1]}${stage.kind.includes('boss') ? '・王有三段血條' : ''}</p><div class="teach-rule">${rules}</div><div class="example-grid">${examples.filter(Boolean).map(exampleHTML).join('')}</div><p class="hint-box"><b>常見錯誤：</b>${common}<br>${ime ? '王的蓄力不會在組字時停止；按暫停可安全休息。' : '每個正確字母會擊退怪物；Tab 消耗偷看且不累積本次連擊。Backspace／Esc 解除鎖定；未鎖定時 Esc 暫停。'}</p>${systemHelp}${region === 1 ? `<details><summary>完整注音 ↔ 拼音對照表</summary>${referenceHTML()}</details>` : ''}<p class="muted" style="font-size:12px">${stage.kind.includes('boss') ? '王題目優先選本區易錯題與你的錯題；打錯會回復少量護甲並加速蓄力。' : `本關同場最多 ${Math.min(3, stage.maxSimultaneous)} 隻；通過後解鎖下一關。`} ${!unlocked ? '目前尚未解鎖，請先通過前一關。' : ''}</p><div class="dialog-actions"><button data-action="close">返回地圖</button>${((save.records[stage.id]?.stars || 0) >= 1 && !stage.kind.includes('boss') && !stage.reviewOnly) ? '<button data-action="replay-guide">重看教學</button>' : ''}<button class="primary" data-action="start" ${unlocked ? '' : 'disabled'}>${stage.kind.includes('boss') || stage.reviewOnly ? '準備挑戰' : '開始引導練習'}</button></div>`, unlocked ? '[data-action="start"]' : '[data-action="close"]');
 }
 function showReference() {
   if (screen === 'play' && game?.running && !game.paused) pauseGame('已暫停，安心查看對照表。', false);
@@ -3164,7 +3164,9 @@ function handleAction(action, id) {
   switch (action) {
     case 'region': selectedRegion = Number(id); renderMap(); break;
     case 'stage': case 'next': teach(stages.find(s => s.id === id)); break;
-    case 'start': startGame(); break;
+    // 已過關的關卡直接開打，不再走引導練習（使用者 11/17）；要複習按「重看教學」。
+    case 'start': startGame(pendingStage, (save.records[pendingStage?.id]?.stars || 0) >= 1); break;
+    case 'replay-guide': startGame(pendingStage, false); break;
     case 'skip-guide': startGame(pendingStage, true); break;
     case 'ready': resumeGame(); break;
     case 'guide-next': guideNext(); break;
@@ -3173,7 +3175,7 @@ function handleAction(action, id) {
     case 'unlock': resetInput(); unlockTarget(); break;
     case 'close': closeOrResumeMenu(); break;
     case 'map': goMap(); break;
-    case 'restart': startGame(game?.stage); break;
+    case 'restart': startGame(game?.stage, (save.records[game?.stage?.id]?.stars || 0) >= 1 || (game && !game.guide && !game.training)); break;
     case 'pause': pauseGame(); break;
     case 'resume': resumeGame(); break;
     case 'reference': showReference(); break;
