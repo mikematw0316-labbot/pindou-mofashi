@@ -8,8 +8,8 @@ const html = await readFile(new URL('index.html', import.meta.url), 'utf8');
 const bankSource = html.match(/\/\/ BEGIN QUESTION BANK\n([\s\S]*?)\n\/\/ END QUESTION BANK/u)[1];
 const data = await import(`data:text/javascript;base64,${Buffer.from(bankSource).toString('base64')}`);
 
-const fxStart = html.indexOf('function magic('), fxEnd = html.indexOf("document.addEventListener('input', event => {",fxStart);
-const fxHTML = html.slice(0,fxStart) + html.slice(fxStart,fxEnd).replaceAll('setTimeout(', '(window.__freezeFX ? (fn,ms)=>{window.__fx.push({fn,ms});} : setTimeout)(') + html.slice(fxEnd);
+const fxStart = html.indexOf('function comboBanner('), fxEnd = html.indexOf("document.addEventListener('input', event => {",fxStart);
+const fxHTML = html.slice(0,fxStart) + html.slice(fxStart,fxEnd).replaceAll('later(', '(window.__freezeFX ? (fn,ms)=>{window.__fx.push({fn,ms});} : later)(') + html.slice(fxEnd);
 const fixture = fxHTML.replace('return {unlock, sync, speak, target,', 'return {pump, unlock, sync, speak, target,')
   .replaceAll('requestAnimationFrame(tick);', 'if (!window.__manualRAF) requestAnimationFrame(tick);')
   .replace('  </script>\n</body>', `window.__test = {audio, SCORE, get game(){return game;}, get save(){return save;},
@@ -92,7 +92,7 @@ async function screenshot(name) {
   await evaluate(`window.getSelection()?.removeAllRanges()`);
 
   const {data} = await send('Page.captureScreenshot', {format: 'png', captureBeyondViewport: false});
-  await writeFile(new URL(`shots5/${name}.png`, import.meta.url), Buffer.from(data, 'base64'));
+  await writeFile(new URL(`shots7/${name}.png`, import.meta.url), Buffer.from(data, 'base64'));
 }
 async function load() {
   await evaluate(`window.__smokeBeforeNavigation=true`);
@@ -118,7 +118,7 @@ async function seed({onboarding=true, builtin=false, keyboardMode=builtin?'built
   // Finish the previous pagehide save before installing a new saved-game fixture.
   await send('Page.navigate', {url:'about:blank'});
   await waitFor(`location.href==='about:blank'&&document.readyState==='complete'`);
-  const {identifier}=await send('Page.addScriptToEvaluateOnNewDocument',{source:`(() => {const s=JSON.parse(localStorage.getItem('pinyin-keep-save-v2'))||{version:2,settings:{},records:{},upgrades:{},review:{}};s.coins=1000;s.learned=[];s.settings.onboarding=${onboarding};s.settings.builtin=${builtin};s.settings.keyboardMode=${JSON.stringify(keyboardMode)};s.settings.debug=${debug};s.settings.sound=true;s.settings.muted=false;s.settings.speech=true;s.settings.music=true;s.settings.effects=true;s.review=${JSON.stringify(review)};for(const id of ${JSON.stringify(data.stages.map(s=>s.id))})s.records[id]={stars:3,bestSpeed:1,bestScore:0,attempts:1,last:{speed:1,accuracy:1,score:0}};localStorage.setItem('pinyin-keep-save-v2',JSON.stringify(s));})()`});
+  const {identifier}=await send('Page.addScriptToEvaluateOnNewDocument',{source:`(() => {const s=JSON.parse(localStorage.getItem('pinyin-keep-save-v2'))||{version:2,settings:{},records:{},upgrades:{},review:{}};s.coins=1000;s.learned=[];s.settings.onboarding=${onboarding};s.settings.builtin=${builtin};s.settings.keyboardMode=${JSON.stringify(keyboardMode)};s.settings.builtinMigrated=true;s.settings.debug=${debug};s.settings.sound=true;s.settings.muted=false;s.settings.speech=true;s.settings.music=true;s.settings.effects=true;s.review=${JSON.stringify(review)};for(const id of ${JSON.stringify(data.stages.map(s=>s.id))})s.records[id]={stars:3,bestSpeed:1,bestScore:0,attempts:1,last:{speed:1,accuracy:1,score:0}};if(!s.settings.onboarding){s.records['r1-1'].stars=0;s.records['r1-boss'].stars=0;}localStorage.setItem('pinyin-keep-save-v2',JSON.stringify(s));})()`});
   await load();
   await send('Page.removeScriptToEvaluateOnNewDocument',{identifier});
 }
@@ -126,7 +126,8 @@ async function stage(id, skip=true) {
   const s=data.stages.find(s=>s.id===id);
   await touch(`[data-action="region"][data-id="${s.region}"]`);
   await touch(`[data-action="stage"][data-id="${id}"]`);
-  await touch(skip&&!s.kind.includes('boss')?'[data-action="skip-guide"]':'[data-action="start"]');
+  const replay = !skip && await evaluate(`!!document.querySelector('[data-action="replay-guide"]')`);
+  await touch(replay ? '[data-action="replay-guide"]' : '[data-action="start"]');
 }
 async function ready({keyboard=false}={}) {
   if(await evaluate(`!!document.querySelector('#start-overlay [data-action="ready"]')?.getClientRects().length`)) await touch('#start-overlay [data-action="ready"]');
@@ -190,22 +191,22 @@ async function battle(id='r1-1', mode='pinyin') {
 }
 async function shotNow(name) {
   const {data}=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});
-  await writeFile(new URL(`shots5/${name}.png`,import.meta.url),Buffer.from(data,'base64'));
+  await writeFile(new URL(`shots7/${name}.png`,import.meta.url),Buffer.from(data,'base64'));
 }
 try {
  await send('Runtime.enable');await send('Log.enable');await send('Page.enable');await metrics();await audioMode();
  for(const [width,height] of [[390,844],[360,640],[430,932],[1280,720]]) {
   await metrics(width,height,width<700);await battle('r2-2','builtin');
   await evaluate(`(()=>{const g=__test.game;g.spawnIn=999;while(g.enemies.length<g.maxEnemies)__test.spawnEnemy();g.enemies.forEach(e=>{e.x=65;__test.positionEnemy(e)});window.__manualRAF=true;window.__freezeFX=true;window.__fx=[];g.combo=0;})()`);
-  for(const c of (await enemy()).q.pinyin)await touch(`[data-key="${c}"]`);
+  for(const c of (await enemy()).q.pinyin)await (width>=700 ? press(c) : touch(`[data-key="${c}"]`));
   await evaluate(`document.querySelectorAll('.magic-bolt').forEach(e=>{e.style.animationPlayState='paused';e.style.animationDelay='-.10s'})`);
   check(await evaluate(`!!document.querySelector('.fireball')`),`${width}×${height} 擊倒有大型飛行火球`);
   let shot=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});
-  await writeFile(new URL(`shots5/${width}x${height}-16-fireball-flight.png`,import.meta.url),Buffer.from(shot.data,'base64'));
+  await writeFile(new URL(`shots7/${width}x${height}-16-fireball-flight.png`,import.meta.url),Buffer.from(shot.data,'base64'));
   await evaluate(`window.__fx.filter(e=>e.ms<220).forEach(e=>e.fn());const style=document.createElement('style');style.textContent='.magic-explosion::before,.magic-explosion i{animation-play-state:paused!important;animation-delay:-.13s!important}';document.head.append(style);`);
   check(await evaluate(`!!document.querySelector('.magic-explosion')`),`${width}×${height} 命中有爆炸與粒子`);
   shot=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});
-  await writeFile(new URL(`shots5/${width}x${height}-08-explosion.png`,import.meta.url),Buffer.from(shot.data,'base64'));
+  await writeFile(new URL(`shots7/${width}x${height}-08-explosion.png`,import.meta.url),Buffer.from(shot.data,'base64'));
   await geometry(`${width}×${height} 特效畫面題卡不重疊`);
  }
  check(errors.length===0,'獨立 VFX 截圖 0 console error／runtime exception '+JSON.stringify(errors));

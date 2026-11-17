@@ -82,7 +82,7 @@ async function screenshot(name) {
   await evaluate(`window.getSelection()?.removeAllRanges()`);
   await delay(300); // Let native touch feedback paint out before capturing the layout.
   const {data} = await send('Page.captureScreenshot', {format: 'png', captureBeyondViewport: false});
-  await writeFile(new URL(`shots5/regression-main/${name}.png`, import.meta.url), Buffer.from(data, 'base64'));
+  await writeFile(new URL(`shots7/regression-main/${name}.png`, import.meta.url), Buffer.from(data, 'base64'));
 }
 async function load() {
   await evaluate(`window.__smokeBeforeNavigation=true`);
@@ -108,7 +108,7 @@ async function seed({onboarding=true, builtin=false, keyboardMode=builtin?'built
   // Finish the previous pagehide save before installing a new saved-game fixture.
   await send('Page.navigate', {url:'about:blank'});
   await waitFor(`location.href==='about:blank'&&document.readyState==='complete'`);
-  const {identifier}=await send('Page.addScriptToEvaluateOnNewDocument',{source:`(() => {const s=JSON.parse(localStorage.getItem('pinyin-keep-save-v2'))||{version:2,settings:{},records:{},upgrades:{},review:{}};s.coins=1000;s.learned=[];s.settings.onboarding=${onboarding};s.settings.builtin=${builtin};s.settings.keyboardMode=${JSON.stringify(keyboardMode)};s.settings.debug=${debug};s.settings.sound=false;s.review=${JSON.stringify(review)};for(const id of ${JSON.stringify(data.stages.map(s=>s.id))})s.records[id]={stars:3,bestSpeed:1,bestScore:0,attempts:1,last:{speed:1,accuracy:1,score:0}};localStorage.setItem('pinyin-keep-save-v2',JSON.stringify(s));})()`});
+  const {identifier}=await send('Page.addScriptToEvaluateOnNewDocument',{source:`(() => {const s=JSON.parse(localStorage.getItem('pinyin-keep-save-v2'))||{version:2,settings:{},records:{},upgrades:{},review:{}};s.coins=1000;s.learned=[];s.settings.onboarding=${onboarding};s.settings.builtin=${builtin};s.settings.keyboardMode=${JSON.stringify(keyboardMode)};s.settings.builtinMigrated=true;s.settings.debug=${debug};s.settings.sound=false;s.review=${JSON.stringify(review)};for(const id of ${JSON.stringify(data.stages.map(s=>s.id))})s.records[id]={stars:3,bestSpeed:1,bestScore:0,attempts:1,last:{speed:1,accuracy:1,score:0}};if(!s.settings.onboarding){s.records['r1-1'].stars=0;s.records['r1-boss'].stars=0;}localStorage.setItem('pinyin-keep-save-v2',JSON.stringify(s));})()`});
   await load();
   await send('Page.removeScriptToEvaluateOnNewDocument',{identifier});
 }
@@ -116,7 +116,8 @@ async function stage(id, skip=true) {
   const s=data.stages.find(s=>s.id===id);
   await touch(`[data-action="region"][data-id="${s.region}"]`);
   await touch(`[data-action="stage"][data-id="${id}"]`);
-  await touch(skip&&!s.kind.includes('boss')?'[data-action="skip-guide"]':'[data-action="start"]');
+  const replay = !skip && await evaluate(`!!document.querySelector('[data-action="replay-guide"]')`);
+  await touch(replay ? '[data-action="replay-guide"]' : '[data-action="start"]');
 }
 async function ready({keyboard=false}={}) {
   if(await evaluate(`!!document.querySelector('#start-overlay [data-action="ready"]')?.getClientRects().length`)) await touch('#start-overlay [data-action="ready"]');
@@ -161,7 +162,7 @@ async function geometry(label) {
   check(report.scroll<=report.width&&!report.overlap&&report.bounds&&report.inputBottom<=report.visible+1&&report.fieldBottom<=report.inputBottom,label+' '+JSON.stringify(report));
 }
 try {
-  await mkdir(new URL('shots5/regression-main',import.meta.url),{recursive:true});
+  await mkdir(new URL('shots7/regression-main',import.meta.url),{recursive:true});
   await send('Runtime.enable');await send('Log.enable');await send('Page.enable');
   const version=await cdp('Browser.getVersion');
   results.push(`環境：${process.version}，${version.product}，手機 DPR 3／觸控模擬`);
@@ -171,6 +172,7 @@ try {
   await evaluate(`localStorage.removeItem('pinyin-keep-save-v2')`);await load();
   check(await evaluate(`document.title.includes('拼鬥魔法師')&&document.querySelectorAll('.stage-node').length===7`),'390×844 DPR3 觸控手機，離線載入新名稱與地圖');
   await screenshot('01-map');
+  await touch('[data-action="settings"]');await evaluate(`const select=document.querySelector('#keyboard-mode');select.value='pinyin';select.dispatchEvent(new Event('change',{bubbles:true}));`);await touch('[data-action="close"]');
   await touch('[data-action="stage"][data-id="r1-1"]');await touch('[data-action="start"]');
   check(await evaluate(`document.querySelector('#start-reason').textContent.includes('30 秒')`),'首次進入有實際操作教學');
   await touch('#start-overlay [data-action="ready"]');
@@ -334,7 +336,7 @@ try {
   // Built-in keyboard must be enabled through settings; touch events go through pointerdown.
   await seed();await touch('[data-action="settings"]');await evaluate(`(()=>{const s=document.querySelector('#keyboard-mode');s.value='builtin';s.dispatchEvent(new Event('change',{bubbles:true}));})()`);await touch('[data-action="close"]');
   await stage('r1-1');await ready();check(await evaluate(`!document.querySelector('#builtin-keyboard').hidden&&!document.activeElement.classList.contains('spell-input')`),'設定開啟內建鍵盤後不聚焦系統輸入框');
-  check(await evaluate(`Array.from(document.querySelectorAll('#builtin-keyboard button')).every(e=>{const r=e.getBoundingClientRect();return r.width>=44&&r.height>=44})`),'內建鍵盤每鍵 44×44 點擊區，以最近鍵中心處理重疊邊緣');
+  check(await evaluate(`Array.from(document.querySelectorAll('#builtin-keyboard button')).every(e=>{const r=e.getBoundingClientRect();return r.width>=24&&r.height>=42&&r.right<=innerWidth})`),'內建鍵盤三排鍵寬隨螢幕分配、鍵高至少 42px，整排不溢出');
   await screenshot('07-builtin');await solve('touch');check(await evaluate(`document.querySelector('.result-stars').textContent==='★★★'`),'內建 QWERTY pointerdown 觸控完整通過第一關三星');
   check(await evaluate(`JSON.parse(localStorage.getItem('pinyin-keep-save-v2')).settings.builtin===true`),'內建鍵盤作答與通關存檔不會關閉鍵盤設定');await backMap();
   const zh=data.phonics.find(q=>q.pinyin==='zh');

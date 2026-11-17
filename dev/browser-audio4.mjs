@@ -8,8 +8,8 @@ const html = await readFile(new URL('index.html', import.meta.url), 'utf8');
 const bankSource = html.match(/\/\/ BEGIN QUESTION BANK\n([\s\S]*?)\n\/\/ END QUESTION BANK/u)[1];
 const data = await import(`data:text/javascript;base64,${Buffer.from(bankSource).toString('base64')}`);
 
-const fxStart = html.indexOf('function magic('), fxEnd = html.indexOf("document.addEventListener('input', event => {",fxStart);
-const fxHTML = html.slice(0,fxStart) + html.slice(fxStart,fxEnd).replaceAll('setTimeout(', '(window.__freezeFX ? (fn,ms)=>{window.__fx.push({fn,ms});} : setTimeout)(') + html.slice(fxEnd);
+const fxStart = html.indexOf('function comboBanner('), fxEnd = html.indexOf("document.addEventListener('input', event => {",fxStart);
+const fxHTML = html.slice(0,fxStart) + html.slice(fxStart,fxEnd).replaceAll('later(', '(window.__freezeFX ? (fn,ms)=>{window.__fx.push({fn,ms});} : later)(') + html.slice(fxEnd);
 const fixture = fxHTML.replace('return {unlock, sync, speak, target,', 'return {pump, unlock, sync, speak, target,')
   .replaceAll('requestAnimationFrame(tick);', 'if (!window.__manualRAF) requestAnimationFrame(tick);')
   .replace('  </script>\n</body>', `window.__test = {audio, SCORE, get game(){return game;}, get save(){return save;},
@@ -92,7 +92,7 @@ async function screenshot(name) {
   await evaluate(`window.getSelection()?.removeAllRanges()`);
 
   const {data} = await send('Page.captureScreenshot', {format: 'png', captureBeyondViewport: false});
-  await writeFile(new URL(`shots5/regression-audio/${name}.png`, import.meta.url), Buffer.from(data, 'base64'));
+  await writeFile(new URL(`shots7/regression-audio/${name}.png`, import.meta.url), Buffer.from(data, 'base64'));
 }
 async function load() {
   await evaluate(`window.__smokeBeforeNavigation=true`);
@@ -118,7 +118,7 @@ async function seed({onboarding=true, builtin=false, keyboardMode=builtin?'built
   // Finish the previous pagehide save before installing a new saved-game fixture.
   await send('Page.navigate', {url:'about:blank'});
   await waitFor(`location.href==='about:blank'&&document.readyState==='complete'`);
-  const {identifier}=await send('Page.addScriptToEvaluateOnNewDocument',{source:`(() => {const s=JSON.parse(localStorage.getItem('pinyin-keep-save-v2'))||{version:2,settings:{},records:{},upgrades:{},review:{}};s.coins=1000;s.learned=[];s.settings.onboarding=${onboarding};s.settings.builtin=${builtin};s.settings.keyboardMode=${JSON.stringify(keyboardMode)};s.settings.debug=${debug};s.settings.sound=true;s.settings.muted=false;s.settings.speech=true;s.settings.music=true;s.settings.effects=true;s.review=${JSON.stringify(review)};for(const id of ${JSON.stringify(data.stages.map(s=>s.id))})s.records[id]={stars:3,bestSpeed:1,bestScore:0,attempts:1,last:{speed:1,accuracy:1,score:0}};localStorage.setItem('pinyin-keep-save-v2',JSON.stringify(s));})()`});
+  const {identifier}=await send('Page.addScriptToEvaluateOnNewDocument',{source:`(() => {const s=JSON.parse(localStorage.getItem('pinyin-keep-save-v2'))||{version:2,settings:{},records:{},upgrades:{},review:{}};s.coins=1000;s.learned=[];s.settings.onboarding=${onboarding};s.settings.builtin=${builtin};s.settings.keyboardMode=${JSON.stringify(keyboardMode)};s.settings.builtinMigrated=true;s.settings.debug=${debug};s.settings.sound=true;s.settings.muted=false;s.settings.speech=true;s.settings.music=true;s.settings.effects=true;s.review=${JSON.stringify(review)};for(const id of ${JSON.stringify(data.stages.map(s=>s.id))})s.records[id]={stars:3,bestSpeed:1,bestScore:0,attempts:1,last:{speed:1,accuracy:1,score:0}};if(!s.settings.onboarding){s.records['r1-1'].stars=0;s.records['r1-boss'].stars=0;}localStorage.setItem('pinyin-keep-save-v2',JSON.stringify(s));})()`});
   await load();
   await send('Page.removeScriptToEvaluateOnNewDocument',{identifier});
 }
@@ -126,7 +126,8 @@ async function stage(id, skip=true) {
   const s=data.stages.find(s=>s.id===id);
   await touch(`[data-action="region"][data-id="${s.region}"]`);
   await touch(`[data-action="stage"][data-id="${id}"]`);
-  await touch(skip&&!s.kind.includes('boss')?'[data-action="skip-guide"]':'[data-action="start"]');
+  const replay = !skip && await evaluate(`!!document.querySelector('[data-action="replay-guide"]')`);
+  await touch(replay ? '[data-action="replay-guide"]' : '[data-action="start"]');
 }
 async function ready({keyboard=false}={}) {
   if(await evaluate(`!!document.querySelector('#start-overlay [data-action="ready"]')?.getClientRects().length`)) await touch('#start-overlay [data-action="ready"]');
@@ -190,10 +191,10 @@ async function battle(id='r1-1', mode='pinyin') {
 }
 async function shotNow(name) {
   const {data}=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});
-  await writeFile(new URL(`shots5/regression-audio/${name}.png`,import.meta.url),Buffer.from(data,'base64'));
+  await writeFile(new URL(`shots7/regression-audio/${name}.png`,import.meta.url),Buffer.from(data,'base64'));
 }
 try {
-  await mkdir(new URL('shots5/regression-audio',import.meta.url),{recursive:true});
+  await mkdir(new URL('shots7/regression-audio',import.meta.url),{recursive:true});
   await send('Runtime.enable');await send('Log.enable');await send('Page.enable');await metrics();
   await audioMode();
   check(await evaluate(`__mock.contexts===0&&__mock.calls.filter(c=>c.type==='speak').length===0&&!__test.audio.diagnostics.unlocked`),'手勢之前無 AudioContext、無 speak、尚未解鎖');
@@ -203,7 +204,7 @@ try {
   await evaluate(`document.querySelector('.sound-settings').scrollIntoView({block:'start'})`);
   await delay(300);await evaluate(`window.getSelection()?.removeAllRanges()`);
   await shotNow('01-sound-settings');
-  await touch('[data-action="test-speech"]');
+  await touch('[data-action="test-speech"]');await waitFor(`__test.audio.diagnostics.speaking`);
   check(await evaluate(`__test.audio.diagnostics.speaking&&__mock.nodes.some(n=>n.kind==='gain'&&n.gain.events.some(e=>e[0]==='ramp'&&e[1]===.24))`),'語音期間 music duck gain 淡到 .24');
   await evaluate(`__mock.endSpeech()`);
   check(await evaluate(`!__test.audio.diagnostics.speaking`),'語音結束恢復音樂增益');
@@ -216,14 +217,14 @@ try {
   check(await evaluate(`!__test.audio.diagnostics.paused`),'看卡閱讀時可播放地區音樂');
   await touch('[data-action="pause"]');
   check(await evaluate(`__test.audio.diagnostics.paused&&!__test.audio.diagnostics.speaking`),'看卡階段按暫停也停止語音並淡出音樂');
-  await battle();
+  await battle();await waitFor(`__mock.calls.some(c=>c.type==='speak'&&c.text===__test.spoken(__test.game.enemies[0].q))`);
   check(await evaluate(`__mock.calls.some(c=>c.type==='speak'&&c.text===__test.spoken(__test.game.enemies[0].q))`),'第一區出怪唸注音讀法');
   const noRepeat=await evaluate(`(()=>{const n=__mock.calls.length;for(let i=0;i<20;i++)__test.audio.target();return __mock.calls.length===n;})()`);
   check(noRepeat,'同一隻怪不重複自動唸');
   const replay=await evaluate(`({id:document.activeElement.id,n:__mock.calls.length})`);
-  await touch('.enemy .replay');
+  await touch('.enemy .replay');await delay(250);
   check(await evaluate(`document.activeElement.id===${JSON.stringify(replay.id)}&&__mock.calls.length>${replay.n}&&document.querySelector('#start-overlay').hidden`),'題卡重聽會 speak，輸入焦點與鍵盤暫停狀態不變');
-  await evaluate(`__mock.calls=[]`);await textInput('x');
+  await evaluate(`__mock.calls=[]`);await textInput('x');await delay(250);
   check(await evaluate(`__mock.calls.some(c=>c.type==='speak'&&c.text===__test.spoken(__test.game.enemies[0].q))`),'打錯唸正確注音讀法');
   await touch('[data-action="sound"]');
   check(await evaluate(`__test.save.settings.muted&&__mock.nodes.some(n=>n.kind==='gain'&&n.gain.events.at(-1)?.[1]===0)`),'戰鬥總靜音將總增益淡到 0');
@@ -231,8 +232,8 @@ try {
   await load();check(await evaluate(`__test.save.settings.muted`),'總靜音存檔');
   await battle('r2-3');
   await evaluate(`__test.game.spawnIn=0`);await waitFor(`__test.game.enemies.length>=2`);
-  await evaluate(`__mock.calls=[]`);await touch('.enemy:nth-child(2)');
-  check(await evaluate(`__mock.calls[0]?.type==='cancel'&&__mock.calls[1]?.text===__test.spoken(__test.game.enemies.find(e=>e.id===__test.game.locked).q)`),'切換鎖定先 cancel 再唸鎖定國字，僅唸目前目標');
+  await evaluate(`__mock.calls=[]`);await touch('.enemy:nth-child(2)');await delay(250);
+  check(await evaluate(`__mock.calls.some(c=>c.type==='cancel')&&__mock.calls.findLast(c=>c.type==='speak')?.text===__test.spoken(__test.game.enemies.find(e=>e.id===__test.game.locked).q)`),'切換鎖定經安全間隔 cancel 再唸鎖定國字，僅唸目前目標');
   check(await evaluate(`!document.querySelector('#target-line').hidden&&document.querySelector('.enemy.locked')`),'鎖定框與連線清楚顯示');
   // Verify all region themes plus boss variations against the actual scheduler.
   const themes=[];
@@ -278,8 +279,8 @@ try {
   check(await evaluate(`document.querySelector('.tier-up')?.textContent.includes('得分 ×1.5')`),'連擊五次有升階演出與倍率');
   // No real wall clock is needed for deterministic movement and pool coverage.
   await metrics(390,932);await battle('r1-1','builtin');
-  const movement=await evaluate(`(()=>{window.__manualRAF=true;const g=__test.game;g.total=1000;g.hp=100000;g.maxHP=100000;const records=new Map();let t=performance.now();__test.setLastTime(t);for(let i=0;i<1001;i++){t+=60;__test.tick(t);for(const e of g.enemies){const top=e.element.getBoundingClientRect().top;const a=records.get(e.id)||{first:top,last:top,monotonic:true};a.monotonic&&=top>=a.last-.1;a.last=top;records.set(e.id,a);}}window.__manualRAF=false;__test.tick(t);const height=document.querySelector('#battlefield').clientHeight;return {height,records:[...records.values()],elapsed:g.elapsed};})()`);
-  check(movement.elapsed>=59&&movement.records.every(r=>r.monotonic)&&movement.records.some(r=>r.last-r.first>movement.height*.6),`模擬 60 秒怪物單調前進、跨越戰場 60% ${JSON.stringify(movement)}`);
+  const movement=await evaluate(`(()=>{window.__manualRAF=true;const g=__test.game;g.total=1000;g.hp=100000;g.maxHP=100000;const records=new Map();let t=performance.now();__test.setLastTime(t);for(let i=0;i<1001;i++){t+=60;__test.tick(t);for(const e of g.enemies){const top=e.element.getBoundingClientRect().top;const a=records.get(e.id)||{first:top,last:top,monotonic:true};a.monotonic&&=top>=a.last-.1;a.last=top;records.set(e.id,a);}}window.__manualRAF=false;__test.tick(t);const height=document.querySelector('#battlefield').clientHeight;return {height,travel:height-document.querySelector('.enemy:not(.defeated)').offsetHeight-8,records:[...records.values()],elapsed:g.elapsed};})()`);
+  check(movement.elapsed>=59&&movement.records.every(r=>r.monotonic)&&movement.records.some(r=>r.last-r.first>movement.travel*.9),`模擬 60 秒怪物單調前進、跨越可移動軌道 90% ${JSON.stringify(movement)}`);
   for(let seedValue=1;seedValue<=5;seedValue++) {
     const coverage=await evaluate(`(()=>{let rng=${seedValue};const original=Math.random;Math.random=()=>((rng=(rng*1664525+1013904223)>>>0)/4294967296);const g=__test.game;g.pool=__test.stagePool(g.stage);g.deck=[...g.pool];const taught=new Set(__test.guideItems(g.stage,[]).map(q=>q.id));const seen=new Set();for(let i=0;i<60;i++){g.enemies.forEach(e=>e.element.remove());g.enemies=[];__test.spawnEnemy();seen.add(g.enemies[0].q.id);}Math.random=original;return {ok:[...seen].every(id=>taught.has(id)),seen:seen.size};})()`);
     check(coverage.ok&&coverage.seen===8,`第一關亂數種子 ${seedValue}：實際出題全部包含於教過的 8 題`);
@@ -309,7 +310,7 @@ try {
   check(await evaluate(`__test.audio.diagnostics.voice==='zh-CN'&&document.querySelector('#voice-status').textContent.includes('此裝置沒有台灣中文語音')`),'沒有台灣 voice 時排除香港並使用 zh-CN，設定說明原因');
   await audioMode('delayed');await battle();
   check(await evaluate(`__test.audio.diagnostics.voice===null`),'非同步載入前沒有 voice');
-  await evaluate(`__mock.changeVoices([{lang:'zh-TW',name:'延遲台灣'}])`);
+  await evaluate(`__mock.changeVoices([{lang:'zh-TW',name:'延遲台灣'}])`);await delay(250);
   check(await evaluate(`__test.audio.diagnostics.voice==='zh-TW'&&__mock.calls.some(c=>c.text===__test.spoken(__test.game.enemies[0].q))`),'voiceschanged 載入中文後自動恢復並唸目前怪物');
   await evaluate(`Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'));`);
   check(await evaluate(`__test.audio.diagnostics.paused&&!__test.audio.diagnostics.speaking&&__test.game.paused`),'分頁隱藏停止語音與音樂，遊戲暫停');

@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="zh-Hant-TW">
 <head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
@@ -757,10 +758,49 @@ button:disabled {opacity:1;color:var(--muted);background:var(--soft);box-shadow:
     .star-conditions p { margin:4px 0; }
     .result-conditions { text-align:left; padding:12px 12px 12px 28px; border-radius:12px; background:var(--soft); font-size:14px; line-height:1.7; overflow-wrap:anywhere; }
     .best-time { font-weight:700; }
+    .builtin-mode .spell-inputs { display:none; }
+    #cast-display { flex:1; min-width:0; font:18px ui-monospace,monospace; overflow-wrap:anywhere; max-height:42px; overflow:hidden; }
+    #builtin-keyboard { --key-height:clamp(24px,calc((var(--visible-height) * .31 - 24px - env(safe-area-inset-bottom)) / 4),46px); height:calc(var(--visible-height) * .31); max-height:280px; min-height:130px; padding:6px 4px max(6px,env(safe-area-inset-bottom)); background:#d3d6dc; border-radius:12px 12px 0 0; display:flex; flex-direction:column; justify-content:space-between; gap:4px; overflow:visible; -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; touch-action:none; }
+    #builtin-keyboard .key-row { gap:5px; flex:1; align-items:center; }
+    #builtin-keyboard .key-row:nth-child(2) { padding:0 5%; }
+    #builtin-keyboard .key-row:nth-child(3) { padding:0 14%; }
+    #builtin-keyboard .key-row:not(.key-tools) button,#builtin-keyboard button { flex:1 1 0; width:0; min-width:0; margin:0; padding:0; height:var(--key-height); min-height:var(--key-height); max-height:46px; border:0; border-radius:5px; background:#fff; color:#18202a; box-shadow:0 1px 1px #606570; font:clamp(16px,calc(var(--key-height) * .5),23px)/1 -apple-system,sans-serif; -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; touch-action:none; }
+    #builtin-keyboard .key-tools button { font:14px -apple-system,sans-serif; background:#adb4c0; }
+    .key-bubble { position:fixed; z-index:100; transform:translateX(-50%); width:58px; height:65px; display:grid; place-items:center; background:#fff; color:#18202a; border-radius:10px; box-shadow:0 2px 5px #2336; font:36px -apple-system,sans-serif; pointer-events:none; -webkit-user-select:none; user-select:none; }
+    .touch-keyboard #play-screen { padding-bottom:0; gap:4px; }
+    .touch-keyboard #builtin-keyboard { order:20; margin:0 -10px; }
+    .touch-keyboard .play-controls { display:none; }
+    .touch-keyboard .battlefield { min-height:80px; }
+    .touch-keyboard .cast-bar { min-height:40px; }
+    .touch-keyboard #action-prompt { display:none; }
+    .touch-keyboard #battle-message { max-height:16px; }
+    .tiny-view .touch-keyboard .cast-bar { margin-right:0; }
+    .tiny-view .touch-keyboard .enemy .prompt { font-size:20px; line-height:1.1; }
+    .tiny-view .touch-keyboard .enemy .answer { font-size:11px; min-height:12px; line-height:1.1; margin-top:2px; }
+    .tiny-view .touch-keyboard .enemy .creature { width:18px; height:18px; margin-top:0; }
+    .tiny-view .touch-keyboard .enemy .plates { margin-top:2px; }
+    .keyboard-recovery { background:transparent; border:0; box-shadow:none; }
+    .keyboard-recovery #start-reason { display:none; }
+    #input-debug { --debug-height:clamp(70px,calc(var(--visible-height) * .24),200px); height:var(--debug-height); max-height:45%; overflow:auto; pointer-events:auto; font:10px/13px ui-monospace,monospace; }
+    .debug-enabled.playing main { padding-top:clamp(70px,calc(var(--visible-height) * .24),200px); }
+    .tiny-view .debug-enabled .battlefield { min-height:70px; }
+    #debug-events:empty { display:none; }
+    #debug-speech,#debug-errors { white-space:pre-wrap; overflow-wrap:anywhere; border-top:1px solid #7d8d83; margin-top:5px; }
+    .pause-actions { flex-wrap:wrap; }
+    @media(max-height:570px) {
+      .touch-keyboard .play-heading .eyebrow { display:none; }
+      .touch-keyboard .enemy .prompt,.touch-keyboard .enemy.word .prompt { font-size:24px; }
+      .touch-keyboard .enemy .creature { width:28px; height:28px; }
+      .touch-keyboard .enemy.boss .creature { width:36px; height:36px; }
+      .touch-keyboard .hud { min-height:36px; }
+      .touch-keyboard .stat { padding:3px 6px; }
+      .touch-keyboard .cast-bar { min-height:30px; }
+      .touch-keyboard #cast-display { font-size:16px; }
+    }
   </style>
 </head>
 <body>
-  <aside id="input-debug" hidden aria-label="最近八筆輸入事件"><div id="debug-context"></div><div id="debug-events"></div></aside>
+  <aside id="input-debug" hidden aria-label="最近八筆輸入事件"><div id="debug-context"></div><div id="debug-events"></div><div id="debug-speech"></div><div id="debug-errors"></div></aside>
   <header>
     <div class="brand">
       <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true"><path d="M6 42V17h8V8h7v9h6V8h7v9h8v25H30V29a6 6 0 0 0-12 0v13Z" fill="currentColor"/><path d="m24 2 3 5-3 5-3-5Z" fill="currentColor"/></svg>
@@ -773,7 +813,7 @@ button:disabled {opacity:1;color:var(--muted);background:var(--soft);box-shadow:
       <select id="theme-select" aria-label="顯示色彩" hidden><option value="light">淺色</option><option value="dark">深色</option></select>
     </div>
   </header>
-  <div class="mobile-note">使用拼音或英文鍵盤施法；也可在設定開啟內建鍵盤。</div>
+  <div class="mobile-note">使用遊戲內建鍵盤施法；可在設定切換系統鍵盤。</div>
   <div id="storage-notice" class="notice" hidden>瀏覽器無法儲存進度，目前使用暫存模式；遊戲仍可正常進行。</div>
   <main>
     <section id="map-screen" aria-label="關卡地圖">
@@ -781,7 +821,7 @@ button:disabled {opacity:1;color:var(--muted);background:var(--soft);box-shadow:
         <aside>
           <div class="intro"><p class="eyebrow">把字母，變成魔法</p><h1>沿著光，出發吧。</h1><p>先學一點拼音，再守住一座城。</p></div>
           <div class="journey-scene" aria-label="從草原、森林、沼澤、山道到神殿的五區旅程"><svg class="journey-fallback" viewBox="0 0 390 420" preserveAspectRatio="none" aria-hidden="true"><rect width="390" height="420" fill="#dce3c0"/><path d="M0 50Q90 0 200 80T390 50V420H0Z" fill="#c1d1a3"/><path d="M20 420C0 310 360 370 315 280S40 260 85 170 355 190 310 80 100 60 90 0" fill="none" stroke="#f4d998" stroke-width="30"/><g fill="#719074"><path d="m20 220 30-65 30 65m220-100 25-65 25 65"/><path d="m225 70 35-65 35 65" fill="#9b9680"/></g><path d="M40 355v-40h15v-14h15v14h15v40m210-315V15h20v25" stroke="#9c8c61" stroke-width="7" fill="#f7edcb"/></svg><img src="assets/journey.webp" alt="" width="600" height="900" fetchpriority="high"><nav id="region-nav" class="region-nav" aria-label="選擇地區"></nav></div>
-          <p id="audio-hint" class="side-note">點任何按鈕後開始播放聲音</p><p class="side-note">使用系統拼音或英文鍵盤。<br>不用聲調，n／l 後的 ü 打 v。<br>第 5 區選出繁體中文整句。</p>
+          <p id="audio-hint" class="side-note">點任何按鈕後開始播放聲音</p><p class="side-note">第 1～4 區預設使用內建鍵盤。<br>不用聲調，n／l 後的 ü 打 v。<br>第 5 區選出繁體中文整句。</p>
         </aside>
         <div class="map-panel">
           <div id="map-heading" class="map-heading"></div>
@@ -825,12 +865,13 @@ button:disabled {opacity:1;color:var(--muted);background:var(--soft);box-shadow:
           <input id="spell-input" class="spell-input active-input" data-slot="A" data-1p-ignore="true" data-lpignore="true" type="text" aria-label="施法列" placeholder="在這裡輸入拼音…" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" enterkeyhint="done">
           <input id="spell-input-b" class="spell-input" data-slot="B" tabindex="-1" aria-hidden="true" data-1p-ignore="true" data-lpignore="true" type="text" aria-label="施法列" placeholder="在這裡輸入拼音…" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" enterkeyhint="done">
         </div>
+        <div id="cast-display" role="status" aria-label="施法列" hidden></div>
         <button id="cast-button" type="submit" class="primary" hidden>施放</button>
         <span id="composition-state" role="status" hidden></span>
       </form>
       <div id="builtin-keyboard" hidden aria-label="遊戲內建鍵盤"></div>
       <p id="battle-message" class="battle-message" role="status" aria-live="polite"></p>
-      <div class="play-controls"><button data-action="peek" id="peek-button">偷看 <kbd>Tab</kbd> <span id="peek-count"></span></button><span id="control-help">英文字母 攻擊　<kbd>Backspace</kbd> 解除鎖定　<kbd>Esc</kbd> 解除／暫停</span><span id="guard-label"></span></div>
+      <div class="play-controls"><button data-action="peek" id="peek-button">偷看 <kbd>Tab</kbd> <span id="peek-count"></span></button><span id="control-help">英文字母 攻擊　<kbd>Backspace</kbd> 刪除　<kbd>Esc</kbd> 解除／暫停</span><span id="guard-label"></span></div>
     </section>
     <section id="result-screen" class="result-layout" aria-label="關卡結算" hidden></section>
   </main>
@@ -1708,6 +1749,19 @@ export const references = [
 ];
 // END QUESTION BANK
 
+// Stage ownership is runtime configuration. Keep the original reading bank intact.
+for (const region of [2, 3, 4]) {
+  const owner = new Set();
+  for (const stage of stages.filter(s => s.region === region && !s.kind.includes('boss'))) {
+    stage.pool = stage.pool.filter(id => {
+      if (owner.has(id)) return false;
+      owner.add(id);
+      return true;
+    });
+    stage.maxSimultaneous = Math.min(stage.maxSimultaneous, new Set(stage.pool.map(id => questionsById[id].pinyin[0])).size);
+  }
+}
+const BUILD = Object.freeze({version: 'v0.7.0', date: '2026-11-17', time: '2026-11-17T13:53:28+08:00'});
 // 遊戲設定集中於此；星等與節奏可直接調整。
 const CONFIG = Object.freeze({
   storageKey: 'pinyin-keep-save-v2',
@@ -1813,8 +1867,8 @@ function celebrateScore() {
  const el=$('#result-score');if(!el)return;
  const final=Number(el.dataset.value);if(matchMedia('(prefers-reduced-motion: reduce)').matches){el.textContent=final;return;}
  const start=performance.now();
- function frame(now){if(screen!=='result'||!el.isConnected)return;const t=Math.min(1,(now-start)/850);el.textContent=Math.round(final*(1-(1-t)**3));if(t<1)requestAnimationFrame(frame);}
- requestAnimationFrame(frame);
+ function frame(now){if(screen!=='result'||!el.isConnected)return;const t=Math.min(1,(now-start)/850);el.textContent=Math.round(final*(1-(1-t)**3));if(t<1)nextFrame(frame);}
+ nextFrame(frame);
 }
 
 function mapArt(region) {
@@ -1825,7 +1879,7 @@ function freshSave() {
   return {
     version: CONFIG.version, coins: 0, records: {}, review: {}, learned: [],
     upgrades: { gate: 0, peek: 0, guard: 0 },
-    settings: { sound: true, muted: false, speech: true, music: true, effects: true, speechVolume: 90, musicVolume: 45, effectsVolume: 65, speechRate: 1, theme: 'light', builtin: false, keyboardMode: 'pinyin', debug: false, onboarding: false },
+    settings: { sound: true, muted: false, speech: true, music: true, effects: true, speechVolume: 90, musicVolume: 45, effectsVolume: 65, speechRate: 1, theme: 'light', builtin: true, keyboardMode: 'builtin', builtinMigrated: true, vibration: true, debug: false, onboarding: false },
   };
 }
 let storageAvailable = true;
@@ -1833,8 +1887,8 @@ function loadSave() {
   const clean = freshSave();
   try {
     const raw = JSON.parse(localStorage.getItem(CONFIG.storageKey) || 'null');
-    if (!raw || raw.version !== CONFIG.version) return clean;
-    clean.learned = Array.isArray(raw.learned) ? raw.learned.filter(id => questionsById[id]) : [];
+    if (!raw || typeof raw !== 'object' || ![1, CONFIG.version].includes(raw.version)) return clean;
+    clean.learned = Array.isArray(raw.learned) ? raw.learned.filter(id => typeof id === 'string' && Object.hasOwn(questionsById, id)) : [];
     clean.coins = clamp(Math.floor(Number(raw.coins) || 0), 0, 10000000);
     for (const key of ['gate', 'peek', 'guard']) {
       clean.upgrades[key] = clamp(Math.floor(Number(raw.upgrades?.[key]) || 0), 0, key === 'guard' ? 1 : 3);
@@ -1847,6 +1901,8 @@ function loadSave() {
     }
     if ([.8, 1, 1.2].includes(raw.settings?.speechRate)) clean.settings.speechRate = raw.settings.speechRate;
     clean.settings.keyboardMode = ['pinyin', 'english', 'builtin'].includes(raw.settings?.keyboardMode) ? raw.settings.keyboardMode : raw.settings?.builtin === true ? 'builtin' : 'pinyin';
+    if (raw.settings?.builtinMigrated !== true && clean.settings.keyboardMode === 'pinyin') clean.settings.keyboardMode = 'builtin';
+    clean.settings.vibration = raw.settings?.vibration !== false;
     clean.settings.builtin = clean.settings.keyboardMode === 'builtin';
     clean.settings.debug = raw.settings?.debug === true;
     clean.settings.onboarding = raw.settings?.onboarding === true;
@@ -1858,18 +1914,18 @@ function loadSave() {
           bestSpeed: clamp(Number(record.bestSpeed) || 0, 0, 100000),
           bestTime: Number.isFinite(record.bestTime) && record.bestTime >= 0 ? record.bestTime : null,
           bestScore: clamp(Number(record.bestScore) || 0, 0, 10000000),
-          attempts: Math.max(0, Number(record.attempts) || 0),
+          attempts: Number.isFinite(record.attempts) ? clamp(Math.floor(record.attempts), 0, 10000000) : 0,
           last: record.last && typeof record.last === 'object' ? {
-            speed: Math.max(0, Number(record.last.speed) || 0),
+            speed: clamp(Number(record.last.speed) || 0, 0, 100000),
             accuracy: clamp(Number(record.last.accuracy) || 0, 0, 1),
-            score: Math.max(0, Number(record.last.score) || 0),
+            score: clamp(Number(record.last.score) || 0, 0, 10000000),
             elapsed: Number.isFinite(record.last.elapsed) && record.last.elapsed >= 0 ? record.last.elapsed : null,
           } : null,
         };
       }
     }
     for (const [id, item] of Object.entries(raw.review || {})) {
-      if (questionsById[id] && item && typeof item === 'object') {
+      if (Object.hasOwn(questionsById, id) && item && typeof item === 'object') {
         clean.review[id] = {
           count: clamp(Math.floor(Number(item.count) || 1), 1, 100000),
           mastered: clamp(Math.floor(Number(item.mastered) || 0), 0, 3),
@@ -1877,8 +1933,8 @@ function loadSave() {
       }
     }
     return clean;
-  } catch {
-    storageAvailable = false;
+  } catch (error) {
+    if (!(error instanceof SyntaxError)) storageAvailable = false;
     return clean;
   }
 }
@@ -1894,6 +1950,36 @@ let toastTimer;
 let globallyComposing = false;
 let compositionEndedAt = -Infinity;
 const modal = $('#modal');
+const recentErrors = [];
+function reportError(message, line = 0) {
+  recentErrors.push({message: String(message), line});
+  if (recentErrors.length > 5) recentErrors.shift();
+  renderDebug();
+}
+window.addEventListener('error', event => { if (event.message) reportError(event.message, event.lineno); });
+window.addEventListener('unhandledrejection', event => reportError(event.reason?.stack || event.reason || '未知 Promise 錯誤'));
+const uiTimers = new Set();
+const uiFrames = new Set();
+function nextFrame(callback) {
+  const id = requestAnimationFrame(time => { uiFrames.delete(id); callback(time); });
+  uiFrames.add(id);
+  return id;
+}
+function later(callback, delay) {
+  const timer = setTimeout(() => { uiTimers.delete(timer); callback(); }, delay);
+  uiTimers.add(timer);
+  return timer;
+}
+function clearBattleEffects() {
+  for (const id of uiFrames) cancelAnimationFrame(id);
+  uiFrames.clear();
+  for (const timer of uiTimers) clearTimeout(timer);
+  uiTimers.clear();
+  releaseKeys();
+  document.querySelectorAll('.magic-bolt,.magic-spark,.magic-explosion,.feedback,.combo-banner,.defeated').forEach(el => el.remove());
+  document.querySelectorAll('.staff-flash,.hit,.hurt,.health-hit,.gate-hit,.magic-shake,.combo-pop,.card-flip,.boss-impact,.celebrate').forEach(el => el.classList.remove('staff-flash','hit','hurt','health-hit','gate-hit','magic-shake','combo-pop','card-flip','boss-impact','celebrate'));
+}
+
 
 function persist() {
   try {
@@ -1951,7 +2037,13 @@ const SCORE = [
 const audio = (() => {
   let context, master, limiter, musicGate, musicVolume, duckGain, effectsVolume;
   let filter, delay, feedback, timer = 0, nextTime = 0, step = 0, theme = -1, boss = false;
-  let unlocked = false, failed = false, paused = false, speaking = false, utterance, speechTimer;
+  let unlocked = false, failed = false, paused = false, speaking = false;
+  // Strong references survive Safari GC until each attempt has settled.
+  let utterance = null, pendingUtterance = null, unlockUtterance = null;
+  let speechTimer = 0, speechQueueTimer = 0, speechEndTimer = 0, unlockTimer = 0;
+  let unlockPending = false, cancelAt = -Infinity, startedAt = -Infinity;
+  let voiceCount = 0;
+  const speechHistory = [];
   let voice = null, voiceReason = '正在載入中文語音…', speechBroken = false, speechTicket = 0;
   const active = new Set();
   const stats = {created: 0, released: 0, peak: 0, scheduled: 0};
@@ -1959,8 +2051,9 @@ const audio = (() => {
   function voices() {
     try {
       const list = synth?.getVoices() || [];
+      voiceCount = list.length;
       voice = list.find(v => /^zh[-_]TW$/i.test(v.lang)) || list.find(v => /^zh(?:[-_]|$)/i.test(v.lang) && !/[-_]HK(?:$|[-_])/i.test(v.lang)) || null;
-      voiceReason = !synth || !window.SpeechSynthesisUtterance ? '此瀏覽器不支援語音提示' : speechBroken ? '此裝置無法播放語音，已自動停用' : !voice ? '此裝置沒有可用的中文語音，已自動停用語音提示；載入後會自動恢復' : /^zh[-_]TW$/i.test(voice.lang) ? `台灣中文語音：${voice.name}` : `此裝置沒有台灣中文語音，使用 ${voice.lang}：${voice.name}`;
+      voiceReason = !synth || !window.SpeechSynthesisUtterance ? '此瀏覽器不支援語音提示' : speechBroken ? '語音無回應，可按測試語音重試' : !voice ? '此裝置沒有可用的中文語音，已自動停用語音提示；載入後會自動恢復' : /^zh[-_]TW$/i.test(voice.lang) ? `台灣中文語音：${voice.name}` : `此裝置沒有台灣中文語音，使用 ${voice.lang}：${voice.name}`;
     } catch { voice = null; voiceReason = '無法讀取中文語音，已自動停用語音提示'; }
     const status = $('#voice-status');
     if (status) status.textContent = voiceReason;
@@ -2076,38 +2169,127 @@ const audio = (() => {
       } catch { failed = true; try { context?.close()?.catch(() => {}); } catch {} context = null; }
     }
     try { if (context && !['running', 'closed'].includes(context.state)) context.resume()?.then(sync).catch(() => {}); } catch { /* Gesture may still be denied. */ }
-    // iOS speech unlock is synchronous in the start/button gesture, even when voices load later.
+    // Keep the silent unlock alive and wait for end, with a bounded fallback.
     if (!audio.speechUnlocked && synth && window.SpeechSynthesisUtterance) {
       audio.speechUnlocked = true;
-      try { const silent = new SpeechSynthesisUtterance('嗯'); silent.volume = 0; silent.rate = 2; synth.speak(silent); } catch { /* Speech remains optional. */ }
+      unlockPending = true;
+      const done = () => {
+        clearTimeout(unlockTimer); unlockTimer = 0;
+        unlockPending = false; unlockUtterance = null;
+        scheduleSpeech();
+      };
+      try {
+        unlockUtterance = new SpeechSynthesisUtterance('嗯');
+        unlockUtterance.volume = 0; unlockUtterance.rate = 2;
+        unlockUtterance.onend = done; unlockUtterance.onerror = done;
+        unlockTimer = setTimeout(() => {
+          // An unlock that never ends must leave the platform queue as well.
+          cancelEngine();
+          done();
+        }, 300);
+        resumeSpeech(); synth.speak(unlockUtterance);
+      } catch { done(); }
     }
-    sync();
+    resumeSpeech(); sync();
+  }
+  function resumeSpeech() {
+    try { if (synth?.paused) synth.resume(); } catch { /* Optional API. */ }
+  }
+  function speechEvent(entry, status) {
+    if (!entry) return;
+    entry.events.push(status);
+    if (entry.events.length > 8) entry.events.shift();
+    renderDebug();
+  }
+  function cancelEngine() {
+    cancelAt = performance.now();
+    try { synth?.cancel(); } catch { /* Optional API. */ }
+  }
+  function clearAttempt() {
+    clearTimeout(speechTimer); clearTimeout(speechEndTimer);
+    speechTimer = speechEndTimer = 0;
+    utterance = null; speaking = false; apply();
   }
   function stopSpeech() {
-    ++speechTicket; clearTimeout(speechTimer); utterance = null; speaking = false;
-    try { synth?.cancel(); } catch { /* Optional API. */ }
-    apply();
+    if (pendingUtterance) speechEvent(pendingUtterance.entry, 'error canceled');
+    if (utterance) speechEvent(utterance.entry, 'error canceled');
+    ++speechTicket;
+    clearTimeout(speechQueueTimer); speechQueueTimer = 0;
+    pendingUtterance = null;
+    clearAttempt();
+    // Let the silent gesture unlock finish before any real speech.
+    if (!unlockPending) cancelEngine();
+  }
+  function scheduleSpeech() {
+    clearTimeout(speechQueueTimer); speechQueueTimer = 0;
+    if (!pendingUtterance || unlockPending) return;
+    // Never interrupt the first 100 ms of a new utterance. Latest request wins.
+    const wait = Math.max(0, cancelAt + 110 - performance.now(), utterance ? startedAt + 110 - performance.now() : 0);
+    speechQueueTimer = setTimeout(flushSpeech, Math.ceil(wait));
+  }
+  function flushSpeech() {
+    speechQueueTimer = 0;
+    if (!pendingUtterance || unlockPending) return;
+    if (utterance) {
+      ++speechTicket;
+      speechEvent(utterance.entry, 'error interrupted');
+      clearAttempt(); cancelEngine(); scheduleSpeech();
+      return;
+    }
+    const request = pendingUtterance;
+    pendingUtterance = null;
+    const u = request.u;
+    const ticket = ++speechTicket;
+    utterance = request;
+    startedAt = performance.now();
+    const ended = () => {
+      if (ticket !== speechTicket || utterance !== request) return;
+      speechEvent(request.entry, 'end');
+      clearAttempt(); scheduleSpeech();
+    };
+    const failedAttempt = code => {
+      if (ticket !== speechTicket || utterance !== request) return;
+      speechEvent(request.entry, 'error ' + code);
+      ++speechTicket;
+      clearAttempt(); cancelEngine();
+      if (!request.retry && !pendingUtterance) {
+        request.retry = 1;
+        pendingUtterance = request;
+        speechEvent(request.entry, 'queued retry');
+      } else if (request.retry) {
+        speechBroken = true; voices();
+        speechEvent(request.entry, 'error 語音無回應');
+      }
+      scheduleSpeech();
+    };
+    u.onstart = () => {
+      if (ticket !== speechTicket || utterance !== request) return;
+      clearTimeout(speechTimer); speechTimer = 0;
+      if (speechBroken) { speechBroken = false; voices(); }
+      speaking = true;
+      speechEvent(request.entry, 'start'); apply();
+    };
+    u.onend = ended;
+    u.onerror = event => failedAttempt(event.error || 'unknown');
+    // Install watchdogs before speak, because mocks and some engines start synchronously.
+    speechTimer = setTimeout(() => failedAttempt('no-start'), 1500);
+    speechEndTimer = setTimeout(ended, Math.max(4000, u.text.length * 750 / u.rate));
+    try { resumeSpeech(); speaking = true; apply(); synth.speak(u); }
+    catch { failedAttempt('speak-threw'); }
   }
   function speak(text) {
-    if (!unlocked || document.hidden || save.settings.muted || !save.settings.speech || !save.settings.speechVolume || !voice || speechBroken || !synth || !window.SpeechSynthesisUtterance) return false;
-    stopSpeech();
-    const ticket = speechTicket;
+    if (!unlocked || document.hidden || save.settings.muted || !save.settings.speech || !save.settings.speechVolume || !voice || !synth || !window.SpeechSynthesisUtterance || !text) return false;
     try {
-      const u = new SpeechSynthesisUtterance(String(text)); utterance = u;
+      const u = new SpeechSynthesisUtterance(String(text));
       u.voice = voice; u.lang = voice.lang; u.rate = save.settings.speechRate; u.volume = save.settings.speechVolume / 100;
-      const ended = () => { if (ticket !== speechTicket) return; clearTimeout(speechTimer); speaking = false; utterance = null; apply(); };
-      u.onstart = () => { if (ticket === speechTicket) { speaking = true; apply(); } };
-      u.onend = ended;
-      u.onerror = event => {
-        if (ticket !== speechTicket) return;
-        ended();
-        if (!['canceled', 'interrupted'].includes(event.error)) { speechBroken = true; voices(); }
-      };
-      speaking = true; apply(); synth.speak(u);
-      // Some embedded browsers never emit end/error. Bound ducking duration.
-      speechTimer = setTimeout(ended, Math.max(4000, text.length * 750 / u.rate));
+      if (pendingUtterance) speechEvent(pendingUtterance.entry, 'error superseded');
+      const entry = {text: u.text, events: ['queued']};
+      speechHistory.push(entry);
+      if (speechHistory.length > 5) speechHistory.shift();
+      pendingUtterance = {u, entry, retry: 0};
+      scheduleSpeech(); renderDebug();
       return true;
-    } catch { stopSpeech(); speechBroken = true; voices(); return false; }
+    } catch { return false; }
   }
   function target(force = false, id) {
     if (!game?.running || (game.paused && (game.guide?.step !== 'look' || !$('#start-overlay').hidden))) return;
@@ -2124,6 +2306,7 @@ const audio = (() => {
     }
   }
   function effect(type, progress = 0) {
+    if (type === 'key') type = 'type';
     if (!context || !unlocked || document.hidden || save.settings.muted || !save.settings.effects || !save.settings.effectsVolume) return;
     const at = context.currentTime + .005;
     const patterns = {
@@ -2133,7 +2316,7 @@ const audio = (() => {
       peek: [83,78,74], count: [67], start: [67,74,79], click: [76], unlock: [60,67,72,76],
       star: [79 + progress * 2,86 + progress * 2], buy: [64,71,76,83], win: [60,64,67,72,79,76,84], lose: [60,55,51,48],
     };
-    const notes = patterns[type] || patterns.click;
+    const notes = patterns[type === 'key' ? 'type' : type] || patterns.click;
     const spacing = ['win','lose','unlock'].includes(type) ? .13 : type === 'count' ? .08 : .045;
     notes.forEach((midi, i) => note(midi, at + i * spacing, type === 'type' || type === 'click' ? .045 : ['win','lose'].includes(type) ? .32 : .14, type === 'type' ? .045 : .1, ['wrong','hurt','boss'].includes(type) ? 'triangle' : 'sine', 'effects', ['wrong','hurt','boss'].includes(type) ? midi - 5 : midi));
   }
@@ -2142,9 +2325,9 @@ const audio = (() => {
     apply(); sync();
   }
   function suspend() { stopSpeech(); sync(); }
-  return {unlock, sync, speak, target, stopSpeech, suspend, effect, voices, settingsChanged,
+  return {unlock, sync, speak, target, stopSpeech, suspend, effect, voices, settingsChanged, resumeSpeech,
     get status() { return voiceReason; },
-    get diagnostics() { return {unlocked, failed, theme, boss, paused, speaking, voice: voice?.lang || null, active: active.size, ...stats}; },
+    get diagnostics() { return {unlocked, failed, theme, boss, paused, speaking, voice: voice?.lang || null, voiceName: voice?.name, voices: voiceCount, speechBroken, history: speechHistory, synthSpeaking: !!synth?.speaking, synthPending: !!synth?.pending, synthPaused: !!synth?.paused, speechTimers: Number(!!speechTimer) + Number(!!speechEndTimer) + Number(!!speechQueueTimer) + Number(!!unlockTimer), active: active.size, ...stats}; },
   };
 })();
 function sound(type, progress) { audio.effect(type, progress); }
@@ -2177,7 +2360,7 @@ function comboBanner(text, count = 0) {
   let top = 5;
   for (const r of cards) if (r.top - bounds.top < top + 48 && r.bottom - bounds.top > top) top = r.bottom - bounds.top + 12;
   banner.style.top = `${top}px`;
-  setTimeout(() => banner.remove(), 1300);
+  later(() => banner.remove(), 1300);
 }
 function magic(enemy, large = false) {
   const field = game.ime ? $('#duel-panel') : $('#battlefield');
@@ -2201,7 +2384,7 @@ function magic(enemy, large = false) {
   bolt.style.cssText = `left:${sx}px;top:${sy}px;--dx:${tx-sx}px;--dy:${ty-sy}px;--angle:${Math.atan2(ty-sy,tx-sx)}rad`;
   field.append(bolt);
   animate($('#mage'), 'staff-flash');
-  setTimeout(() => {
+  later(() => {
     bolt.remove();
     // A finished/restarted battle must never receive delayed damage or effects.
     if (!field.isConnected || screen !== 'play' || game !== battle) return;
@@ -2212,7 +2395,7 @@ function magic(enemy, large = false) {
     field.append(burst);
     if (enemy?.element.isConnected) animate(enemy.element, game.boss ? 'boss-impact' : 'hit');
     if (large) animate(field, 'magic-shake');
-    setTimeout(() => burst.remove(), 430);
+    later(() => burst.remove(), 430);
   }, large ? 190 : 150);
 }
 document.addEventListener('input', event => {
@@ -2226,7 +2409,7 @@ document.addEventListener('input', event => {
 });
 // Unlock before native focus/button handlers; do not create audio on page load.
 document.addEventListener('pointerdown', event => {
-  if (event.isTrusted && event.target.closest('button')) audio.unlock();
+  if (event.isTrusted && event.target.closest?.('button')) audio.unlock();
 }, true);
 
 function animate(element, className) {
@@ -2234,7 +2417,7 @@ function animate(element, className) {
   element.classList.remove(className);
   void element.offsetWidth;
   element.classList.add(className);
-  setTimeout(() => element.classList.remove(className), 280);
+  later(() => element.classList.remove(className), 280);
 }
 function showScreen(name) {
   screen = name;
@@ -2244,7 +2427,7 @@ function showScreen(name) {
   if (name !== 'play') { cancelKeyboardWait(); $('#start-overlay').hidden = true; castInput.blur(); }
   window.scrollTo(0, 0);
   for (const value of ['map', 'play', 'result']) $(`#${value}-screen`).hidden = value !== name;
-  const page=$(`#${name}-screen`);page.classList.remove('screen-enter');requestAnimationFrame(()=>page.classList.add('screen-enter'));
+  const page=$(`#${name}-screen`);page.classList.remove('screen-enter');nextFrame(()=>page.classList.add('screen-enter'));
   document.querySelector('.bottom-toolbar').hidden = name !== 'map';
 }
 function isUnlocked(stage) {
@@ -2275,6 +2458,8 @@ function renderMap() {
   refreshHeader();
 }
 function goMap() {
+  clearBattleEffects();
+  $('#enemy-layer').replaceChildren();
   if (game) {
     game.running = false;
     persist();
@@ -2283,7 +2468,7 @@ function goMap() {
   game = null;
   showScreen('map');
   renderMap();
-  requestAnimationFrame(() => $('.region-tab[aria-pressed="true"]')?.focus());
+  nextFrame(() => $('.region-tab[aria-pressed="true"]')?.focus());
 }
 function openModal(kind, content, focusSelector) {
   if (modal.open) modal.close();
@@ -2324,15 +2509,16 @@ function warmRegion(region) {
  }
 }
 function teach(stage) {
- warmRegion(stage.region||1);
   if (!stage) return;
+  warmRegion(stage.region||1);
   pendingStage = stage;
   const unlocked = isUnlocked(stage);
   const region = stage.region || 1;
   const ime = stage.kind.startsWith('ime');
   const group = soundGroups.find(g => g.id === stage.soundGroup);
   let examples = stage.pool.slice(0, 4).map(id => questionsById[id]);
-  if (group) examples = group.exampleTexts.map(text => characters.find(q => q.text === text));
+  if (group) examples = group.exampleTexts.map(text => stage.pool.map(id => questionsById[id]).find(q => q.text === text)).filter(Boolean);
+  if (!examples.length) examples = stage.pool.slice(0,4).map(id => questionsById[id]);
   const rules = group?.rule || (ime
     ? '使用系統拼音輸入法選出完整繁體中文。組字時不判錯；選字完成後，再按一次 Enter 施放。標點、空白與全半形差異會忽略。每次至少 80% 正確才削血，完全正確傷害最高。'
     : stage.region === 1
@@ -2345,7 +2531,7 @@ function teach(stage) {
     : region === 1 ? '依題卡標示輸入：ㄅ（八）只打 b，ㄓ（知）只打 zh；元、雲、翁則打 yuan、yun、weng。'
       : '不要加聲調、空格或把 ü 打成 u；女為 nv，去為 qu。打錯會立刻亮出正解 1.5 秒。');
   const systemHelp = ime ? `<details open><summary>新增與切換繁體拼音輸入法</summary><div class="hint-box"><b>macOS：</b>系統設定 → 鍵盤 → 文字輸入 → 編輯 → ＋ → 繁體中文 → 拼音。用地球鍵／Control＋空白鍵切換；選擇繁體拼音，鍵入拼音後用空白或數字選字。不同系統版本的名稱可能略有差異。<br><b>Windows：</b>設定 → 時間與語言 → 語言與地區 → 中文（繁體，台灣）→ 語言選項 → Microsoft 注音 → 鍵盤選項 → 按鍵指派／鍵盤配置，選漢語拼音。用 Win＋空白鍵切換、Shift 切中英。也可在已有的 Microsoft 拼音設定啟用繁體輸出；請確認輸入框產生的是繁體字。<br><b>連打：</b>先練「我們」women，再連成詞句；候選不對時重新選字。本頁無法替你安裝或判斷輸入法種類。</div></details>` : '';
-  openModal('teach', `${dialogHeader(`${stage.region ? `第 ${stage.region} 區・` : ''}${escapeHTML(stage.title)}`)}<p class="eyebrow">怪物圖鑑 / ${artNames[region - 1]}${stage.kind.includes('boss') ? '・王有三段血條' : ''}</p><div class="teach-rule">${rules}</div><div class="example-grid">${examples.filter(Boolean).map(exampleHTML).join('')}</div><p class="hint-box"><b>常見錯誤：</b>${common}<br>${ime ? '王的蓄力不會在組字時停止；按暫停可安全休息。' : '每個正確字母會擊退怪物；Tab 消耗偷看且不累積本次連擊。Backspace／Esc 解除鎖定；未鎖定時 Esc 暫停。'}</p>${systemHelp}${region === 1 ? `<details><summary>完整注音 ↔ 拼音對照表</summary>${referenceHTML()}</details>` : ''}<p class="muted" style="font-size:12px">${stage.kind.includes('boss') ? '王題目優先選本區易錯題與你的錯題；打錯會回復少量護甲並加速蓄力。' : `本關同場最多 ${Math.min(3, stage.maxSimultaneous)} 隻；通過後解鎖下一關。`} ${!unlocked ? '目前尚未解鎖，請先通過前一關。' : ''}</p><div class="dialog-actions"><button data-action="close">返回地圖</button>${((save.records[stage.id]?.stars || 0) >= 1 && !stage.kind.includes('boss') && !stage.reviewOnly) ? '<button data-action="replay-guide">重看教學</button>' : ''}<button class="primary" data-action="start" ${unlocked ? '' : 'disabled'}>${stage.kind.includes('boss') || stage.reviewOnly ? '準備挑戰' : '開始引導練習'}</button></div>`, unlocked ? '[data-action="start"]' : '[data-action="close"]');
+  openModal('teach', `${dialogHeader(`${stage.region ? `第 ${stage.region} 區・` : ''}${escapeHTML(stage.title)}`)}<p class="eyebrow">怪物圖鑑 / ${artNames[region - 1]}${stage.kind.includes('boss') ? '・王有三段血條' : ''}</p><div class="teach-rule">${rules}</div><div class="example-grid">${examples.filter(Boolean).map(exampleHTML).join('')}</div><p class="hint-box"><b>常見錯誤：</b>${common}<br>${ime ? '王的蓄力不會在組字時停止；按暫停可安全休息。' : '每個正確字母會擊退怪物；Tab 消耗偷看且不累積本次連擊。Backspace 刪除，Esc 解除鎖定；未鎖定時 Esc 暫停。'}</p>${systemHelp}${region === 1 ? `<details><summary>完整注音 ↔ 拼音對照表</summary>${referenceHTML()}</details>` : ''}<p class="muted" style="font-size:12px">${stage.kind.includes('boss') ? '王題目優先選本區易錯題與你的錯題；打錯會回復少量護甲並加速蓄力。' : `本關同場最多 ${Math.min(3, stage.maxSimultaneous)} 隻；通過後解鎖下一關。`} ${!unlocked ? '目前尚未解鎖，請先通過前一關。' : ''}</p><div class="dialog-actions"><button data-action="close">返回地圖</button>${((save.records[stage.id]?.stars || 0) >= 1 && !stage.kind.includes('boss') && !stage.reviewOnly) ? '<button data-action="replay-guide">重看教學</button>' : ''}<button class="primary" data-action="start" ${unlocked ? '' : 'disabled'}>${(save.records[stage.id]?.stars || 0) >= 1 ? '開始' : stage.kind.includes('boss') || stage.reviewOnly ? '準備挑戰' : '開始引導練習'}</button></div>`, unlocked ? '[data-action="start"]' : '[data-action="close"]');
 }
 function showReference() {
   if (screen === 'play' && game?.running && !game.paused) pauseGame('已暫停，安心查看對照表。', false);
@@ -2394,11 +2580,7 @@ function buy(key) {
 }
 
 function stagePool(stage) {
-  if (stage.reviewOnly) return [...stage.pool];
-  const validKind = stage.region === 1 ? 'phonics' : stage.region === 4 ? 'word' : stage.region === 5 ? 'sentence' : 'character';
-  const known = new Set(save.learned);
-  const review = Object.entries(save.review).filter(([id, item]) => item.mastered < 3 && known.has(id) && questionsById[id].kind === validKind).map(([id]) => id);
-  return [...new Set([...stage.pool, ...review])];
+  return [...stage.pool];
 }
 // Freeze the run's actual questions before showing its time limits. Heavy monsters
 // keep one initial across both plates so simultaneous targets stay distinguishable.
@@ -2484,6 +2666,7 @@ function startGame(stage = pendingStage, skipGuide = false) {
   audio.unlock();
   if (!stage || !isUnlocked(stage)) return;
   cancelKeyboardWait();
+  clearBattleEffects();
   closeModal();
   globallyComposing = false;
   compositionEndedAt = -Infinity;
@@ -2521,14 +2704,14 @@ function startGame(stage = pendingStage, skipGuide = false) {
   $('#boss-name').textContent = ime ? `${boss ? '墨冠守望者' : '神殿試煉者'}・三段咒印` : `${artNames[(stage.region || 1) - 1]}之王・三段護甲`;
   $('#progress-label').textContent = ime || boss ? '護甲' : '進度';
   $('#speed-label').textContent = ime ? '中文字 / 分鐘' : '字母 / 分鐘';
-  $('#control-help').textContent = ime ? 'Enter 施放　·　Esc 暫停　·　組字期間不觸發快捷鍵' : '英文字母 攻擊　·　Backspace 解除鎖定　·　Esc 解除／暫停';
+  $('#control-help').textContent = ime ? 'Enter 施放　·　Esc 暫停　·　組字期間不觸發快捷鍵' : '英文字母 攻擊　·　Backspace 刪除　·　Esc 解除／暫停';
   $('#spell-feedback').replaceChildren();
   castInput.value = '';
   castInput.classList.remove('composing');
   castInput.readOnly = false;
   $('#composition-state').textContent = '等待輸入・標點與全半形不影響判定';
   showScreen('play');
-  message(ime ? '請切換系統拼音輸入法，輸入繁體中文。' : '請切英文鍵盤，打出怪物的拼音！', false, 6);
+  message(ime ? '請切換系統拼音輸入法，輸入繁體中文。' : useBuiltin() ? '用遊戲鍵盤，打出怪物的拼音！' : '使用拼音或英文鍵盤，打出怪物的拼音！', false, 6);
   $('#cast-button').hidden = !ime;
   document.documentElement.dataset.region = stage.region || 1;
   $('#battlefield .landscape').outerHTML = sceneSVG(stage.region || 1);
@@ -2543,7 +2726,7 @@ function startGame(stage = pendingStage, skipGuide = false) {
   configureInputs();
   setInstruction(ime ? '選出完整繁體中文，再按施放。' : '點怪或打首字母鎖定，再打完拼音。');
   if (ime) { $('#duel-panel').insertAdjacentHTML('afterbegin', sceneSVG(5)); $('#duel-art').innerHTML = creatureSVG(5, true); nextSpell(); }
-  if (!save.settings.onboarding) {
+  if (!save.settings.onboarding && !skipGuide) {
     game.onboarding = 0;
     game.training = true;
     $('#skip-onboarding').hidden = false;
@@ -2703,7 +2886,7 @@ function floating(text, enemy) {
   element.style.left = `${Math.max(5, Math.min(88, enemy.x))}%`;
   element.style.top = '38%';
   $('#battlefield').append(element);
-  setTimeout(() => element.remove(), 560);
+  later(() => element.remove(), 560);
 }
 function closestEnemy() {
   return [...game.enemies].sort((a, b) => a.x - b.x)[0];
@@ -2815,6 +2998,7 @@ function nextEnemyQuestion(enemy) {
   audio.target();
 }
 function completeQuestion(enemy) {
+  if (!game?.running || game.completing || !game.enemies.includes(enemy)) return;
   const defeats = !game.boss && enemy.remaining <= 1;
   judge(enemy, defeats ? '完整符合，擊倒！' : '完整符合，命中扣一格');
   magic(enemy, true);
@@ -2868,10 +3052,10 @@ function addCombo() {
 function removeEnemy(enemy, defeated = false) {
   game.enemies = game.enemies.filter(e => e !== enemy);
   if (!game.training) game.spawnIn = CONFIG.timing.spawnDelay;
-  if (game.locked === enemy.id) { game.locked = null; $('#target-line').hidden = true; }
+  if (game.locked === enemy.id) { game.locked = null; $('#target-line').hidden = true; resetInput(); }
   if (defeated) {
     enemy.element.classList.add('defeated');
-    setTimeout(() => enemy.element.remove(), 450);
+    later(() => enemy.element.remove(), 450);
   } else enemy.element.remove();
 }
 function hurt(amount) {
@@ -3019,11 +3203,19 @@ function castSpell() {
 }
 
 function pauseGame(reason = '怪物與王的蓄力已停止。', showMenu = true) {
-  if (!game?.running) return;
+  if (!game?.running || game.completing) return;
   game.paused = true;
+  clearBattleEffects();
   audio.suspend();
   cancelKeyboardWait();
   if (showMenu) showPauseMenu(reason);
+}
+function keyboardDismissed() {
+  if (!game?.running || game.completing || useBuiltin()) return;
+  if (!game.ime) { pauseGame('鍵盤已收起，點我繼續並重新開啟鍵盤。'); return; }
+  pauseGame('', false);
+  readyOverlay('', '點我繼續打字');
+  $('#start-overlay .start-card').classList.add('keyboard-recovery');
 }
 function showPauseMenu(reason = '怪物與王的蓄力已停止。') {
   readyOverlay(reason, '點我繼續', true);
@@ -3040,12 +3232,13 @@ function completeVictory() {
   game.paused = true;
   audio.suspend();
   // Let the final projectile land and its explosion paint before the result.
-  setTimeout(() => { if (game === battle && battle.running) finishGame(true); }, 450);
+  later(() => { if (game === battle && battle.running) finishGame(true); }, 450);
 }
 function finishGame(won) {
   if (!game?.running) return;
   cancelKeyboardWait();
   game.running = false;
+  clearBattleEffects();
   closeModal();
   const elapsed = game.elapsed;
   const accuracy = game.correct / Math.max(1, game.correct + game.wrong);
@@ -3079,18 +3272,18 @@ function finishGame(won) {
   celebrateScore();
   $('#result-screen .primary')?.focus({preventScroll:true});
   window.scrollTo(0,0);
-  if (won) { sound('win'); $('#result-screen').classList.add('celebrate'); setTimeout(() => $('#result-screen').classList.remove('celebrate'), 1600); }
+  if (won) { sound('win'); $('#result-screen').classList.add('celebrate'); later(() => $('#result-screen').classList.remove('celebrate'), 1600); }
   else sound('lose');
   audio.speak(won ? '守住了，做得好！' : '城門失守，再試一次。');
   if (won) {
     const resultGame = game;
-    for (let i = 0; i < stars; i++) setTimeout(() => { if (game === resultGame && screen === 'result') sound('star', i); }, 600 + i * 300);
-    if (next && !previous.stars) setTimeout(() => { if (game === resultGame && screen === 'result') sound('unlock'); }, 1700);
+    for (let i = 0; i < stars; i++) later(() => { if (game === resultGame && screen === 'result') sound('star', i); }, 600 + i * 300);
+    if (next && !previous.stars) later(() => { if (game === resultGame && screen === 'result') sound('unlock'); }, 1700);
   }
 }
 
 function tick(time) {
-  const dt = lastTime ? Math.min((time - lastTime) / 1000, .06) : 0;
+  const dt = lastTime ? clamp((time - lastTime) / 1000, 0, .06) : 0;
   lastTime = time;
   if (game?.running && !game.paused && game.training && game.onboarding < 3) {
     for (const enemy of game.enemies) { enemy.x = Math.max(38, enemy.x - dt * 3.5); positionEnemy(enemy); }
@@ -3175,7 +3368,7 @@ function handleAction(action, id) {
     case 'unlock': resetInput(); unlockTarget(); break;
     case 'close': closeOrResumeMenu(); break;
     case 'map': goMap(); break;
-    case 'restart': startGame(game?.stage, (save.records[game?.stage?.id]?.stars || 0) >= 1 || (game && !game.guide && !game.training)); break;
+    case 'restart': startGame(game?.stage, true); break;
     case 'pause': pauseGame(); break;
     case 'resume': resumeGame(); break;
     case 'reference': showReference(); break;
@@ -3201,7 +3394,7 @@ function handleAction(action, id) {
   }
 }
 document.addEventListener('click', event => {
-  const button = event.target.closest('button[data-action]');
+  const button = event.target.closest?.('button[data-action]');
   if (!button || button.disabled) return;
   // 遊戲過程中的地圖功能必須先暫停，避免藏在視窗後繼續扣血。
   if (game?.running && screen === 'play' && ['review', 'shop'].includes(button.dataset.action)) pauseGame('遊戲已暫停。', false);
@@ -3232,6 +3425,15 @@ let lastCommit = {value: '', at: -Infinity};
 let viewportBaseline = Math.max(innerHeight, document.documentElement.clientHeight);
 let lastViewportHeight = window.visualViewport?.height || innerHeight;
 const useBuiltin = () => save.settings.keyboardMode === 'builtin' && !game?.ime;
+let hardwareKeyboard = false;
+function showBuiltinKeyboard() {
+  $('#builtin-keyboard').hidden = !useBuiltin() || !navigator.maxTouchPoints || hardwareKeyboard || !!game?.guide && game.guide.step === 'look';
+  document.body.classList.toggle('touch-keyboard', !$('#builtin-keyboard').hidden);
+}
+function displayCast() {
+  $('#cast-display').textContent = castInput.value || '等待輸入拼音…';
+}
+
 function resetInput() {
   castInput.value = '';
   inputState.consumed = 0;
@@ -3240,6 +3442,7 @@ function resetInput() {
   inputState.credits = [];
   inputState.lastHan = '';
   castInputs.forEach(input => { input.value = ''; });
+  displayCast();
 }
 // Retain the consumed prefix as a fallback for IMEs that carry their buffer
 // across focus. A clean next value starts a fresh buffer automatically.
@@ -3256,14 +3459,22 @@ function pendingLetters(value, answers = []) {
 }
 function configureInputs() {
   document.body.classList.toggle('builtin-mode', useBuiltin());
+  $('.spell-inputs').hidden = useBuiltin();
+  $('#cast-display').hidden = !useBuiltin();
+  $('#input-label').removeAttribute('for');
+  if (!useBuiltin()) $('#input-label').htmlFor = castInput.id;
   const english = save.settings.keyboardMode === 'english' && !game?.ime;
   for (const input of castInputs) {
     input.type = english ? 'email' : 'text';
     input.inputMode = useBuiltin() ? 'none' : english ? 'email' : 'text';
     input.readOnly = useBuiltin();
+    input.disabled = useBuiltin();
+    input.tabIndex = useBuiltin() || input !== castInput ? -1 : 0;
     input.autocomplete = 'off';
     input.placeholder = game?.ime ? '選出繁體中文…' : '輸入拼音…';
   }
+  if (useBuiltin() && document.activeElement?.matches('input,textarea')) document.activeElement.blur();
+  displayCast();
 }
 function rotateInput() {
   const previous = castInput;
@@ -3303,8 +3514,11 @@ function renderDebug() {
   if (!save.settings.debug) return;
   const ua = /iPhone|iPad|Android/.exec(navigator.userAgent)?.[0] || navigator.platform;
   const browser = /(?:CriOS|Chrome|Version|Firefox)\/[\d.]+/.exec(navigator.userAgent)?.[0] || 'WebView';
-  $('#debug-context').textContent = `vv/window ${Math.round(window.visualViewport?.height || innerHeight)}/${innerHeight} active=${document.activeElement?.dataset.slot || document.activeElement?.tagName}\n判定 ${lastJudgment}\nUA ${ua} ${browser} · D=data C=isComposing V=value R=raw N=consumed T=target`;
+  $('#debug-context').textContent = `${BUILD.version}・${BUILD.date} 建置 ${BUILD.time}\nvv/window ${Math.round(window.visualViewport?.height || innerHeight)}/${innerHeight} active=${document.activeElement?.dataset.slot || document.activeElement?.tagName}\n判定 ${lastJudgment}\nUA ${ua} ${browser} · D=data C=isComposing V=value R=raw N=consumed T=target`;
   $('#debug-events').textContent = debugEvents.join('\n');
+  const speech = audio.diagnostics;
+  $('#debug-speech').textContent = `語音 ${speech.speechBroken ? '語音無回應' : ''} voices=${speech.voices} ${speech.voiceName || '—'} ${speech.voice || ''}\nspeaking=${speech.synthSpeaking} pending=${speech.synthPending} paused=${speech.synthPaused}\n` + speech.history.map(item => `${item.text} ${item.events.join(' → ')}`).join('\n');
+  $('#debug-errors').textContent = `${BUILD.version}・${BUILD.date} 建置 ${BUILD.time}\n最近錯誤\n` + (recentErrors.map(e => `${e.message} 行 ${e.line}`).join('\n') || '無');
 }
 function logInput(event, input) {
   if (!save.settings.debug) return;
@@ -3337,18 +3551,20 @@ function sceneFallbackSVG(region) {
 }
 function showSettings() {
   if (game?.running) pauseGame('設定期間已暫停。', false);
-  openModal('settings', `${dialogHeader('施法設定')}<div class="teach-rule"><h3>鍵盤模式</h3><p>第 1 區打字母；第 2～4 區可用拼音選字。第五區一律使用一般文字輸入框。</p><label for="keyboard-mode">選擇鍵盤</label><select id="keyboard-mode">${[['pinyin','手機拼音鍵盤（預設）'],['english','英文鍵盤'],['builtin','遊戲內建鍵盤']].map(([v,t]) => `<option value="${v}" ${save.settings.keyboardMode === v ? 'selected' : ''}>${t}</option>`).join('')}</select><p class="muted">手機拼音鍵盤會在命中或重試時換焦，清除組字。英文鍵盤只接受字母；內建鍵盤適用第 1～4 區。</p><label class="debug-switch"><input id="debug-toggle" type="checkbox" ${save.settings.debug ? 'checked' : ''}>偵錯資訊（最近 8 筆輸入事件）</label></div>${soundSettingsHTML()}<label for="panel-theme">選擇介面色彩</label><select id="panel-theme"><option value="light" ${save.settings.theme==='light'?'selected':''}>晨光淺色</option><option value="dark" ${save.settings.theme==='dark'?'selected':''}>星夜深色</option></select><div class="dialog-actions"><button class="primary" data-action="close">儲存設定</button></div>`);
+  openModal('settings', `${dialogHeader('施法設定')}<div class="teach-rule"><h3>鍵盤模式</h3><p>第 1～4 區預設使用內建鍵盤輸入字母，可切換手機拼音或英文鍵盤。第五區使用系統拼音輸入法。</p><label for="keyboard-mode">選擇鍵盤</label><select id="keyboard-mode">${[['pinyin','手機拼音鍵盤'],['english','英文鍵盤'],['builtin','遊戲內建鍵盤（預設）']].map(([v,t]) => `<option value="${v}" ${save.settings.keyboardMode === v ? 'selected' : ''}>${t}</option>`).join('')}</select><label class="debug-switch"><input id="vibration-toggle" type="checkbox" ${save.settings.vibration ? 'checked' : ''}>按鍵震動</label><p class="muted">手機拼音鍵盤會在命中或重試時換焦，清除組字。英文鍵盤只接受字母；內建鍵盤適用第 1～4 區。</p><label class="debug-switch"><input id="debug-toggle" type="checkbox" ${save.settings.debug ? 'checked' : ''}>偵錯資訊（最近 8 筆輸入事件）</label></div>${soundSettingsHTML()}<label for="panel-theme">選擇介面色彩</label><select id="panel-theme"><option value="light" ${save.settings.theme==='light'?'selected':''}>晨光淺色</option><option value="dark" ${save.settings.theme==='dark'?'selected':''}>星夜深色</option></select><p class="build-info">${BUILD.version}・${BUILD.date}<br><small>建置 ${BUILD.time}</small></p><div class="dialog-actions"><button class="primary" data-action="close">儲存設定</button></div>`);
 }
 document.addEventListener('change', event => {
   if(event.target.id==='panel-theme') {const el=$('#theme-select');el.value=event.target.value;el.dispatchEvent(new Event('change',{bubbles:true}));}
   if (event.target.id === 'keyboard-mode') {
     save.settings.keyboardMode = event.target.value;
     save.settings.builtin = save.settings.keyboardMode === 'builtin';
-    save.settings.builtin = event.target.value === 'builtin';
+    save.settings.builtinMigrated = true;
     resetInput();
     configureInputs();
+    showBuiltinKeyboard();
     persist();
   }
+  if (event.target.id === 'vibration-toggle') { save.settings.vibration = event.target.checked; persist(); }
   if (event.target.id === 'debug-toggle') {
     save.settings.debug = event.target.checked;
     persist();
@@ -3359,7 +3575,7 @@ document.addEventListener('change', event => {
 function readyOverlay(reason, label = '開始', menu = false) {
   const panel = $('#start-overlay');
   panel.hidden = false;
-  panel.innerHTML = `<div class="start-card"><p id="start-reason">${escapeHTML(reason)}</p>${!menu && game && !game.training && !game.guide && !game.elapsed ? starConditions() : ''}<button class="primary" data-action="ready">${label}</button>${menu ? '<div class="pause-actions"><button data-action="map">返回地圖</button><button data-action="restart">重來</button><button data-action="settings">調整設定</button></div>' : ''}</div>`;
+  panel.innerHTML = `<div class="start-card"><p id="start-reason">${escapeHTML(reason)}</p>${!menu && game && !game.training && !game.guide && !game.elapsed ? starConditions() : ''}<button class="primary" data-action="ready">${label}</button>${menu ? '<div class="pause-actions"><button data-action="map">返回地圖</button><button data-action="restart">重來</button><button data-action="settings">調整設定</button><button data-action="test-speech">測試語音</button></div>' : ''}</div>`;
   audio.sync();
 }
 function cancelKeyboardWait() {
@@ -3378,7 +3594,7 @@ function beginKeyboard() {
   game.paused = true;
   audio.suspend();
   keyboardSeen = false;
-  $('#builtin-keyboard').hidden = !useBuiltin();
+  showBuiltinKeyboard();
   if (useBuiltin()) { keyboardSeen = false; }
   configureInputs();
   // Synchronous focus inside the original click / pointer gesture is required on iOS.
@@ -3386,7 +3602,7 @@ function beginKeyboard() {
   else castInput.focus({preventScroll: true});
   readyOverlay('等待鍵盤…外接鍵盤會在 1.5 秒後開始。');
   $('#start-overlay button').hidden = true;
-  const lowered = window.visualViewport && visualViewport.height < viewportBaseline - 120;
+  const lowered = !useBuiltin() && window.visualViewport && visualViewport.height < viewportBaseline - 120;
   if (useBuiltin() || lowered) {
     keyboardSeen = Boolean(lowered);
     runCountdown(ticket);
@@ -3411,7 +3627,9 @@ function runCountdown(ticket) {
     $('#start-overlay').hidden = true;
     $('#start-overlay').classList.remove('counting');
     game.paused = false;
-    sound('start'); audio.sync();
+    sound('start'); audio.resumeSpeech(); audio.sync();
+    game.spokenSpell = null;
+    game.enemies.forEach(e => { e.spokenQuestion = null; });
     lastTime = performance.now();
     if (game.training) renderOnboarding();
     else if (game.guide) renderGuide();
@@ -3455,7 +3673,7 @@ function updateViewport() {
   const noKeyboardNeeded = game?.training && game.onboarding === 3;
   if (game?.running && !useBuiltin() && game.guide?.step !== 'look' && !noKeyboardNeeded) {
     if (lowered && game.paused && keyboardTimer) { keyboardSeen = true; runCountdown(keyboardTicket); }
-    if (keyboardSeen && !lowered && h > lastViewportHeight + 80) pauseGame('鍵盤已收起，點我繼續並重新開啟鍵盤。');
+    if (keyboardSeen && !lowered && h > lastViewportHeight + 80) keyboardDismissed();
   }
   renderDebug();
   lastViewportHeight = h;
@@ -3471,13 +3689,11 @@ window.addEventListener('resize', updateViewport);
 updateViewport();
 // Every newly introduced item is taught before it can enter combat.
 function guideItems(stage, learned = save.learned) {
-  const known = new Set(learned);
-  const group = soundGroups.find(g => g.id === stage.soundGroup);
-  const anchors = group ? group.exampleTexts.map(t => stage.pool.find(id => questionsById[id].text === t)).filter(Boolean) : [];
-  const ids = [...new Set([...anchors, ...stage.pool.filter(id => !known.has(id))])];
-  return (ids.length ? ids : stage.pool.slice(0,4)).map(id => questionsById[id]);
+  return stage.pool.map(id => questionsById[id]);
 }
 function beginGuide() {
+  clearBattleEffects();
+  audio.stopSpeech();
   document.body.classList.add('learning');
   game.guide = {items: guideItems(game.stage), step: 'look', index: 0, progress: '', retry: false};
   game.paused = true;
@@ -3613,6 +3829,8 @@ function renderOnboarding() {
 }
 function finishOnboarding() {
   if (!game?.training) return;
+  clearBattleEffects();
+  audio.stopSpeech();
   save.settings.onboarding = true;
   persist();
   $('#enemy-layer').replaceChildren();
@@ -3684,11 +3902,12 @@ function processText(value, composing = globallyComposing, fromBuiltin = false, 
       const e = candidates.find(e => remaining.includes(e.q.text));
       if (!e) break;
       remaining = remaining.replace(e.q.text, '');
+      if (!game.running || game.completing) break;
       game.correct += e.q.pinyin.length - e.progress;
       completeQuestion(e);
       rotateInput();
     }
-    if (remaining) wrongKey(game.enemies.find(e => e.id === game.locked) || closestEnemy());
+    if (remaining && game.running && !game.completing) wrongKey(game.enemies.find(e => e.id === game.locked) || closestEnemy());
     else if (epoch === inputEpoch) rotateInput();
     // Committed text is cleared outside composition; following duplicate input sees empty value.
     resetInput();
@@ -3727,7 +3946,7 @@ function processText(value, composing = globallyComposing, fromBuiltin = false, 
   const previous = game.enemies.find(e => e.id === game.locked);
   if (previous && previous !== enemy) { previous.progress = 0; renderEnemy(previous); }
   game.locked = enemy.id;
-  if (previous !== enemy) { sound('lock'); if (enemy.spokenQuestion === enemy.q) audio.stopSpeech(); else audio.target(); }
+  if (previous !== enemy) { sound('lock'); audio.target(); }
   judge(enemy, pending === enemy.q.pinyin ? '完整符合' : '前綴符合，尚未完成');
   const added = Math.max(0, pending.length - enemy.progress);
   game.correct += added;
@@ -3755,7 +3974,7 @@ for (const input of castInputs) {
     logInput(event, input);
     if (input !== castInput || swappingInput) { input.value = ''; return; }
     if (!globallyComposing && input.value === lastCommit.value && performance.now() - lastCommit.at < 80 && !game?.ime) { input.value = ''; return; }
-    processText(input.value, save.settings.keyboardMode === 'english' && !game?.ime ? false : globallyComposing || event.isComposing, false, event.inputType.startsWith('delete'));
+    processText(input.value, save.settings.keyboardMode === 'english' && !game?.ime ? false : globallyComposing || event.isComposing, false, (event.inputType || '').startsWith('delete'));
   });
   input.addEventListener('compositionstart', event => {
     logInput(event, input);
@@ -3788,13 +4007,13 @@ for (const input of castInputs) {
   });
   input.addEventListener('blur', () => {
     if (swappingInput || castInputs.includes(document.activeElement) || game?.training && game.onboarding === 3) return;
-    if (screen === 'play' && game?.running && (!game.paused || countdownTimer || keyboardTimer) && !useBuiltin() && game.guide?.step !== 'look') pauseGame('施法列失去焦點，怪物與王已暫停。');
+    if (screen === 'play' && game?.running && (!game.paused || countdownTimer || keyboardTimer) && !useBuiltin() && game.guide?.step !== 'look') keyboardDismissed();
   });
 }
 document.addEventListener('pointerdown', event => {
   if (useBuiltin() && event.target === castInput) event.preventDefault();
-  const enemyNode = event.target.closest('.enemy');
-  const action = event.target.closest('[data-action]')?.dataset.action;
+  const enemyNode = event.target.closest?.('.enemy');
+  const action = event.target.closest?.('[data-action]')?.dataset.action;
   if (action === 'replay' || action === 'sound') { event.preventDefault(); audio.unlock(); return; }
   if (enemyNode && game?.running && !game.paused) {
     event.preventDefault();
@@ -3802,11 +4021,11 @@ document.addEventListener('pointerdown', event => {
     if (!e) return;
     if (game.locked === e.id) { if (!useBuiltin()) castInput.focus({preventScroll: true}); return; }
     if (globallyComposing) { inputState.consumed = inputState.raw.length; inputState.credits = []; } else resetInput();
-    unlockTarget(); game.locked = e.id; renderEnemy(e); sound('lock'); if (e.spokenQuestion === e.q) audio.stopSpeech(); else audio.target();
+    unlockTarget(); game.locked = e.id; renderEnemy(e); sound('lock'); audio.target(true);
     if (!useBuiltin()) castInput.focus({preventScroll: true});
 
   }
-  if (['peek','unlock','ready','guide-next','replay','sound'].includes(action) || event.target.closest('#cast-button')) event.preventDefault();
+  if (['peek','unlock','ready','guide-next','replay','sound','pause'].includes(action) || event.target.closest?.('#cast-button')) event.preventDefault();
 });
 function builtinLetter(key) {
   if (!game?.running || (game.paused && game.guide?.step !== 'look') || (game.ime && !game.training && !game.guide)) return;
@@ -3816,32 +4035,58 @@ function builtinLetter(key) {
   else castInput.value += key;
   // The same prefix engine is used by touch and system input.
   processText(castInput.value, false, true, key === 'delete');
+  displayCast();
 }
-$('#builtin-keyboard').innerHTML = ['qwertyuiop','asdfghjkl','zxcvbnm'].map(row => `<div class="key-row" style="--key-count:${row.length}">${[...row].map(c => `<button type="button" data-key="${c}" aria-label="字母 ${c}">${c}</button>`).join('')}</div>`).join('') + '<div class="key-row key-tools"><button data-key="peek">偷看</button><button data-key="delete">刪除</button><button data-key="unlock">解除鎖定</button></div>';
-// A key can finish the stage during pointerdown. Its following click must
-// not land on a newly revealed result button (for example, 再挑戰一次).
-// A fresh pointerdown starts a new gesture, so deliberate result taps work.
+const builtinKeyboard = $('#builtin-keyboard');
+builtinKeyboard.innerHTML = ['qwertyuiop','asdfghjkl','zxcvbnm'].map(row => `<div class="key-row" style="--key-count:${row.length}">${[...row].map(c => `<button type="button" tabindex="-1" data-key="${c}" aria-label="字母 ${c}">${c}</button>`).join('')}</div>`).join('') + '<div class="key-row key-tools"><button tabindex="-1" data-key="peek">偷看</button><button tabindex="-1" data-key="delete" aria-label="刪除">⌫</button><button tabindex="-1" data-key="unlock">解除鎖定</button></div>';
+const keyPointers = new Map();
+function releasePointer(pointerId) {
+  const held = keyPointers.get(pointerId);
+  if (!held) return;
+  held.bubble?.remove();
+  keyPointers.delete(pointerId);
+  if (![...keyPointers.values()].some(item => item.key === held.key)) held.key.classList.remove('pressed');
+}
+function releaseKeys() { for (const id of [...keyPointers.keys()]) releasePointer(id); }
+// Suppress only compatibility clicks from keyboard gestures, including a final hit.
 let keyboardClickPending = false;
-document.addEventListener('pointerdown', event => {
-  keyboardClickPending = Boolean(event.target.closest('#builtin-keyboard'));
-}, true);
+document.addEventListener('pointerdown', event => { keyboardClickPending = Boolean(event.target.closest?.('#builtin-keyboard')); }, true);
 document.addEventListener('click', event => {
-  if (!keyboardClickPending) return;
+  if (!keyboardClickPending && !event.target.closest?.('#builtin-keyboard')) return;
   keyboardClickPending = false;
   event.preventDefault();
   event.stopImmediatePropagation();
 }, true);
-$('#builtin-keyboard').addEventListener('pointerdown', event => {
+builtinKeyboard.addEventListener('contextmenu', event => event.preventDefault());
+builtinKeyboard.addEventListener('pointerdown', event => {
   event.preventDefault();
-  const buttons = [...event.currentTarget.querySelectorAll('[data-key]')];
-  const nearest = buttons.sort((a,b) => {
-    const distance = el => { const r = el.getBoundingClientRect(); return Math.hypot(event.clientX - r.x - r.width/2, event.clientY - r.y - r.height/2); };
-    return distance(a) - distance(b);
-  })[0];
+  if (keyPointers.has(event.pointerId)) return;
+  const buttons = [...builtinKeyboard.querySelectorAll('[data-key]')];
+  const distance = el => {
+    const r = el.getBoundingClientRect();
+    return Math.hypot(Math.max(r.left - event.clientX, 0, event.clientX - r.right), Math.max(r.top - event.clientY, 0, event.clientY - r.bottom));
+  };
+  const nearest = buttons.reduce((best, key) => !best || distance(key) < distance(best) ? key : best, null);
   if (!nearest) return;
-  animate(nearest, 'pressed');
+  let bubble;
+  if (/^[a-z]$/.test(nearest.dataset.key)) {
+    bubble = document.createElement('span'); bubble.className = 'key-bubble'; bubble.textContent = nearest.dataset.key;
+    const r = nearest.getBoundingClientRect();
+    bubble.style.left = `${clamp(r.left + r.width/2, 30, innerWidth-30)}px`;
+    bubble.style.top = `${r.top - 57}px`;
+    document.body.append(bubble);
+  }
+  nearest.classList.add('pressed');
+  keyPointers.set(event.pointerId, {key: nearest, bubble});
+  try { builtinKeyboard.setPointerCapture(event.pointerId); } catch { /* Synthetic events have no native pointer. */ }
+  audio.unlock(); sound('key');
+  try { if (save.settings.vibration && navigator.vibrate) navigator.vibrate(8); } catch { /* Optional feedback. */ }
   builtinLetter(nearest.dataset.key);
 });
+for (const type of ['pointerup','pointercancel','lostpointercapture']) builtinKeyboard.addEventListener(type, event => releasePointer(event.pointerId));
+document.addEventListener('pointerdown', event => {
+  if (event.pointerType === 'touch' && hardwareKeyboard) { hardwareKeyboard = false; showBuiltinKeyboard(); }
+}, true);
 document.addEventListener('keydown', event => {
   if (event.isComposing || event.keyCode === 229 || globallyComposing || event.ctrlKey || event.metaKey || event.altKey) return;
   if (modal.open) {
@@ -3849,6 +4094,8 @@ document.addEventListener('keydown', event => {
     return;
   }
   if (screen !== 'play' || !game?.running || (game.paused && game.guide?.step !== 'look')) return;
+  if (/^[a-z]$/iu.test(event.key) && !event.repeat && useBuiltin()) { hardwareKeyboard = true; showBuiltinKeyboard(); }
+  if (event.repeat && useBuiltin()) return;
   if (event.key === 'Escape') { event.preventDefault(); if (!unlockTarget()) pauseGame(); else resetInput(); }
   else if (event.key === 'Tab') { event.preventDefault(); peek(); }
   else if (event.key === 'Enter' && game.ime) {
@@ -3866,10 +4113,13 @@ document.addEventListener('keydown', event => {
 });
 modal.addEventListener('cancel', event => { event.preventDefault(); closeOrResumeMenu(); });
 window.addEventListener('blur', () => { if (game?.running && (!game.paused || countdownTimer || keyboardTimer)) pauseGame('視窗已失焦，已自動暫停。'); });
-document.addEventListener('visibilitychange', () => { audio.suspend(); if (document.hidden && game?.running && (!game.paused || countdownTimer || keyboardTimer)) pauseGame('分頁暫時離開，已自動暫停。'); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) { audio.suspend(); if (game?.running && (!game.paused || countdownTimer || keyboardTimer)) pauseGame('分頁暫時離開，已自動暫停。'); } else { audio.resumeSpeech(); audio.sync(); lastTime = performance.now(); } });
 
 document.addEventListener('touchmove', event => { if (screen === 'play' && event.touches.length > 1) event.preventDefault(); }, {passive: false});
-window.addEventListener('pagehide', persist);
+window.addEventListener('pagehide', () => { persist(); cancelKeyboardWait(); clearBattleEffects(); audio.suspend(); if (game) { game.paused = true; if (game.completing) finishGame(true); } });
+window.addEventListener('pageshow', event => { if (event.persisted) { lastTime = performance.now(); audio.resumeSpeech(); if (game?.running) showPauseMenu('已回到遊戲，點我繼續。'); } });
+window.addEventListener('popstate', () => { if (screen !== 'map' || modal.open) goMap(); });
+
 
 document.querySelectorAll('img').forEach(img=>{if(img.complete&&img.naturalWidth)assetLoaded(img);});
 decorateIcons();
@@ -3877,6 +4127,11 @@ refreshHeader();
 renderDebug();
 renderMap();
 persist();
+try {
+  const previousBuild = localStorage.getItem('pinyin-build');
+  if (previousBuild && previousBuild !== BUILD.version) toast('已更新到新版本 ' + BUILD.version);
+  localStorage.setItem('pinyin-build', BUILD.version);
+} catch { /* Temporary storage mode. */ }
 requestAnimationFrame(tick);
   </script>
 </body>

@@ -81,7 +81,7 @@ async function screenshot(name) {
   await evaluate(`window.getSelection()?.removeAllRanges()`);
   await delay(300); // Let native touch feedback paint out before capturing the layout.
   const {data} = await send('Page.captureScreenshot', {format: 'png', captureBeyondViewport: false});
-  await writeFile(new URL(`shots5/regression-layout/${name}.png`, import.meta.url), Buffer.from(data, 'base64'));
+  await writeFile(new URL(`shots7/regression-layout/${name}.png`, import.meta.url), Buffer.from(data, 'base64'));
 }
 async function load() {
   await evaluate(`window.__smokeBeforeNavigation=true`);
@@ -107,7 +107,7 @@ async function seed({onboarding=true, builtin=false, review={}}={}) {
   // Finish the previous pagehide save before installing a new saved-game fixture.
   await send('Page.navigate', {url:'about:blank'});
   await waitFor(`location.href==='about:blank'&&document.readyState==='complete'`);
-  const {identifier}=await send('Page.addScriptToEvaluateOnNewDocument',{source:`(() => {const s=JSON.parse(localStorage.getItem('pinyin-keep-save-v2'));s.coins=1000;s.learned=[];s.settings.onboarding=${onboarding};s.settings.builtin=${builtin};s.settings.sound=false;s.review=${JSON.stringify(review)};for(const id of ${JSON.stringify(data.stages.map(s=>s.id))})s.records[id]={stars:3,bestSpeed:1,bestScore:0,attempts:1,last:{speed:1,accuracy:1,score:0}};localStorage.setItem('pinyin-keep-save-v2',JSON.stringify(s));})()`});
+  const {identifier}=await send('Page.addScriptToEvaluateOnNewDocument',{source:`(() => {const s=JSON.parse(localStorage.getItem('pinyin-keep-save-v2'));s.coins=1000;s.learned=[];s.settings.onboarding=${onboarding};s.settings.builtin=${builtin};s.settings.sound=false;s.review=${JSON.stringify(review)};for(const id of ${JSON.stringify(data.stages.map(s=>s.id))})s.records[id]={stars:3,bestSpeed:1,bestScore:0,attempts:1,last:{speed:1,accuracy:1,score:0}};if(!s.settings.onboarding){s.records['r1-1'].stars=0;s.records['r1-boss'].stars=0;}localStorage.setItem('pinyin-keep-save-v2',JSON.stringify(s));})()`});
   await load();
   await send('Page.removeScriptToEvaluateOnNewDocument',{identifier});
 }
@@ -115,7 +115,8 @@ async function stage(id, skip=true) {
   const s=data.stages.find(s=>s.id===id);
   await touch(`[data-action="region"][data-id="${s.region}"]`);
   await touch(`[data-action="stage"][data-id="${id}"]`);
-  await touch(skip&&!s.kind.includes('boss')?'[data-action="skip-guide"]':'[data-action="start"]');
+  const replay = !skip && await evaluate(`!!document.querySelector('[data-action="replay-guide"]')`);
+  await touch(replay ? '[data-action="replay-guide"]' : '[data-action="start"]');
 }
 async function ready({keyboard=false}={}) {
   if(await evaluate(`!!document.querySelector('#start-overlay [data-action="ready"]')?.getClientRects().length`)) await touch('#start-overlay [data-action="ready"]');

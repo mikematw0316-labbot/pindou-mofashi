@@ -8,8 +8,8 @@ const html = await readFile(new URL('index.html', import.meta.url), 'utf8');
 const bankSource = html.match(/\/\/ BEGIN QUESTION BANK\n([\s\S]*?)\n\/\/ END QUESTION BANK/u)[1];
 const data = await import(`data:text/javascript;base64,${Buffer.from(bankSource).toString('base64')}`);
 
-const fxStart = html.indexOf('function magic('), fxEnd = html.indexOf("document.addEventListener('input', event => {",fxStart);
-const fxHTML = html.slice(0,fxStart) + html.slice(fxStart,fxEnd).replaceAll('setTimeout(', '(window.__freezeFX ? (fn,ms)=>{window.__fx.push({fn,ms});} : setTimeout)(') + html.slice(fxEnd);
+const fxStart = html.indexOf('function comboBanner('), fxEnd = html.indexOf("document.addEventListener('input', event => {",fxStart);
+const fxHTML = html.slice(0,fxStart) + html.slice(fxStart,fxEnd).replaceAll('later(', '(window.__freezeFX ? (fn,ms)=>{window.__fx.push({fn,ms});} : later)(') + html.slice(fxEnd);
 const fixture = fxHTML.replace('return {unlock, sync, speak, target,', 'return {pump, unlock, sync, speak, target,')
   .replaceAll('requestAnimationFrame(tick);', 'if (!window.__manualRAF) requestAnimationFrame(tick);')
   .replace('  </script>\n</body>', `window.__test = {audio, SCORE, get game(){return game;}, get save(){return save;},
@@ -92,7 +92,7 @@ async function screenshot(name) {
   await evaluate(`window.getSelection()?.removeAllRanges()`);
 
   const {data} = await send('Page.captureScreenshot', {format: 'png', captureBeyondViewport: false});
-  await writeFile(new URL(`shots5/${name}.png`, import.meta.url), Buffer.from(data, 'base64'));
+  await writeFile(new URL(`shots7/${name}.png`, import.meta.url), Buffer.from(data, 'base64'));
 }
 async function load() {
   await evaluate(`window.__smokeBeforeNavigation=true`);
@@ -118,7 +118,7 @@ async function seed({onboarding=true, builtin=false, keyboardMode=builtin?'built
   // Finish the previous pagehide save before installing a new saved-game fixture.
   await send('Page.navigate', {url:'about:blank'});
   await waitFor(`location.href==='about:blank'&&document.readyState==='complete'`);
-  const {identifier}=await send('Page.addScriptToEvaluateOnNewDocument',{source:`(() => {const s=JSON.parse(localStorage.getItem('pinyin-keep-save-v2'))||{version:2,settings:{},records:{},upgrades:{},review:{}};s.coins=1000;s.learned=[];s.settings.onboarding=${onboarding};s.settings.builtin=${builtin};s.settings.keyboardMode=${JSON.stringify(keyboardMode)};s.settings.debug=${debug};s.settings.sound=true;s.settings.muted=false;s.settings.speech=true;s.settings.music=true;s.settings.effects=true;s.review=${JSON.stringify(review)};for(const id of ${JSON.stringify(data.stages.map(s=>s.id))})s.records[id]={stars:3,bestSpeed:1,bestScore:0,attempts:1,last:{speed:1,accuracy:1,score:0}};localStorage.setItem('pinyin-keep-save-v2',JSON.stringify(s));})()`});
+  const {identifier}=await send('Page.addScriptToEvaluateOnNewDocument',{source:`(() => {const s=JSON.parse(localStorage.getItem('pinyin-keep-save-v2'))||{version:2,settings:{},records:{},upgrades:{},review:{}};s.coins=1000;s.learned=[];s.settings.onboarding=${onboarding};s.settings.builtin=${builtin};s.settings.keyboardMode=${JSON.stringify(keyboardMode)};s.settings.builtinMigrated=true;s.settings.debug=${debug};s.settings.sound=true;s.settings.muted=false;s.settings.speech=true;s.settings.music=true;s.settings.effects=true;s.review=${JSON.stringify(review)};for(const id of ${JSON.stringify(data.stages.map(s=>s.id))})s.records[id]={stars:3,bestSpeed:1,bestScore:0,attempts:1,last:{speed:1,accuracy:1,score:0}};if(!s.settings.onboarding){s.records['r1-1'].stars=0;s.records['r1-boss'].stars=0;}localStorage.setItem('pinyin-keep-save-v2',JSON.stringify(s));})()`});
   await load();
   await send('Page.removeScriptToEvaluateOnNewDocument',{identifier});
 }
@@ -126,7 +126,8 @@ async function stage(id, skip=true) {
   const s=data.stages.find(s=>s.id===id);
   await touch(`[data-action="region"][data-id="${s.region}"]`);
   await touch(`[data-action="stage"][data-id="${id}"]`);
-  await touch(skip&&!s.kind.includes('boss')?'[data-action="skip-guide"]':'[data-action="start"]');
+  const replay = !skip && await evaluate(`!!document.querySelector('[data-action="replay-guide"]')`);
+  await touch(replay ? '[data-action="replay-guide"]' : '[data-action="start"]');
 }
 async function ready({keyboard=false}={}) {
   if(await evaluate(`!!document.querySelector('#start-overlay [data-action="ready"]')?.getClientRects().length`)) await touch('#start-overlay [data-action="ready"]');
@@ -190,21 +191,21 @@ async function battle(id='r1-1', mode='pinyin') {
 }
 async function shotNow(name) {
   const {data}=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});
-  await writeFile(new URL(`shots5/${name}.png`,import.meta.url),Buffer.from(data,'base64'));
+  await writeFile(new URL(`shots7/${name}.png`,import.meta.url),Buffer.from(data,'base64'));
 }
 let prefix='';
 async function shot(name,wait=260) {
   await delay(wait);
   await evaluate(`document.getSelection()?.removeAllRanges()`);
   const {data}=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});
-  await writeFile(new URL(`shots5/${prefix}${name}.png`,import.meta.url),Buffer.from(data,'base64'));
+  await writeFile(new URL(`shots7/${prefix}${name}.png`,import.meta.url),Buffer.from(data,'base64'));
 }
 async function verify(label) {
   const g=await evaluate(`(()=>{const visible=e=>e.getClientRects().length&&!e.closest('[hidden]');const buttons=[...document.querySelectorAll('button,select,input[type=range]')].filter(visible);const small=buttons.filter(e=>{const r=e.getBoundingClientRect();return r.width<43.5||r.height<43.5}).filter(e=>!e.closest('#builtin-keyboard'));const broken=[...document.images].filter(e=>visible(e)&&e.complete&&e.naturalWidth===0);const panel=document.querySelector('#modal[open]');let panelOverlap=false;if(panel){const content=panel.querySelector('.dialog-scroll').getBoundingClientRect(),head=panel.querySelector('.dialog-top').getBoundingClientRect(),foot=panel.querySelector('.dialog-actions')?.getBoundingClientRect();panelOverlap=content.top<head.bottom-.5||(foot&&content.bottom>foot.top+.5)}return {panelOverlap,overflow:document.documentElement.scrollWidth>innerWidth,small:small.map(e=>({text:e.textContent.slice(0,20),w:e.offsetWidth,h:e.offsetHeight})),broken:broken.map(e=>e.src)}})()`);
   check(!g.panelOverlap&&!g.overflow&&!g.small.length&&!g.broken.length,label+' '+JSON.stringify(g));
 }
 try {
- await mkdir(new URL('shots5',import.meta.url),{recursive:true});
+ await mkdir(new URL('shots7',import.meta.url),{recursive:true});
  await send('Runtime.enable');await send('Log.enable');await send('Page.enable');
  await metrics();await audioMode();
  for(const [width,height] of [[390,844],[360,640],[430,932],[1280,720]]) {
@@ -214,13 +215,13 @@ try {
   await shot('01-map');await verify(prefix+'地圖、三種節點與工具列');
   check(await evaluate(`document.querySelector('.stage-node.cleared')&&document.querySelector('.stage-node.next-node[aria-disabled=false]')&&document.querySelector('.stage-node[aria-disabled=true]')`),prefix+'通關／可挑戰／未解鎖節點');
   await seed({builtin:true});await touch('[data-action="stage"][data-id="r1-1"]');await shot('02-teach');await verify(prefix+'教學面板');
-  await touch('[data-action="start"]');await shot('03-guide-look');await verify(prefix+'引導看');
+  await touch('[data-action="replay-guide"]');await shot('03-guide-look');await verify(prefix+'引導看');
   await evaluate(`__test.game.guide.step='follow';__test.renderGuide()`);await shot('04-guide-follow');
   await evaluate(`__test.game.guide.step='try';__test.renderGuide()`);await shot('05-guide-try');
   await seed({onboarding:false,builtin:true});await stage('r1-1',false);await ready();await shot('06-onboarding');await geometry(prefix+'操作教學');
   await battle('r2-2','builtin');
   await evaluate(`(()=>{const g=__test.game;g.spawnIn=999;while(g.enemies.length<g.maxEnemies)__test.spawnEnemy();g.enemies.forEach(e=>{e.x=65;__test.positionEnemy(e)});window.__manualRAF=true;window.__freezeFX=true;window.__fx=[];g.combo=4;g.longest=4;})()`);
-  for(const letter of (await enemy()).q.pinyin)await touch(`[data-key="${letter}"]`);
+  for(const letter of (await enemy()).q.pinyin)await (width>=700 ? press(letter) : touch(`[data-key="${letter}"]`));
   await evaluate(`document.querySelectorAll('.magic-bolt').forEach(e=>{e.style.animationPlayState='paused';e.style.animationDelay='-.10s'});const combo=document.querySelector('.combo-banner');if(combo){combo.style.animationPlayState='paused';combo.style.animationDelay='-.3s'}`);
   await shot('07-battle-combo-fireball');await geometry(prefix+'含特效與 Combo 戰鬥');
   check(await evaluate(`!!document.querySelector('.fireball')&&!!document.querySelector('.combo-banner')`),prefix+'火球與 Combo');

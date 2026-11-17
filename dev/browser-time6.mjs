@@ -127,7 +127,7 @@ try {
  await send('Page.addScriptToEvaluateOnNewDocument',{source:'window.__manualRAF=true;'});
  await send('Page.navigate',{url:pathToFileURL(root+'.test6.html').href});
  await waitFor('!!window.__runRobot');
- await mkdir(new URL('shots6',import.meta.url),{recursive:true});
+ await mkdir(new URL('shots7/regression-time',import.meta.url),{recursive:true});
  await evaluate(`(()=>{const t=__test;for(const s of t.stages)t.save.records[s.id]={stars:3,bestSpeed:0,bestScore:0,attempts:0};t.save.settings.onboarding=true;t.save.settings.keyboardMode='builtin';t.save.settings.muted=true;})()`);
  check(await evaluate(`(()=>{const t=__test;t.startGame(t.stages.find(s=>s.id==='r1-4'),true);return t.game.paused&&document.querySelector('.star-conditions').textContent.includes('三星')&&document.querySelector('.star-conditions').textContent.includes(t.game.star3Seconds.toFixed(2).replace(/\\.?0+$/,''));})()`),'準備畫面依實抽題目顯示兩星、三星時限');
  check(await evaluate(`(()=>{const t=__test;__advance(3);return t.game.elapsed===0;})()`),'開始前等待不計時');
@@ -152,17 +152,17 @@ try {
    await evaluate(`(()=>{const t=__test;t.startGame(t.stages.find(s=>s.id==='r1-4'),true);})()`);
    await delay(280);
    let shot=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});
-   await writeFile(new URL('shots6/'+width+'-ready.png',import.meta.url),Buffer.from(shot.data,'base64'));
+   await writeFile(new URL('shots7/regression-time/'+width+'-ready.png',import.meta.url),Buffer.from(shot.data,'base64'));
    await evaluate(`__test.beginKeyboard()`);
    await waitFor('!__test.game.paused',5000);
    check(await evaluate(`(()=>{const t=__test;__advance(.5);const clock=document.querySelector('#battle-clock').getBoundingClientRect();const input=document.querySelector('#spell-form').getBoundingClientRect();window.__layout6={scroll:document.documentElement.scrollWidth,width:innerWidth,clock:{left:clock.left,right:clock.right},input:input.bottom,viewport:visualViewport.height};return document.documentElement.scrollWidth<=innerWidth&&clock.left>=0&&clock.right<=innerWidth&&input.bottom<=visualViewport.height+1;})()`),width+' 窄版 HUD 與施法列無溢出');
    await delay(280);
    shot=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});
-   await writeFile(new URL('shots6/'+width+'-battle.png',import.meta.url),Buffer.from(shot.data,'base64'));
+   await writeFile(new URL('shots7/regression-time/'+width+'-battle.png',import.meta.url),Buffer.from(shot.data,'base64'));
    await evaluate(`(()=>{const t=__test;t.game.elapsed=t.game.star3Seconds+7;t.game.correct=94;t.game.wrong=6;t.game.hp=40;t.finishGame(true);})()`);
    await delay(1800);
    shot=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});
-   await writeFile(new URL('shots6/'+width+'-result.png',import.meta.url),Buffer.from(shot.data,'base64'));
+   await writeFile(new URL('shots7/regression-time/'+width+'-result.png',import.meta.url),Buffer.from(shot.data,'base64'));
  }
  await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
  const simulations=[];

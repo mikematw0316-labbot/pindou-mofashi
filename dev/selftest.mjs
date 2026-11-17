@@ -12,6 +12,10 @@ assert.equal(source, originalBank?.[1], '第二版題庫必須與 v1.html 備份
 const data = await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
 const {zhuyinToPinyin: convert, readingToPinyin, phonics, characters, words,
   sentences, soundGroups, stages, regions, questionBank, questionsById, reviewStage} = data;
+const normalization = html.slice(html.indexOf('// Stage ownership'), html.indexOf('const BUILD ='));
+const originalStagePools = new Map(stages.map(stage=>[stage.id,[...stage.pool]]));
+new Function('stages','questionsById', normalization)(stages,questionsById);
+const poolChanges = stages.flatMap(stage=>originalStagePools.get(stage.id).filter(id=>!stage.pool.includes(id)));
 const failures = [];
 let assertions = 0;
 function check(ok, message) {
@@ -42,6 +46,36 @@ for (const stage of stages) {
   check(stage.pool.every(id => previouslyTaught.has(id)), `${stage.id} 打怪題池包含於本關及之前實際教過的項目`);
 }
 check(planGuide(stages[0], [], soundGroups, questionsById).length === 8, '第一關引導涵蓋全部八個聲母');
+
+// Preserve TASK7's user-authored pronunciation mapping independently of the bank.
+const speechSource = html.slice(html.indexOf('const ZHUYIN_SOUND ='), html.indexOf('function toast('));
+const getSpoken = new Function(speechSource + '; return spoken;')();
+for(const [symbol, expected] of [['ㄅ','玻'],['ㄓ','知'],['ㄩ','迂'],['ㄩㄣ','暈'],['ㄨㄥ','翁']]) {
+  equal(getSpoken(phonics.find(q=>q.symbol===symbol)),expected,`${symbol} 語音唸注音本身的讀法`);
+}
+check(phonics.every(q=>getSpoken(q).length>0),'全部注音片段具有語音文字');
+const backup7 = readFileSync(new URL('./v6.html',import.meta.url),'utf8');
+equal(speechSource,backup7.slice(backup7.indexOf('const ZHUYIN_SOUND ='),backup7.indexOf('function toast(')),'手動 ZHUYIN_SOUND 與 spoken(q) 修正逐字保留');
+
+// TASK7: run the actual stage pool and picker against 20 deterministic seeds.
+const getPool = new Function('stage', html.match(/function stagePool\(stage\) \{([\s\S]*?)\n\}/u)[1]);
+const chooseSource = html.slice(html.indexOf('function chooseQuestion('), html.indexOf('function spawnEnemy('));
+for (const stage of stages.filter(s=>!s.kind.includes('boss'))) {
+  const allowed = new Set(stage.pool);
+  equal(planGuide(stage, Object.keys(questionsById), soundGroups, questionsById).map(q=>q.id).sort().join(','),[...allowed].sort().join(','),`${stage.id} 已學過仍完整引導本關題池`);
+  for(let seed=1;seed<=20;seed++) {
+    let rng=seed;
+    const math=Object.create(Math);
+    math.random=()=>((rng=Math.imul(rng,1664525)+1013904223>>>0)/4294967296);
+    const game={stage,pool:getPool(stage),deck:[...stage.pool],boss:false};
+    const save={learned:Object.keys(questionsById),review:Object.fromEntries(Object.keys(questionsById).map(id=>[id,{count:3,mastered:0}]))};
+    const pick=new Function('game','save','questionsById','shuffle','Math',chooseSource+';return chooseQuestion;')(game,save,questionsById,a=>[...a],math);
+    const sampled=Array.from({length:Math.max(60,stage.pool.length*2)},()=>pick().id);
+    check(sampled.every(id=>allowed.has(id)),`${stage.id} seed ${seed} 實際抽題屬於本關`);
+  }
+}
+for(const region of [2,3,4])unique(stages.filter(s=>s.region===region&&!s.kind.includes('boss')).flatMap(s=>s.pool),`第 ${region} 區一般關所有項目 `);
+check(poolChanges.length>0,'已整理重疊題池');
 
 // 答案獨立寫出，不以 FINALS／INITIALS 產生期望值。
 const regression = [
@@ -282,7 +316,7 @@ for (const region of regions) {
 for (const group of soundGroups) {
   const matches = stages.filter(s=>s.soundGroup===group.id);
   equal(matches.length,1,`${group.id} 專項小關數`);
-  equal(matches[0]?.pool.join(','),group.pool.join(','),`${group.id} 小關完整引用專項題池`);
+  check(matches[0]?.pool.every(id=>group.pool.includes(id)),`${group.id} 小關只引用專項題池、重複題歸前關`);
 }
 const reviewErrors=[];
 validateStage(reviewStage,reviewErrors);
