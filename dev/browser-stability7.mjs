@@ -235,7 +235,7 @@ try{
  await waitFor(`__mock.calls.some(c=>c.text==='恢復語音')`);
  check(await evaluate(`!speechSynthesis.paused&&__mock.calls.some(c=>c.type==='resume')`),'paused 引擎在 speak 前 resume');
  await evaluate(`__test.audio.stopSpeech();__mock.speechMode='no-start';__mock.calls=[];__test.audio.speak('測試看門狗');`);
- await waitFor(`__test.audio.diagnostics.speechBroken`,4500);
+ await waitFor(`__test.audio.diagnostics.history.at(-1).events.some(e=>e.includes('語音無回應'))`,4500);
  check(await evaluate(`__mock.calls.filter(c=>c.text==='測試看門狗').length===2&&__test.audio.diagnostics.history.at(-1).events.some(e=>e.includes('語音無回應'))&&__test.game.running`),'1.5 秒 onstart 看門狗重試一次，兩次無回應留下診斷且遊戲持續');
  await evaluate(`__mock.speechMode='normal';__test.audio.speak('恢復成功');`);
  await waitFor(`__test.audio.diagnostics.history.at(-1).events.includes('start')`);
@@ -258,10 +258,10 @@ try{
  await writeFile(new URL('geometry7.json',import.meta.url),JSON.stringify(geometries,null,2)+'\n');
  await metrics();await start();await activate();
  await evaluate(`__test.save.settings.debug=true;__test.renderDebug();`);await delay(50);
- check(await evaluate(`document.querySelector('#debug-speech').textContent.includes('voices=3')&&document.querySelector('#debug-errors').textContent.includes('v0.7.0')`),'偵錯面板顯示 voice 名稱、語系、狀態、五筆紀錄與版本');
+ check(await evaluate(`document.querySelector('#debug-speech').textContent.includes('voices=3')&&document.querySelector('#debug-errors').textContent.includes('v0.7.1')`),'偵錯面板顯示 voice 名稱、語系、狀態、五筆紀錄與版本');
  await shot('debug-speech');
  await evaluate(`__test.save.settings.debug=false;__test.renderDebug();__test.goMap();__test.handleAction('settings');document.querySelector('.build-info').scrollIntoView({block:'center'});`);
- check(await evaluate(`document.querySelector('.build-info').textContent.includes('v0.7.0')&&document.querySelector('.build-info').textContent.includes('2026-11-17')`),'設定頁最下方版本及完整建置時間');
+ check(await evaluate(`document.querySelector('.build-info').textContent.includes('v0.7.1')&&document.querySelector('.build-info').textContent.includes(__test.BUILD.date)`),'設定頁最下方版本及完整建置時間');
  await shot('settings-version');await evaluate(`__test.goMap()`);
  await start('r5-1');
  await evaluate(`__test.beginKeyboard()`);await mockKeyboard(500);
@@ -296,7 +296,7 @@ try{
   await checkBaseline(`${transition} 狀態轉換後計時器／監聽回基準`);
  }
  await metrics(1280,720,false);await start();await activate();
- check(await evaluate(`document.querySelector('#builtin-keyboard').hidden`),'非觸控桌機預設隱藏內建鍵盤');
+ check(await evaluate(`!document.querySelector('#builtin-keyboard').hidden`),'非觸控桌機預設也能使用內建鍵盤');
  const desktop=await evaluate(`(()=>{const t=__test;const e=t.game.enemies[0];for(const c of e.q.pinyin)document.dispatchEvent(new KeyboardEvent('keydown',{key:c,bubbles:true}));return t.game.kills;})()`);
  check(desktop===1,'桌機實體鍵盤照常擊倒');
  await metrics();await start();await activate();
@@ -364,7 +364,7 @@ try{
  // Version notice appears once per new build, and the silent speech unlock settles.
  await evaluate(`localStorage.setItem('pinyin-build','v0.6.0')`);
  await evaluate(`window.__beforeReload7=true`);await send('Page.reload');await waitFor(`!window.__beforeReload7&&window.__test&&__test.screen==='map'`);
- check(await evaluate(`document.querySelector('#toast').textContent.includes('已更新到新版本 v0.7.0')&&localStorage.getItem('pinyin-build')==='v0.7.0'`),'版本變更提示並記錄最新版');
+ check(await evaluate(`document.querySelector('#toast').textContent.includes('已更新到新版本 v0.7.1')&&localStorage.getItem('pinyin-build')==='v0.7.1'`),'版本變更提示並記錄最新版');
  await evaluate(`__test.audio.unlock();__test.audio.speak('解鎖之後第一句');`);
  await waitFor(`__mock.calls.some(c=>c.text==='解鎖之後第一句')`);
  check(await evaluate(`(()=>{const a=__mock.calls.find(c=>c.type==='speak'&&c.volume===0);const b=__mock.calls.find(c=>c.text==='解鎖之後第一句');return b.at-a.at>=15;})()`),'第一句真語音等待靜音 utterance onend 完成');

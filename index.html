@@ -1750,7 +1750,7 @@ export const references = [
 // END QUESTION BANK
 
 // Stage ownership is runtime configuration. Keep the original reading bank intact.
-for (const region of [2, 3, 4]) {
+for (const region of [2, 4]) {
   const owner = new Set();
   for (const stage of stages.filter(s => s.region === region && !s.kind.includes('boss'))) {
     stage.pool = stage.pool.filter(id => {
@@ -1761,7 +1761,7 @@ for (const region of [2, 3, 4]) {
     stage.maxSimultaneous = Math.min(stage.maxSimultaneous, new Set(stage.pool.map(id => questionsById[id].pinyin[0])).size);
   }
 }
-const BUILD = Object.freeze({version: 'v0.7.0', date: '2026-11-17', time: '2026-11-17T13:53:28+08:00'});
+const BUILD = Object.freeze({version: 'v0.7.1', date: '2026-11-18', time: '2026-11-18T00:15:07+08:00'});
 // 遊戲設定集中於此；星等與節奏可直接調整。
 const CONFIG = Object.freeze({
   storageKey: 'pinyin-keep-save-v2',
@@ -2053,8 +2053,8 @@ const audio = (() => {
       const list = synth?.getVoices() || [];
       voiceCount = list.length;
       voice = list.find(v => /^zh[-_]TW$/i.test(v.lang)) || list.find(v => /^zh(?:[-_]|$)/i.test(v.lang) && !/[-_]HK(?:$|[-_])/i.test(v.lang)) || null;
-      voiceReason = !synth || !window.SpeechSynthesisUtterance ? '此瀏覽器不支援語音提示' : speechBroken ? '語音無回應，可按測試語音重試' : !voice ? '此裝置沒有可用的中文語音，已自動停用語音提示；載入後會自動恢復' : /^zh[-_]TW$/i.test(voice.lang) ? `台灣中文語音：${voice.name}` : `此裝置沒有台灣中文語音，使用 ${voice.lang}：${voice.name}`;
-    } catch { voice = null; voiceReason = '無法讀取中文語音，已自動停用語音提示'; }
+      voiceReason = !synth || !window.SpeechSynthesisUtterance ? '此瀏覽器不支援語音提示' : speechBroken ? '語音無回應，可按測試語音重試' : !voice ? '未取得語音清單，使用系統預設中文' : /^zh[-_]TW$/i.test(voice.lang) ? `台灣中文語音：${voice.name}` : `此裝置沒有台灣中文語音，使用 ${voice.lang}：${voice.name}`;
+    } catch { voice = null; voiceReason = '未取得語音清單，使用系統預設中文'; }
     const status = $('#voice-status');
     if (status) status.textContent = voiceReason;
   }
@@ -2134,7 +2134,13 @@ const audio = (() => {
     }
     timer = setTimeout(pump, 25);
   }
+  let resuming = false;
   function sync() {
+    if (unlocked && context && !document.hidden && !['running', 'closed'].includes(context.state) && !resuming) {
+      resuming = true;
+      try { Promise.resolve(context.resume()).then(() => { resuming = false; if (context.state === 'running') sync(); }, () => { resuming = false; }); }
+      catch { resuming = false; }
+    }
     const wanted = screen === 'play' ? game?.stage.region || 1 : 0;
     const isBoss = screen === 'play' && !!game?.boss && !game?.training && !game?.guide;
     const shouldPause = document.hidden || (screen === 'play' && !!game?.paused && (game?.guide?.step !== 'look' || !$('#start-overlay').hidden));
@@ -2224,7 +2230,7 @@ const audio = (() => {
     clearTimeout(speechQueueTimer); speechQueueTimer = 0;
     if (!pendingUtterance || unlockPending) return;
     // Never interrupt the first 100 ms of a new utterance. Latest request wins.
-    const wait = Math.max(0, cancelAt + 110 - performance.now(), utterance ? startedAt + 110 - performance.now() : 0);
+    const wait = Math.max(0, cancelAt + 250 - performance.now(), utterance ? startedAt + 110 - performance.now() : 0);
     speechQueueTimer = setTimeout(flushSpeech, Math.ceil(wait));
   }
   function flushSpeech() {
@@ -2257,7 +2263,8 @@ const audio = (() => {
         pendingUtterance = request;
         speechEvent(request.entry, 'queued retry');
       } else if (request.retry) {
-        speechBroken = true; voices();
+        // Queue cancellation and no-start are transient platform failures.
+        speechBroken = !['no-start', 'canceled', 'interrupted'].includes(code); voices();
         speechEvent(request.entry, 'error 語音無回應');
       }
       scheduleSpeech();
@@ -2278,10 +2285,10 @@ const audio = (() => {
     catch { failedAttempt('speak-threw'); }
   }
   function speak(text) {
-    if (!unlocked || document.hidden || save.settings.muted || !save.settings.speech || !save.settings.speechVolume || !voice || !synth || !window.SpeechSynthesisUtterance || !text) return false;
+    if (!unlocked || document.hidden || save.settings.muted || !save.settings.speech || !save.settings.speechVolume || !synth || !window.SpeechSynthesisUtterance || !text) return false;
     try {
       const u = new SpeechSynthesisUtterance(String(text));
-      u.voice = voice; u.lang = voice.lang; u.rate = save.settings.speechRate; u.volume = save.settings.speechVolume / 100;
+      if (voice) u.voice = voice; u.lang = voice?.lang || 'zh-TW'; u.rate = save.settings.speechRate; u.volume = save.settings.speechVolume / 100;
       if (pendingUtterance) speechEvent(pendingUtterance.entry, 'error superseded');
       const entry = {text: u.text, events: ['queued']};
       speechHistory.push(entry);
@@ -2327,7 +2334,7 @@ const audio = (() => {
   function suspend() { stopSpeech(); sync(); }
   return {unlock, sync, speak, target, stopSpeech, suspend, effect, voices, settingsChanged, resumeSpeech,
     get status() { return voiceReason; },
-    get diagnostics() { return {unlocked, failed, theme, boss, paused, speaking, voice: voice?.lang || null, voiceName: voice?.name, voices: voiceCount, speechBroken, history: speechHistory, synthSpeaking: !!synth?.speaking, synthPending: !!synth?.pending, synthPaused: !!synth?.paused, speechTimers: Number(!!speechTimer) + Number(!!speechEndTimer) + Number(!!speechQueueTimer) + Number(!!unlockTimer), active: active.size, ...stats}; },
+    get diagnostics() { return {unlocked, failed, theme, boss, paused, speaking, voice: voice?.lang || null, voiceName: voice?.name, voiceReason, voices: voiceCount, speechBroken, history: speechHistory, synthSpeaking: !!synth?.speaking, synthPending: !!synth?.pending, synthPaused: !!synth?.paused, speechTimers: Number(!!speechTimer) + Number(!!speechEndTimer) + Number(!!speechQueueTimer) + Number(!!unlockTimer), active: active.size, ...stats}; },
   };
 })();
 function sound(type, progress) { audio.effect(type, progress); }
@@ -2408,8 +2415,8 @@ document.addEventListener('input', event => {
   audio.settingsChanged(); persist();
 });
 // Unlock before native focus/button handlers; do not create audio on page load.
-document.addEventListener('pointerdown', event => {
-  if (event.isTrusted && event.target.closest?.('button')) audio.unlock();
+for (const type of ['pointerdown', 'touchend', 'keydown']) document.addEventListener(type, event => {
+  if (event.isTrusted) audio.unlock();
 }, true);
 
 function animate(element, className) {
@@ -2582,8 +2589,8 @@ function buy(key) {
 function stagePool(stage) {
   return [...stage.pool];
 }
-// Freeze the run's actual questions before showing its time limits. Heavy monsters
-// keep one initial across both plates so simultaneous targets stay distinguishable.
+// Freeze the run's questions before showing time limits. Prefer one initial
+// across plates; reserve every planned initial when a second word needs another.
 function prepareBattle() {
   const count = game.ime ? Math.ceil(game.bossMax / 2) : game.boss ? game.bossMax : game.total;
   let previousId = '';
@@ -2594,7 +2601,9 @@ function prepareBattle() {
       const excluded = new Set(game.pool.map(id => questionsById[id].pinyin[0]));
       excluded.delete(first.pinyin[0]);
       for (let i = 1; i < (game.stage.questionsPerMonster || 2); i++) {
-        questions.push(chooseQuestion(excluded, questions.at(-1).id));
+        const previous = questions.at(-1);
+        const hasAlternative = game.pool.some(id => id !== previous.id && !excluded.has(questionsById[id].pinyin[0]));
+        questions.push(chooseQuestion(hasAlternative ? excluded : new Set(), previous.id));
       }
     }
     previousId = questions.at(-1).id;
@@ -2658,9 +2667,11 @@ function starConditions() {
 function resultConditions(accuracy) {
   const target = game.star3Seconds;
   const time = target == null ? `✓ 有效時間 ${secondsText(game.elapsed)}・本關無時限` : `${game.elapsed <= target ? '✓' : '✗'} 時間 ${secondsText(game.elapsed)}（三星需 ${secondsText(target)}${game.elapsed > target ? `，差 ${secondsText(game.elapsed - target)}` : '內'}）；兩星需 ${secondsText(game.star2Seconds)}內${game.elapsed <= game.star2Seconds ? ' ✓' : `，差 ${secondsText(game.elapsed - game.star2Seconds)}`}`;
+  const accuracyText = (Math.floor(accuracy * 1000) / 10).toFixed(1);
+  const gapText = target => Math.max(.1, Math.ceil((target - accuracy * 100) * 10) / 10).toFixed(1);
   const accuracyGap = Math.max(0, 95 - accuracy * 100);
   const hpGap = Math.max(0, game.maxHP / 2 - game.hp);
-  return `<ul class="result-conditions"><li>${time}</li><li>${accuracy >= .95 ? '✓' : '✗'} 正確率 ${(accuracy * 100).toFixed(1)}%（三星 95%${accuracyGap ? `，差 ${accuracyGap.toFixed(1)} 個百分點` : ' ✓'}；兩星 90%${accuracy >= .9 ? ' ✓' : `，差 ${(90 - accuracy * 100).toFixed(1)} 個百分點`}）</li><li>${hpGap ? '✗' : '✓'} 城門 ${Math.ceil(game.hp)} / ${game.maxHP}（三星需半血${hpGap ? `，差 ${hpGap.toFixed(1)} 點` : ' ✓'}）</li></ul>`;
+  return `<ul class="result-conditions"><li>${time}</li><li>${accuracy >= .95 ? '✓' : '✗'} 正確率 ${accuracyText}%（三星 95%${accuracyGap ? `，差 ${gapText(95)} 個百分點` : ' ✓'}；兩星 90%${accuracy >= .9 ? ' ✓' : `，差 ${gapText(90)} 個百分點`}）</li><li>${hpGap ? '✗' : '✓'} 城門 ${Math.ceil(game.hp)} / ${game.maxHP}（三星需半血${hpGap ? `，差 ${hpGap.toFixed(1)} 點` : ' ✓'}）</li></ul>`;
 }
 function startGame(stage = pendingStage, skipGuide = false) {
   audio.unlock();
@@ -2769,8 +2780,9 @@ function spawnEnemy(forcedQuestion = null) {
   const lanes = Array.from({length: limit}, (_, i) => i);
   const lane = lanes.find(i => !game.enemies.some(e => e.lane === i));
   if (lane === undefined) return false;
-  const occupied = new Set(game.enemies.map(enemy => enemy.q.pinyin[0]));
-  const planIndex = game.battlePlan?.findIndex(questions => !occupied.has(questions[0].pinyin[0]));
+  // Reserve later plates too: a fallback may change this monster's initial.
+  const occupied = new Set([...game.enemies, ...game.parked].flatMap(enemy => [enemy.q, ...enemy.questions].map(q => q.pinyin[0])));
+  const planIndex = game.battlePlan?.findIndex(questions => questions.every(q => !occupied.has(q.pinyin[0])));
   const planned = !game.training && !forcedQuestion && planIndex >= 0 ? game.battlePlan.splice(planIndex, 1)[0] : null;
   const q = forcedQuestion || planned?.[0] || (game.training || !game.battlePlan?.length ? chooseQuestion(occupied) : null);
   if (!q) return;
@@ -2778,7 +2790,7 @@ function spawnEnemy(forcedQuestion = null) {
   const enemy = {
     questions: planned?.slice(1) || [], id: ++game.serial, q, progress: 0, x: game.boss ? 72 : 96,
     lane: 0, variant: (game.serial - 1) % 3, remaining: game.boss || game.training || game.stage.region !== 4 ? 1 : (game.stage.questionsPerMonster || 2),
-    clean: true, peeked: false, reveal: 0, element,
+    clean: true, credited: 0, peeked: false, reveal: 0, element,
   };
   enemy.lane = lane;
   enemy.maxRemaining = enemy.remaining;
@@ -2952,6 +2964,14 @@ function wrongKey(enemy) {
   consumeInput(inputState.raw);
   updateHUD();
 }
+function creditLetters(enemy, length) {
+  // Count only the final accepted answer, once per question. Retry prefixes
+  // and deleted / unlocked partial answers never inflate accuracy.
+  if (length === enemy.q.pinyin.length && !enemy.credited) {
+    game.correct += length;
+    enemy.credited = length;
+  }
+}
 function attack(letter) {
   if (!game || game.paused || game.ime || !game.running) return;
   let enemy = game.enemies.find(e => e.id === game.locked);
@@ -2970,7 +2990,7 @@ function attack(letter) {
     return;
   }
   enemy.progress++;
-  game.correct++;
+  creditLetters(enemy, enemy.progress);
   if (!game.boss) {
     const following = game.enemies.filter(e => e !== enemy && e.lane === enemy.lane && e.x > enemy.x).sort((a, b) => a.x - b.x)[0];
     enemy.x = Math.min(following ? following.x - 24 : 96, enemy.x + 1.1);
@@ -2988,6 +3008,8 @@ function nextEnemyQuestion(enemy) {
   const q = enemy.questions.shift() || (game.boss && !game.training ? game.battlePlan?.shift()?.[0] : null) || chooseQuestion(occupied, enemy.q.id);
   enemy.q = q || enemy.q;
   enemy.spokenQuestion = null;
+  enemy.clean = true;
+  enemy.credited = 0;
   enemy.progress = 0;
   enemy.reveal = 0;
   enemy.peeked = false;
@@ -3130,6 +3152,7 @@ function nextSpell() {
   game.spellPeeked = false;
   game.spellFailed = false;
   game.spellAdvance = 0;
+  $('#cast-button').disabled = false;
   $('#spell-target').textContent = question.text;
   $('#spell-hint').textContent = question.zhuyin;
   castInput.value = '';
@@ -3137,9 +3160,15 @@ function nextSpell() {
   audio.target();
 }
 
-function castSpell() {
-  if (!game?.running || !game.ime || game.paused || game.spellAdvance || globallyComposing || performance.now() - compositionEndedAt < 100) return;
+function castSpell(explicitSubmit = false) {
+  if (!game?.running || !game.ime || game.paused || game.spellAdvance) return;
   const value = castInput.value;
+  // A deliberate button/form submission may commit an already selected Han phrase.
+  if (globallyComposing || performance.now() - compositionEndedAt < 100) {
+    if (!explicitSubmit || !/\p{Script=Han}/u.test(value) || /[a-z]/iu.test(value)) return;
+    globallyComposing = false;
+    castInput.classList.remove('composing');
+  }
   if (!normalizeSpell(value)) {
     message('先輸入咒語，再按 Enter 施放。', true);
     return;
@@ -3148,10 +3177,15 @@ function castSpell() {
     message('輸入內容過長，請只輸入畫面上的一句咒語。', true);
     return;
   }
+  if (!/\p{Script=Han}/u.test(value)) {
+    message('請先切換至繁體中文拼音輸入法再送出。', true);
+    return;
+  }
   const q = game.currentSpell;
   const result = alignSpell(q.text, value);
   const good = result.parts.filter(part => part.type === 'good').length;
-  game.correct += good;
+  // Rejected (<80%) attempts contribute errors, not repeated correct prefixes.
+  if (result.ratio >= .8) game.correct += good;
   game.wrong += result.errors;
   const html = result.parts.map(part => {
     if (part.type === 'good') return `<span class="char-good">${escapeHTML(part.actual)}</span>`;
@@ -3198,7 +3232,8 @@ function castSpell() {
     return;
   }
   game.spellAdvance = result.errors ? 2.7 : CONFIG.timing.spellFlipSeconds;
-  castInput.readOnly = true;
+  $('#cast-button').disabled = true;
+  // spellAdvance blocks further submissions while the focused editor stays writable.
   updateHUD();
 }
 
@@ -3285,6 +3320,11 @@ function finishGame(won) {
 function tick(time) {
   const dt = lastTime ? clamp((time - lastTime) / 1000, 0, .06) : 0;
   lastTime = time;
+  if (game?.running && game.guide?.step === 'look') {
+    const q = game.guide.items[game.guide.index];
+    const next = q.pinyin[Math.floor(time / 700) % q.pinyin.length];
+    $('#guide-panel').querySelectorAll('.mini-keys i').forEach(key => key.classList.toggle('next-key', key.textContent === next));
+  }
   if (game?.running && !game.paused && game.training && game.onboarding < 3) {
     for (const enemy of game.enemies) { enemy.x = Math.max(38, enemy.x - dt * 3.5); positionEnemy(enemy); }
     game.idleSeconds = (game.idleSeconds || 0) + dt;
@@ -3401,6 +3441,7 @@ document.addEventListener('click', event => {
   audio.unlock();
   if (!['sound', 'replay'].includes(button.dataset.action)) sound('click');
   handleAction(button.dataset.action, button.dataset.id);
+  if (game?.running && !game.paused && !useBuiltin() && ['peek', 'unlock', 'replay', 'sound'].includes(button.dataset.action)) castInput.focus({preventScroll: true});
 });
 $('#theme-select').addEventListener('change', event => {
   save.settings.theme = event.target.value;
@@ -3408,7 +3449,8 @@ $('#theme-select').addEventListener('change', event => {
 });
 $('#spell-form').addEventListener('submit', event => {
   event.preventDefault();
-  castSpell();
+  castSpell(true);
+  if (game?.running && !game.paused) castInput.focus({preventScroll: true});
 });
 // Both cast inputs remain mounted through lessons, battles, pauses and IME sessions.
 const castInputs = [...document.querySelectorAll('.spell-input')];
@@ -3427,7 +3469,7 @@ let lastViewportHeight = window.visualViewport?.height || innerHeight;
 const useBuiltin = () => save.settings.keyboardMode === 'builtin' && !game?.ime;
 let hardwareKeyboard = false;
 function showBuiltinKeyboard() {
-  $('#builtin-keyboard').hidden = !useBuiltin() || !navigator.maxTouchPoints || hardwareKeyboard || !!game?.guide && game.guide.step === 'look';
+  $('#builtin-keyboard').hidden = !useBuiltin() || hardwareKeyboard || !!game?.guide && game.guide.step === 'look';
   document.body.classList.toggle('touch-keyboard', !$('#builtin-keyboard').hidden);
 }
 function displayCast() {
@@ -3444,11 +3486,12 @@ function resetInput() {
   castInputs.forEach(input => { input.value = ''; });
   displayCast();
 }
-// Retain the consumed prefix as a fallback for IMEs that carry their buffer
-// across focus. A clean next value starts a fresh buffer automatically.
+// Retain the consumed prefix while the stable editor carries an IME buffer.
+// A clean next value starts a fresh buffer automatically.
 function pendingLetters(value, answers = []) {
   const raw = normalizeLetters(value);
   const prefix = inputState.raw.slice(0, inputState.consumed);
+  if (inputState.consumed && raw === prefix) return raw;
   // A clean correct answer may itself begin with the previous answer (ni → nihao).
   // Prefer a live full prefix before trying the carried-buffer suffix.
   if (inputState.consumed && (answers.some(answer => answer.startsWith(raw)) || !(raw.length > prefix.length && raw.startsWith(prefix)))) {
@@ -3477,32 +3520,15 @@ function configureInputs() {
   displayCast();
 }
 function rotateInput() {
-  const previous = castInput;
-  const next = castInputs.find(input => input !== previous);
-  const hadFocus = document.activeElement === previous;
-  swappingInput = true;
+  // Keep one stable editor: programmatic focus swaps are unreliable on iOS.
   inputEpoch++;
-  // Change the event owner before focus: synchronous compositionend / blur
-  // emitted by the retired editor must never answer the next question.
-  castInput = next;
-  previous.value = '';
-  next.value = '';
-  globallyComposing = false;
-  previous.classList.remove('composing', 'active-input');
-  next.classList.add('active-input');
-  previous.tabIndex = -1;
-  previous.setAttribute('aria-hidden', 'true');
-  next.tabIndex = 0;
-  next.removeAttribute('aria-hidden');
-  $('#input-label').htmlFor = next.id;
-  configureInputs();
-  if (hadFocus && !useBuiltin()) next.focus({preventScroll: true});
-  swappingInput = false;
+  if (!globallyComposing) castInput.value = '';
+  displayCast();
   renderDebug();
 }
 function consumeInput(raw, credit = '') {
-  inputState.raw = raw;
-  inputState.consumed = raw.length;
+  inputState.raw = globallyComposing ? raw : '';
+  inputState.consumed = globallyComposing ? raw.length : 0;
   inputState.lastError = '';
   if (credit) inputState.credits.push(credit);
   rotateInput();
@@ -3517,7 +3543,7 @@ function renderDebug() {
   $('#debug-context').textContent = `${BUILD.version}・${BUILD.date} 建置 ${BUILD.time}\nvv/window ${Math.round(window.visualViewport?.height || innerHeight)}/${innerHeight} active=${document.activeElement?.dataset.slot || document.activeElement?.tagName}\n判定 ${lastJudgment}\nUA ${ua} ${browser} · D=data C=isComposing V=value R=raw N=consumed T=target`;
   $('#debug-events').textContent = debugEvents.join('\n');
   const speech = audio.diagnostics;
-  $('#debug-speech').textContent = `語音 ${speech.speechBroken ? '語音無回應' : ''} voices=${speech.voices} ${speech.voiceName || '—'} ${speech.voice || ''}\nspeaking=${speech.synthSpeaking} pending=${speech.synthPending} paused=${speech.synthPaused}\n` + speech.history.map(item => `${item.text} ${item.events.join(' → ')}`).join('\n');
+  $('#debug-speech').textContent = `語音 ${speech.speechBroken ? '語音無回應' : ''} voices=${speech.voices} ${speech.voiceName || '—'} ${speech.voice || ''} ${speech.voiceReason}\nspeaking=${speech.synthSpeaking} pending=${speech.synthPending} paused=${speech.synthPaused}\n` + speech.history.map(item => `${item.text} ${item.events.join(' → ')}`).join('\n');
   $('#debug-errors').textContent = `${BUILD.version}・${BUILD.date} 建置 ${BUILD.time}\n最近錯誤\n` + (recentErrors.map(e => `${e.message} 行 ${e.line}`).join('\n') || '無');
 }
 function logInput(event, input) {
@@ -3551,7 +3577,7 @@ function sceneFallbackSVG(region) {
 }
 function showSettings() {
   if (game?.running) pauseGame('設定期間已暫停。', false);
-  openModal('settings', `${dialogHeader('施法設定')}<div class="teach-rule"><h3>鍵盤模式</h3><p>第 1～4 區預設使用內建鍵盤輸入字母，可切換手機拼音或英文鍵盤。第五區使用系統拼音輸入法。</p><label for="keyboard-mode">選擇鍵盤</label><select id="keyboard-mode">${[['pinyin','手機拼音鍵盤'],['english','英文鍵盤'],['builtin','遊戲內建鍵盤（預設）']].map(([v,t]) => `<option value="${v}" ${save.settings.keyboardMode === v ? 'selected' : ''}>${t}</option>`).join('')}</select><label class="debug-switch"><input id="vibration-toggle" type="checkbox" ${save.settings.vibration ? 'checked' : ''}>按鍵震動</label><p class="muted">手機拼音鍵盤會在命中或重試時換焦，清除組字。英文鍵盤只接受字母；內建鍵盤適用第 1～4 區。</p><label class="debug-switch"><input id="debug-toggle" type="checkbox" ${save.settings.debug ? 'checked' : ''}>偵錯資訊（最近 8 筆輸入事件）</label></div>${soundSettingsHTML()}<label for="panel-theme">選擇介面色彩</label><select id="panel-theme"><option value="light" ${save.settings.theme==='light'?'selected':''}>晨光淺色</option><option value="dark" ${save.settings.theme==='dark'?'selected':''}>星夜深色</option></select><p class="build-info">${BUILD.version}・${BUILD.date}<br><small>建置 ${BUILD.time}</small></p><div class="dialog-actions"><button class="primary" data-action="close">儲存設定</button></div>`);
+  openModal('settings', `${dialogHeader('施法設定')}<div class="teach-rule"><h3>鍵盤模式</h3><p>第 1～4 區預設使用內建鍵盤輸入字母，可切換手機拼音或英文鍵盤。第五區使用系統拼音輸入法。</p><label for="keyboard-mode">選擇鍵盤</label><select id="keyboard-mode">${[['pinyin','手機拼音鍵盤'],['english','英文鍵盤'],['builtin','遊戲內建鍵盤（預設）']].map(([v,t]) => `<option value="${v}" ${save.settings.keyboardMode === v ? 'selected' : ''}>${t}</option>`).join('')}</select><label class="debug-switch"><input id="vibration-toggle" type="checkbox" ${save.settings.vibration ? 'checked' : ''}>按鍵震動</label><p class="muted">手機拼音鍵盤在命中或重試後保留輸入焦點。英文鍵盤只接受字母；內建鍵盤適用第 1～4 區。</p><label class="debug-switch"><input id="debug-toggle" type="checkbox" ${save.settings.debug ? 'checked' : ''}>偵錯資訊（最近 8 筆輸入事件）</label></div>${soundSettingsHTML()}<label for="panel-theme">選擇介面色彩</label><select id="panel-theme"><option value="light" ${save.settings.theme==='light'?'selected':''}>晨光淺色</option><option value="dark" ${save.settings.theme==='dark'?'selected':''}>星夜深色</option></select><p class="build-info">${BUILD.version}・${BUILD.date}<br><small>建置 ${BUILD.time}</small></p><div class="dialog-actions"><button class="primary" data-action="close">儲存設定</button></div>`);
 }
 document.addEventListener('change', event => {
   if(event.target.id==='panel-theme') {const el=$('#theme-select');el.value=event.target.value;el.dispatchEvent(new Event('change',{bubbles:true}));}
@@ -3668,6 +3694,7 @@ function updateViewport() {
   document.documentElement.style.setProperty('--visible-height', `${h}px`);
   document.documentElement.style.setProperty('--visible-top', `${top}px`);
   if (screen !== 'play') viewportBaseline = Math.max(innerHeight, h);
+  else if (h > viewportBaseline) viewportBaseline = h;
   const lowered = h < viewportBaseline - 120;
   // 說明卡（操作教學第 4 步）不需要鍵盤：收起鍵盤不可觸發暫停。
   const noKeyboardNeeded = game?.training && game.onboarding === 3;
@@ -3718,7 +3745,7 @@ function renderGuide() {
   const q = g.items[g.index];
   const known = g.step !== 'try' || g.retry;
   const cue = `${g.step}:${g.index}:${g.retry}`;
-  if (g.spokenCue !== cue) {
+  if (g.spokenCue !== cue && (g.step === 'look' || !game.paused)) {
     g.spokenCue = cue;
     audio.speak(g.retry || g.step === 'look' ? spoken(q) : g.step === 'follow' ? '照著打一次。' : '想想拼音，自己試試看。');
   }
@@ -3735,7 +3762,7 @@ function renderGuide() {
     $('#guide-panel').prepend(content);
   }
   $('#spell-form').before($('#action-prompt'));
-  setInstruction(g.step === 'look' ? '看這張卡，按「下一張」；也可以直接打出拼音。' : g.retry ? `正解是 ${q.pinyin}，請從頭重打。` : g.step === 'follow' ? `照著打出 ${q.pinyin}。` : '想想題目的拼音，直接輸入。');
+  setInstruction(g.step === 'look' ? '看這張卡，按「翻下一張」繼續。' : g.retry ? `正解是 ${q.pinyin}，請從頭重打。` : g.step === 'follow' ? `照著打出 ${q.pinyin}。` : '想想題目的拼音，直接輸入。');
   configureInputs();
   updateKeyHint();
 }
@@ -3743,7 +3770,7 @@ function guideNext() {
   const g = game?.guide;
   if (!g) return;
   if (++g.index < g.items.length) renderGuide();
-  else { g.index = 0; g.step = 'follow'; renderGuide(); beginKeyboard(); }
+  else { g.index = 0; g.step = 'follow'; beginKeyboard(); renderGuide(); }
 }
 function updateKeyHint() {
   const g = game?.guide;
@@ -3829,6 +3856,7 @@ function renderOnboarding() {
 }
 function finishOnboarding() {
   if (!game?.training) return;
+  cancelKeyboardWait();
   clearBattleEffects();
   audio.stopSpeech();
   save.settings.onboarding = true;
@@ -3850,6 +3878,8 @@ function finishOnboarding() {
   $('#battlefield').classList.remove('answer-nudge');
   $('#keyboard-hint').hidden = true;
   configureInputs();
+  $('#battlefield').hidden = game.ime;
+  $('#duel-panel').hidden = !game.ime;
   if (!game.boss && !game.stage.reviewOnly) beginGuide();
   else { game.paused = true; readyOverlay('操作教學完成，準備開始！', '開始戰鬥'); }
 }
@@ -3870,6 +3900,12 @@ function processText(value, composing = globallyComposing, fromBuiltin = false, 
   const deleting = isDelete || (normalizeLetters(value).length < inputState.raw.length && inputState.consumed === 0);
   const answers = game.guide ? [game.guide.items[game.guide.index].pinyin] : game.enemies.map(e => e.q.pinyin);
   const normalized = pendingLetters(value, answers);
+  const han = value.match(/\p{Script=Han}+/gu)?.join('') || '';
+  if (han && (game.stage.region === 1 || !game.ime && save.settings.keyboardMode === 'english')) {
+    message('請切換到拼音或英文鍵盤，輸入字母。', true);
+    resetInput();
+    return;
+  }
   if (game.guide) {
     const q = game.guide.items[game.guide.index];
     if (!composing && game.stage.region !== 1 && value === q.text && (save.settings.keyboardMode !== 'english' || game.ime)) {
@@ -3889,7 +3925,11 @@ function processText(value, composing = globallyComposing, fromBuiltin = false, 
     else resetInput();
     return;
   }
-  const han = value.match(/\p{Script=Han}+/gu)?.join('') || '';
+  if (han && !composing && inputState.credits.length) {
+    // The IME's candidate may be a homophone of the letters already accepted.
+    resetInput();
+    return;
+  }
   if (han && !composing && game.stage.region !== 1 && save.settings.keyboardMode !== 'english') {
     if (han === inputState.lastHan) return;
     inputState.lastHan = han;
@@ -3903,7 +3943,7 @@ function processText(value, composing = globallyComposing, fromBuiltin = false, 
       if (!e) break;
       remaining = remaining.replace(e.q.text, '');
       if (!game.running || game.completing) break;
-      game.correct += e.q.pinyin.length - e.progress;
+      creditLetters(e, e.q.pinyin.length);
       completeQuestion(e);
       rotateInput();
     }
@@ -3949,7 +3989,7 @@ function processText(value, composing = globallyComposing, fromBuiltin = false, 
   if (previous !== enemy) { sound('lock'); audio.target(); }
   judge(enemy, pending === enemy.q.pinyin ? '完整符合' : '前綴符合，尚未完成');
   const added = Math.max(0, pending.length - enemy.progress);
-  game.correct += added;
+  creditLetters(enemy, pending.length);
   enemy.progress = pending.length;
   if (added) { for (let i=0;i<added;i++) { sound('type', enemy.progress - added + i); magic(enemy); } animate(enemy.element, 'hit'); }
   renderEnemy(enemy); positionEnemy(enemy);
@@ -3968,17 +4008,20 @@ function processText(value, composing = globallyComposing, fromBuiltin = false, 
 for (const input of castInputs) {
   input.addEventListener('beforeinput', event => {
     logInput(event, input);
+    if (game?.ime && game.spellAdvance) { event.preventDefault(); return; }
     if (input === castInput && !swappingInput) inputState.before = input.value;
   });
   input.addEventListener('input', event => {
     logInput(event, input);
     if (input !== castInput || swappingInput) { input.value = ''; return; }
+    if (game?.ime && game.spellAdvance) { input.value = ''; return; }
     if (!globallyComposing && input.value === lastCommit.value && performance.now() - lastCommit.at < 80 && !game?.ime) { input.value = ''; return; }
     processText(input.value, save.settings.keyboardMode === 'english' && !game?.ime ? false : globallyComposing || event.isComposing, false, (event.inputType || '').startsWith('delete'));
   });
   input.addEventListener('compositionstart', event => {
     logInput(event, input);
     if (input !== castInput || swappingInput || (save.settings.keyboardMode === 'english' && !game?.ime)) return;
+    inputState.credits = [];
     globallyComposing = true;
     input.classList.add('composing');
   });
@@ -3994,8 +4037,8 @@ for (const input of castInputs) {
     compositionEndedAt = performance.now();
     input.classList.remove('composing');
     const finalValue = event.data || input.value;
-    // Some WebViews deliver the final Latin commit to the newly focused editor.
-    // The letters were already accepted by compositionupdate; do not hit twice.
+    // The stable editor can receive a final Latin commit after compositionupdate
+    // already accepted all its letters. Do not hit the next question twice.
     if (!game?.ime && inputState.consumed > 0 && inputState.consumed === inputState.raw.length && normalizeLetters(finalValue) === inputState.raw) {
       resetInput();
       return;
@@ -4005,7 +4048,8 @@ for (const input of castInputs) {
     if (epoch === inputEpoch && !game?.ime && inputState.consumed > 0 && normalizeLetters(finalValue).length <= inputState.consumed) resetInput();
     if (/\p{Script=Han}/u.test(finalValue)) lastCommit = {value: finalValue, at: performance.now()};
   });
-  input.addEventListener('blur', () => {
+  input.addEventListener('blur', event => {
+    if (event.relatedTarget?.closest?.('#cast-button,[data-action]')) return;
     if (swappingInput || castInputs.includes(document.activeElement) || game?.training && game.onboarding === 3) return;
     if (screen === 'play' && game?.running && (!game.paused || countdownTimer || keyboardTimer) && !useBuiltin() && game.guide?.step !== 'look') keyboardDismissed();
   });
@@ -4014,8 +4058,8 @@ document.addEventListener('pointerdown', event => {
   if (useBuiltin() && event.target === castInput) event.preventDefault();
   const enemyNode = event.target.closest?.('.enemy');
   const action = event.target.closest?.('[data-action]')?.dataset.action;
-  if (action === 'replay' || action === 'sound') { event.preventDefault(); audio.unlock(); return; }
-  if (enemyNode && game?.running && !game.paused) {
+  if (action === 'replay' || action === 'sound') { if (useBuiltin()) event.preventDefault(); audio.unlock(); return; }
+  if (enemyNode && !action && game?.running && !game.paused) {
     event.preventDefault();
     const e = game.enemies.find(e => e.id === Number(enemyNode.dataset.enemyId));
     if (!e) return;
@@ -4025,7 +4069,7 @@ document.addEventListener('pointerdown', event => {
     if (!useBuiltin()) castInput.focus({preventScroll: true});
 
   }
-  if (['peek','unlock','ready','guide-next','replay','sound','pause'].includes(action) || event.target.closest?.('#cast-button')) event.preventDefault();
+  if (useBuiltin() && ['peek','unlock','ready','guide-next','replay','sound','pause'].includes(action)) event.preventDefault();
 });
 function builtinLetter(key) {
   if (!game?.running || (game.paused && game.guide?.step !== 'look') || (game.ime && !game.training && !game.guide)) return;
@@ -4043,23 +4087,28 @@ const keyPointers = new Map();
 function releasePointer(pointerId) {
   const held = keyPointers.get(pointerId);
   if (!held) return;
+  clearTimeout(held.timer);
   held.bubble?.remove();
   keyPointers.delete(pointerId);
   if (![...keyPointers.values()].some(item => item.key === held.key)) held.key.classList.remove('pressed');
 }
 function releaseKeys() { for (const id of [...keyPointers.keys()]) releasePointer(id); }
-// Suppress only compatibility clicks from keyboard gestures, including a final hit.
-let keyboardClickPending = false;
-document.addEventListener('pointerdown', event => { keyboardClickPending = Boolean(event.target.closest?.('#builtin-keyboard')); }, true);
+// Limit suppression to this container or a recent touch's retargeted compatibility click.
+let lastKeyboardTouch = null;
 document.addEventListener('click', event => {
-  if (!keyboardClickPending && !event.target.closest?.('#builtin-keyboard')) return;
-  keyboardClickPending = false;
+  const touch = lastKeyboardTouch;
+  const compatible = touch && performance.now() - touch.at < 400 &&
+    (event.pointerType === 'touch' || event.sourceCapabilities?.firesTouchEvents) &&
+    Math.hypot(event.clientX - touch.x, event.clientY - touch.y) < 12;
+  if (!event.target.closest?.('#builtin-keyboard') && !compatible) return;
   event.preventDefault();
   event.stopImmediatePropagation();
 }, true);
+builtinKeyboard.addEventListener('touchstart', event => event.preventDefault(), {passive: false});
 builtinKeyboard.addEventListener('contextmenu', event => event.preventDefault());
 builtinKeyboard.addEventListener('pointerdown', event => {
   event.preventDefault();
+  if (event.pointerType === 'touch') lastKeyboardTouch = {at: performance.now(), x: event.clientX, y: event.clientY};
   if (keyPointers.has(event.pointerId)) return;
   const buttons = [...builtinKeyboard.querySelectorAll('[data-key]')];
   const distance = el => {
@@ -4067,7 +4116,7 @@ builtinKeyboard.addEventListener('pointerdown', event => {
     return Math.hypot(Math.max(r.left - event.clientX, 0, event.clientX - r.right), Math.max(r.top - event.clientY, 0, event.clientY - r.bottom));
   };
   const nearest = buttons.reduce((best, key) => !best || distance(key) < distance(best) ? key : best, null);
-  if (!nearest) return;
+  if (!nearest || distance(nearest) > 10) return;
   let bubble;
   if (/^[a-z]$/.test(nearest.dataset.key)) {
     bubble = document.createElement('span'); bubble.className = 'key-bubble'; bubble.textContent = nearest.dataset.key;
@@ -4077,7 +4126,7 @@ builtinKeyboard.addEventListener('pointerdown', event => {
     document.body.append(bubble);
   }
   nearest.classList.add('pressed');
-  keyPointers.set(event.pointerId, {key: nearest, bubble});
+  keyPointers.set(event.pointerId, {key: nearest, bubble, timer: setTimeout(() => releasePointer(event.pointerId), 1200)});
   try { builtinKeyboard.setPointerCapture(event.pointerId); } catch { /* Synthetic events have no native pointer. */ }
   audio.unlock(); sound('key');
   try { if (save.settings.vibration && navigator.vibrate) navigator.vibrate(8); } catch { /* Optional feedback. */ }
@@ -4085,12 +4134,18 @@ builtinKeyboard.addEventListener('pointerdown', event => {
 });
 for (const type of ['pointerup','pointercancel','lostpointercapture']) builtinKeyboard.addEventListener(type, event => releasePointer(event.pointerId));
 document.addEventListener('pointerdown', event => {
+  if (!event.target.closest?.('#builtin-keyboard')) lastKeyboardTouch = null;
   if (event.pointerType === 'touch' && hardwareKeyboard) { hardwareKeyboard = false; showBuiltinKeyboard(); }
 }, true);
 document.addEventListener('keydown', event => {
   if (event.isComposing || event.keyCode === 229 || globallyComposing || event.ctrlKey || event.metaKey || event.altKey) return;
   if (modal.open) {
     if (event.key === 'Escape') { event.preventDefault(); closeOrResumeMenu(); }
+    return;
+  }
+  if (screen === 'result' && event.key === 'Enter' && !event.repeat) {
+    event.preventDefault();
+    $('#result-screen .primary')?.click();
     return;
   }
   if (screen !== 'play' || !game?.running || (game.paused && game.guide?.step !== 'look')) return;

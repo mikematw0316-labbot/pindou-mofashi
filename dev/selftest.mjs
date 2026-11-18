@@ -57,6 +57,16 @@ check(phonics.every(q=>getSpoken(q).length>0),'全部注音片段具有語音文
 const backup7 = readFileSync(new URL('./v6.html',import.meta.url),'utf8');
 equal(speechSource,backup7.slice(backup7.indexOf('const ZHUYIN_SOUND ='),backup7.indexOf('function toast(')),'手動 ZHUYIN_SOUND 與 spoken(q) 修正逐字保留');
 
+// TASK8: preserve the user's manual fixes and original reading bank.
+const backup8 = readFileSync(new URL('./v7.html', import.meta.url), 'utf8');
+equal(source, backup8.match(/\/\/ BEGIN QUESTION BANK\n([\s\S]*?)\n\/\/ END QUESTION BANK/u)[1], 'v0.7.1 題庫與動工前 v7.html 逐位元相同');
+for (const snippet of [
+  "const noKeyboardNeeded = game?.training && game.onboarding === 3;",
+  "if (game?.running && !useBuiltin() && game.guide?.step !== 'look' && !noKeyboardNeeded)",
+  "case 'start': startGame(pendingStage, (save.records[pendingStage?.id]?.stars || 0) >= 1); break;",
+  "case 'replay-guide': startGame(pendingStage, false); break;",
+]) check(backup8.includes(snippet) && html.includes(snippet), `手動修正保留 ${snippet}`);
+
 // TASK7: run the actual stage pool and picker against 20 deterministic seeds.
 const getPool = new Function('stage', html.match(/function stagePool\(stage\) \{([\s\S]*?)\n\}/u)[1]);
 const chooseSource = html.slice(html.indexOf('function chooseQuestion('), html.indexOf('function spawnEnemy('));
@@ -74,8 +84,16 @@ for (const stage of stages.filter(s=>!s.kind.includes('boss'))) {
     check(sampled.every(id=>allowed.has(id)),`${stage.id} seed ${seed} 實際抽題屬於本關`);
   }
 }
-for(const region of [2,3,4])unique(stages.filter(s=>s.region===region&&!s.kind.includes('boss')).flatMap(s=>s.pool),`第 ${region} 區一般關所有項目 `);
+for(const region of [2,4])unique(stages.filter(s=>s.region===region&&!s.kind.includes('boss')).flatMap(s=>s.pool),`第 ${region} 區一般關所有項目 `);
 check(poolChanges.length>0,'已整理重疊題池');
+for (const stage of stages.filter(s=>s.region===3)) equal(stage.pool.join(','), originalStagePools.get(stage.id).join(','), `${stage.id} 對比專項保留原始完整題池`);
+for (const [id, readings] of [['r3-6',['nv','lv','lve']],['r3-8',['yu','yue','yuan','yun']]]) {
+  const pool=stages.find(s=>s.id===id).pool.map(id=>questionsById[id]);
+  for(const reading of readings)check(pool.some(q=>q.pinyin===reading),`${id} 保留核心 ${reading}`);
+}
+
+
+for(const stage of stages.filter(s=>s.region===3&&s.soundGroup)){const group=soundGroups.find(g=>g.id===stage.soundGroup);for(const text of group.exampleTexts)check(stage.pool.some(id=>questionsById[id].text===text),`${stage.id} 教學卡例字 ${text} 存在於本關`);}
 
 // 答案獨立寫出，不以 FINALS／INITIALS 產生期望值。
 const regression = [
@@ -346,7 +364,9 @@ equal(pendingLettersTest("bp ' m").slice(state.consumed), 'm', '組字持續累�
 state.raw = 'b'; state.consumed = 1;
 equal(pendingLettersTest('p').slice(state.consumed), 'p', '換焦成功後新字母 p 不被舊 consumed 吞掉');
 state.raw = 'b'; state.consumed = 1;
-equal(pendingLettersTest('b').slice(state.consumed), 'b', '下一隻同答案 b 仍可重新擊倒');
+equal(pendingLettersTest('b').slice(state.consumed), '', '同一組字的重複 input 不可擊倒下一隻同答案 b');
+state.raw = ''; state.consumed = 0;
+equal(pendingLettersTest('b').slice(state.consumed), 'b', '提交結束清空後下一隻同答案 b 可重新擊倒');
 state.raw = 'ni'; state.consumed = 0;
 equal(pendingLettersTest('n').slice(state.consumed), 'n', '刪除回退保留新的有效前綴');
 state.raw = 'b'; state.consumed = 1;

@@ -194,7 +194,7 @@ try {
   await evaluate(`window.imeStep=(value,start=false)=>{const i=document.querySelector('.active-input');if(start)i.dispatchEvent(new CompositionEvent('compositionstart',{bubbles:true}));i.dispatchEvent(new CompositionEvent('compositionupdate',{bubbles:true,data:value}));i.value=value;i.dispatchEvent(new InputEvent('input',{bubbles:true,data:value,isComposing:true,inputType:'insertCompositionText'}));}`);
   const firstSlot=await evaluate(`document.activeElement.id`);
   await evaluate(`imeStep('b',true)`);
-  check(await evaluate(`document.querySelector('#action-prompt').textContent.includes('打出 p')&&document.activeElement.id!==${JSON.stringify(firstSlot)}&&[...document.querySelectorAll('.spell-input')].every(i=>i.value==='')&&document.querySelector('#start-overlay').hidden`),'iOS b 組字無 compositionend 立即擊倒、換焦空白、不暫停');
+  check(await evaluate(`document.querySelector('#action-prompt').textContent.includes('打出 p')&&document.activeElement.id===${JSON.stringify(firstSlot)}&&document.querySelector('#start-overlay').hidden`),'iOS b 組字無 compositionend 立即擊倒、保留同框焦點、不暫停');
   await screenshot('00-tutorial-step2');
   await evaluate(`imeStep('bp')`);
   check(await evaluate(`document.querySelector('#action-prompt').textContent.includes('兩隻一起來')&&document.querySelectorAll('.enemy:not(.defeated)').length===2&&document.querySelector('#combo-value').textContent.startsWith('2')&&document.querySelector('#start-overlay').hidden`),'組字未結束連續 bp，consumed 備援接受下一題 p，示範兩連擊');
@@ -252,7 +252,7 @@ try {
     const e=await enemy();const old=await evaluate(`document.querySelector('.active-input').id`);
     if(mode==='builtin')for(const c of e.q.pinyin)await touch(`[data-key="${c}"]`);
     else await textInput(e.q.pinyin);
-    check(await evaluate(`document.querySelector('#progress-value').textContent.startsWith('1 /')&&document.querySelector('.active-input').value===''&&document.querySelector('.active-input').id!==${JSON.stringify(old)}&&document.querySelector('#start-overlay').hidden`),`${mode} 戰鬥擊倒後換框、清空、不暫停`);
+    check(await evaluate(`document.querySelector('#progress-value').textContent.startsWith('1 /')&&document.querySelector('.active-input').value===''&&document.querySelector('.active-input').id===${JSON.stringify(old)}&&document.querySelector('#start-overlay').hidden`),`${mode} 戰鬥擊倒後同框、清空、不暫停`);
     await touch('[data-action="pause"]');await touch('#start-overlay [data-action="settings"]');
     check(await evaluate(`!!document.querySelector('#keyboard-mode')`),`${mode} 暫停選單可進設定`);
     await touch('[data-action="close"]');await touch('#start-overlay [data-action="map"]');
@@ -262,7 +262,7 @@ try {
   await mockKeyboard(420);
   const debugSlot=await evaluate(`document.activeElement.id`);
   await composition('start','');await composition('update','x');
-  check(await evaluate(`document.activeElement.id!==${JSON.stringify(debugSlot)}&&document.querySelector('.active-input').value===''&&document.querySelector('.enemy.reveal')&&document.querySelector('#start-overlay').hidden`),'打錯同事件換焦清空、揭答、可乾淨重打');
+  check(await evaluate(`document.activeElement.id===${JSON.stringify(debugSlot)}&&document.querySelector('.active-input').value===''&&document.querySelector('.enemy.reveal')&&document.querySelector('#start-overlay').hidden`),'打錯同事件同框清空、揭答、可乾淨重打');
   for(let i=0;i<10;i++)await textInput('');
   check(await evaluate(`document.querySelector('#debug-events').textContent.split('\\n').length===8&&document.querySelector('#debug-context').textContent.includes('UA')&&document.querySelector('#debug-events').textContent.includes(' N')`),'偵錯面板最近 8 筆事件與 viewport／焦點／UA 有內容');
   const debugRect=await evaluate(`(()=>{const r=e=>{const b=e.getBoundingClientRect();return {x:b.x,y:b.y,right:b.right,bottom:b.bottom}};const panel=r(document.querySelector('#input-debug'));const targets=[document.querySelector('.question-card'),document.querySelector('#spell-form'),document.querySelector('.creature')].map(r);return {panel,targets,ok:targets.every(t=>panel.bottom<=t.y||panel.y>=t.bottom||panel.right<=t.x||panel.x>=t.right)}})()`);
@@ -366,7 +366,7 @@ try {
   await composition('start','');await press('Enter');await press('Escape');check(await evaluate(`document.querySelector('#start-overlay').hidden&&document.querySelector('#progress-value').textContent.startsWith('12 /')`),'第五區組字中 Enter／Esc 不施放或暫停');await composition('end','');
   for(let i=0;i<7;i++) {
     if(await evaluate(`!document.querySelector('#result-screen').hidden`))break;
-    await waitFor(`!document.querySelector('.active-input').readOnly`);
+    await waitFor(`!document.querySelector('#cast-button').disabled`);
     const target=await evaluate(`document.querySelector('#spell-target').textContent`);
     await composition('start','');await textInput(target,true);await composition('end',target);await delay(120);if(i===0) await touch('#cast-button'); else await press('Enter');
   }
@@ -411,11 +411,11 @@ try {
     await seed();await stage('r5-1');await ready({keyboard:true});
     const spellSlot=await evaluate(`document.querySelector('.active-input').id`);
     await textInput(await evaluate(`document.querySelector('#spell-target').textContent`));await press('Enter');
-    check(await evaluate(`document.activeElement.id!==${JSON.stringify(spellSlot)}&&[...document.querySelectorAll('.spell-input')].every(i=>i.value==='')&&document.querySelector('#spell-feedback').textContent.includes('咒語命中')&&document.querySelector('#start-overlay').hidden`),'第五區施放命中也同事件換焦清空且不暫停');
-    await waitFor(`!document.querySelector('.active-input').readOnly`);
+    check(await evaluate(`document.activeElement.id===${JSON.stringify(spellSlot)}&&[...document.querySelectorAll('.spell-input')].every(i=>i.value==='')&&document.querySelector('#spell-feedback').textContent.includes('咒語命中')&&document.querySelector('#start-overlay').hidden`),'第五區施放命中也同事件同框清空且不暫停');
+    await waitFor(`!document.querySelector('#cast-button').disabled`);
     const retrySlot=await evaluate(`document.querySelector('.active-input').id`);
     await textInput('錯');await press('Enter');
-    check(await evaluate(`document.activeElement.id!==${JSON.stringify(retrySlot)}&&[...document.querySelectorAll('.spell-input')].every(i=>i.value==='')&&document.querySelector('#spell-feedback').textContent.includes('未達 80%')&&document.querySelector('#start-overlay').hidden`),'第五區未達門檻重試也換焦清空，保留逐字回饋');
+    check(await evaluate(`document.activeElement.id===${JSON.stringify(retrySlot)}&&[...document.querySelectorAll('.spell-input')].every(i=>i.value==='')&&document.querySelector('#spell-feedback').textContent.includes('未達 80%')&&document.querySelector('#start-overlay').hidden`),'第五區未達門檻重試也同框清空，保留逐字回饋');
     const word=data.words.find(q=>q.text==='你好');
     await seed({review:{[word.id]:{count:1,mastered:0}}});
     await touch('[data-action="review"]');await touch('[data-action="review-start"]');await touch('[data-action="start"]');await ready({keyboard:true});
@@ -428,7 +428,7 @@ try {
     check(await evaluate(`document.querySelectorAll('.enemy .typed').length===0&&JSON.parse(localStorage.getItem('pinyin-keep-save-v2')).review[${JSON.stringify(word.id)}].count===${before}`),'組字刪光不計錯，進度歸零');
     await evaluate(`(()=>{const i=document.querySelector('.active-input');i.addEventListener('blur',()=>{i.dispatchEvent(new CompositionEvent('compositionend',{bubbles:true,data:'錯'}));i.value='錯';i.dispatchEvent(new InputEvent('input',{bubbles:true,data:'錯',inputType:'insertText'}));},{once:true});})()`);
     await textInput('nihao',true);
-    check(await evaluate(`document.querySelector('#progress-value').textContent.startsWith('1 /')&&document.querySelector('#start-overlay').hidden&&document.activeElement.classList.contains('active-input')&&[...document.querySelectorAll('.spell-input')].every(i=>i.value==='')&&JSON.parse(localStorage.getItem('pinyin-keep-save-v2')).review[${JSON.stringify(word.id)}].count===${before}`),'換焦同步觸發舊框 compositionend／input／blur 均不重複判錯或暫停');
+    check(await evaluate(`document.querySelector('#progress-value').textContent.startsWith('1 /')&&document.querySelector('#start-overlay').hidden&&document.activeElement.classList.contains('active-input')&&JSON.parse(localStorage.getItem('pinyin-keep-save-v2')).review[${JSON.stringify(word.id)}].count===${before}`),'穩定同框組字命中不觸發 blur、不重複判錯或暫停');
     await metrics(360,640);await seed({builtin:true});await stage('r1-1');await ready();await waitFor(`document.querySelector('.enemy:not(.defeated)')`);
     await geometry('360×640 內建鍵盤題卡、施法列完整可見');
     check(await evaluate(`document.querySelector('#builtin-keyboard').getBoundingClientRect().bottom<=visualViewport.height&&document.querySelector('.enemy:not(.defeated) .creature').getBoundingClientRect().bottom<=document.querySelector('#battlefield').getBoundingClientRect().bottom`),'360×640 內建鍵盤和怪物完整可見');

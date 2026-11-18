@@ -222,9 +222,9 @@ try {
   const noRepeat=await evaluate(`(()=>{const n=__mock.calls.length;for(let i=0;i<20;i++)__test.audio.target();return __mock.calls.length===n;})()`);
   check(noRepeat,'同一隻怪不重複自動唸');
   const replay=await evaluate(`({id:document.activeElement.id,n:__mock.calls.length})`);
-  await touch('.enemy .replay');await delay(250);
+  await touch('.enemy .replay');await delay(600);
   check(await evaluate(`document.activeElement.id===${JSON.stringify(replay.id)}&&__mock.calls.length>${replay.n}&&document.querySelector('#start-overlay').hidden`),'題卡重聽會 speak，輸入焦點與鍵盤暫停狀態不變');
-  await evaluate(`__mock.calls=[]`);await textInput('x');await delay(250);
+  await evaluate(`__mock.calls=[]`);await textInput('x');await delay(600);
   check(await evaluate(`__mock.calls.some(c=>c.type==='speak'&&c.text===__test.spoken(__test.game.enemies[0].q))`),'打錯唸正確注音讀法');
   await touch('[data-action="sound"]');
   check(await evaluate(`__test.save.settings.muted&&__mock.nodes.some(n=>n.kind==='gain'&&n.gain.events.at(-1)?.[1]===0)`),'戰鬥總靜音將總增益淡到 0');
@@ -232,7 +232,7 @@ try {
   await load();check(await evaluate(`__test.save.settings.muted`),'總靜音存檔');
   await battle('r2-3');
   await evaluate(`__test.game.spawnIn=0`);await waitFor(`__test.game.enemies.length>=2`);
-  await evaluate(`__mock.calls=[]`);await touch('.enemy:nth-child(2)');await delay(250);
+  await evaluate(`__mock.calls=[]`);await touch('.enemy:nth-child(2)');await delay(600);
   check(await evaluate(`__mock.calls.some(c=>c.type==='cancel')&&__mock.calls.findLast(c=>c.type==='speak')?.text===__test.spoken(__test.game.enemies.find(e=>e.id===__test.game.locked).q)`),'切換鎖定經安全間隔 cancel 再唸鎖定國字，僅唸目前目標');
   check(await evaluate(`!document.querySelector('#target-line').hidden&&document.querySelector('.enemy.locked')`),'鎖定框與連線清楚顯示');
   // Verify all region themes plus boss variations against the actual scheduler.
@@ -304,13 +304,13 @@ try {
     await audioMode(mode);await battle();const e=await enemy();await textInput(e.q.pinyin);
     check(await evaluate(`__test.game.kills===1`),`${mode} 語音／音訊不可用仍能正常擊倒`);
     await touch('[data-action="pause"]');await touch('#start-overlay [data-action="settings"]');
-    if(mode==='none'||mode==='absent')check(await evaluate(`document.querySelector('#voice-status').textContent.includes(${JSON.stringify(mode==='none'?'沒有可用的中文語音':'不支援語音')})`),`${mode} 設定頁顯示停用原因`);
+    if(mode==='none'||mode==='absent')check(await evaluate(`document.querySelector('#voice-status').textContent.includes(${JSON.stringify(mode==='none'?'使用系統預設中文':'不支援語音')})`),`${mode} 設定頁顯示停用原因`);
   }
   await audioMode('fallback');await touch('[data-action="settings"]');
   check(await evaluate(`__test.audio.diagnostics.voice==='zh-CN'&&document.querySelector('#voice-status').textContent.includes('此裝置沒有台灣中文語音')`),'沒有台灣 voice 時排除香港並使用 zh-CN，設定說明原因');
   await audioMode('delayed');await battle();
   check(await evaluate(`__test.audio.diagnostics.voice===null`),'非同步載入前沒有 voice');
-  await evaluate(`__mock.changeVoices([{lang:'zh-TW',name:'延遲台灣'}])`);await delay(250);
+  await evaluate(`__mock.changeVoices([{lang:'zh-TW',name:'延遲台灣'}])`);await delay(600);
   check(await evaluate(`__test.audio.diagnostics.voice==='zh-TW'&&__mock.calls.some(c=>c.text===__test.spoken(__test.game.enemies[0].q))`),'voiceschanged 載入中文後自動恢復並唸目前怪物');
   await evaluate(`Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'));`);
   check(await evaluate(`__test.audio.diagnostics.paused&&!__test.audio.diagnostics.speaking&&__test.game.paused`),'分頁隱藏停止語音與音樂，遊戲暫停');
